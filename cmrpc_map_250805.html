@@ -556,7 +556,7 @@ function batchSetFeatureStates({ //batching experiment
 
         map.addSource("parcels", {    
             type: "vector",
-            url: 'mapbox://communityscale.massachusetts-parcels', //update to stream json source + join!!
+            url: 'mapbox://communityscale.centralmass-parcels', //update to stream json source + join!!
             promoteId: "LOC_ID"
         })
    
@@ -663,7 +663,7 @@ function batchSetFeatureStates({ //batching experiment
                         batchSetFeatureStates({
                         data,
                         source: 'parcels',
-                        sourceLayer: 'tracts',
+                        sourceLayer: 'parcels',
                         batchSize: 1000,     // adjustable
                         delay: 50,           // ms delay between batches
                         });
@@ -1317,7 +1317,7 @@ map.addLayer({
             id: "parcels-density",  
             type: "fill",
             source: "parcels",
-            'source-layer': 'tracts',
+            'source-layer': 'parcels',
             paint: {
                 "fill-color": [
                     "case", ["==", ["feature-state", "density"], null], 'transparent',
@@ -1355,6 +1355,7 @@ map.addLayer({
     //             id: "parcels-landuse", //update with parcel types!!
     //             type: "fill",
     //             source: "parcels",
+    //              'source-layer': 'parcels',
     //             paint: {
     //                 "fill-color": [
     //                     "match",
@@ -1388,6 +1389,7 @@ map.addLayer({
     //         id: "parcels-pctLV",  
     //         type: "fill",
     //         source: "parcels",
+    //              'source-layer': 'parcels',
     //         paint: {
     //             "fill-color": [
     //                 "case", ["==", ["get", "pctLandVal"], null], communityScaleGray,
@@ -1419,40 +1421,6 @@ map.addLayer({
     //     },
     //     labelLayerId
     // )
-
-    // map.addLayer({ 
-    //         id: "parcels-ownership",  
-    //         type: "fill",
-    //         source: "parcels",
-    //             //filter by residential??
-    //         paint: {
-    //             "fill-color": [
-    //                 "match",
-    //                 ["get", "credits"], //update palette
-    //                     "HMST", taxCreditPalette[0].color, 
-    //                     "AG", taxCreditPalette[2].color,
-    //                     "MIL", taxCreditPalette[1].color, 
-    //                     "S42", taxCreditPalette[3].color,
-    //                     "HMST,AG", taxCreditPalette[5].color,
-    //                     "HMST,MIL", taxCreditPalette[4].color,
-    //                     "HMST,AG,MI", taxCreditPalette[6].color,
-    //                     "NONE", taxCreditPalette[7].color,
-    //                     taxCreditPalette[7].color
-    //                     ],
-    //             "fill-outline-color": "#545453",
-    //             "fill-opacity": [
-    //                 "case", ["==", ["get", "credits"], null], 0.3,
-    //                 ["case",
-    //                 ["boolean", ["feature-state", "hover"], false],
-    //                 0.95,
-    //                 0.66
-    //         ]]},
-    //          layout: {
-    //             visibility: "none"
-    //         }},
-    //         labelLayerId
-    // ) 
-
 
     map.addLayer({
             id: "town-layer",
@@ -1732,7 +1700,7 @@ layerSelect.addEventListener('change', (e) => {
           newOpacity // otherwise use slider opacity
         ];
 
-        map.setPaintProperty(layerId, "fill-opacity", fillOpacityExpression);
+        map.setPaintProperty(layerId, "fill-opacity", fillOpacityExpression); //I don't think this is
       });
     });
 
