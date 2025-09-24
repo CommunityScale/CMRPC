@@ -90,7 +90,7 @@
         <option value="tracts-rdAge">Risk Displacement - Age</option> 
         <option value="tracts-rdRace">Risk Displacement - Race & Ethnicity</option> 
         <option value="parcels-density">Residential density</option> 
-        <!--<option value="tracts-conditions">Neighborhood Conditions</option>-->
+        <option value="tracts-mva">Neighborhood Conditions</option>
         <!--<option value="parcels-landuse">Property Class</option> 
         <option value="parcels-ownership">Property Tax Credits</option>
         <option value="parcels-pctLV">Land Value as Percent of Assessed Value</option>
@@ -595,9 +595,9 @@ function batchSetFeatureStates({ //batching experiment
                         id: id
                         },
                         {
-                        medIncome: f["medIncome"],
-                        pctRent30: f["pctRent30"],
-                        pctOwned30: f["pctOwned30"]
+                        medIncome: f["medIncome"]
+                        //pctRent30: f["pctRent30"],
+                        //pctOwned30: f["pctOwned30"]
                         }
                     )
                     });
@@ -689,6 +689,26 @@ function batchSetFeatureStates({ //batching experiment
                         {
                         rd_seniors: Number(f["rd_seniors"]),
                         rd_nonwhitePops: Number(f["rd_nonWhitePops"])
+                        }
+                    )
+                    });
+                });
+
+                fetch('https://raw.githubusercontent.com/CommunityScale/CMRPC/adc9df09b39883512a5175738efe5ace91ad2917/CMRPC_Tracts_MVA_CostBurden_250828.json') 
+                .then(response => response.json())
+                .then(data => {
+                    data.forEach(f => {
+                    const id = f.geoid.toString(); // Ensure id is a string to match with geometry's geoid 
+                    map.setFeatureState(
+                        {
+                        source: 'tracts',
+                        sourceLayer: 'tracts',
+                        id: id
+                        },
+                        {
+                        pctOwned30: Number(f["pctowned30_23"]),
+                        pctRent30: Number(f["pctrent30_23"]),
+                        mva: (f["class"])
                         }
                     )
                     });
@@ -828,7 +848,7 @@ const interpolateLayers = [
             property: "pctRent30",
             data_source: "tracts",
             source_layer: "tracts",
-            source_url: "https://raw.githubusercontent.com/emtzot/mapSources/main/mass_basicHNA_2023acs_250620.json",
+            source_url: "https://raw.githubusercontent.com/CommunityScale/CMRPC/adc9df09b39883512a5175738efe5ace91ad2917/CMRPC_Tracts_MVA_CostBurden_250828.json",
             colors: medIncomePalette, //replaced with medIncomePalette for color consistency 
             defaultViz: "none",
             useFeatureState: true
@@ -838,7 +858,7 @@ const interpolateLayers = [
             property:"pctOwned30",
             data_source: "tracts",
             source_layer: "tracts",
-            source_url: "https://raw.githubusercontent.com/emtzot/mapSources/main/mass_basicHNA_2023acs_250620.json",
+            source_url: "https://raw.githubusercontent.com/CommunityScale/CMRPC/adc9df09b39883512a5175738efe5ace91ad2917/CMRPC_Tracts_MVA_CostBurden_250828.json",
             colors: medIncomePalette, //replaced with medIncomePalette for color consistency 
             defaultViz: "none",
             useFeatureState: true
@@ -1036,12 +1056,7 @@ const interpolateLayers = [
               ["==", useFeatureState ? ["feature-state", property] : ["get", property], null],
               ["==", useFeatureState ? ["feature-state", property] : ["get", property], ""]
             ], 0,  // fully transparent if null or empty string
-            ["case",
-              ["boolean", ["feature-state", "hover"], false],
-              0.95,
-              opacity
-            ]
-]
+        ]
 }
     }, labelLayerId);
 
@@ -1238,7 +1253,55 @@ map.addLayer({
              }
         },
         labelLayerId
-    )
+    );
+
+  map.addLayer(
+    {
+    id: "tracts-mva",
+    type: "fill",
+    source: "tracts",
+    "source-layer": "tracts",
+    paint: {
+      "fill-color": [
+        "case",
+        ["==", ["feature-state", "mva"], null], "transparent",
+        [
+          "match",
+          ["feature-state", "mva"],
+          "HDCQ", "#7a9232",
+          "HDKU", "#becd5f",
+          "HDNI", "#f7fccf",
+          "OKCQ", "#2a6abc",
+          "OKKU", "#6ea6ea",
+          "OKNI", "#c3dcf5",
+          "DCQ", "#341188",
+          "DKU", "#815de1",
+          "DNI", "#c6b7f6",
+          "transparent"
+        ]
+      ],
+      "fill-outline-color": "white",
+      "fill-opacity": [
+        "case",
+        ["==", ["feature-state", "mva"], null], 0,
+        ["case",
+          ["boolean", ["feature-state", "hover"], false],
+          0.95,
+          0.6
+        ]
+      ]
+    },
+    layout: {
+      visibility: "none"
+    }
+  },
+  labelLayerId
+);
+
+const feats = map.queryRenderedFeatures({ layers: ["tracts-mva"] });
+console.log(feats[0]);
+
+
 
     map.addLayer({      
             id: "tracts-rdRace",  
@@ -1613,6 +1676,7 @@ const allFillLayers = [
     'tracts-rdRace',
     'ctysds-pctHH',
     'zip-currentZHVI',
+    'tracts-mva',
     'zip-chZHVI',
     'parcels-density',
     //'parcels-landuse',
@@ -2041,7 +2105,8 @@ layerSelect.addEventListener('change', (e) => {
             'ctysds-pctHH': 'pctChangeHH',
             'zip-currentZHVI': 'zhvi25',
             'zip-chZHVI': 'chZhvi',
-            'admin-layer': 'GEOID'
+            'admin-layer': 'GEOID',
+            'tracts-mva': 'mva'
         };
 
         dataLayers.forEach(layerId => {
@@ -2103,6 +2168,7 @@ layerSelect.addEventListener('change', (e) => {
             "tracts-pctCostBurdenedOwners",
             "tracts-rdAge",
             "tracts-rdRace",
+            "tracts-mva",
             "zip-currentZHVI",
             "zip-chZHVI",
             "ctysds-pctHH", 
@@ -2261,6 +2327,28 @@ layerSelect.addEventListener('change', (e) => {
             break;
             }
 
+            case "tracts-mva": { 
+              const condition = attributes.mva;
+              const conditionText = {
+                'DCQ' : `${attributes.NAME} has been a competitve area and is changing quickly.`,
+                'DKU' : `${attributes.NAME} has been a competitive area and is keeping up.`,
+                'DNI' : `${attributes.NAME} has been a competitive area but has not improved over the past five years.`,
+                'OKCQ' : `${attributes.NAME} has been doing alright and is changing quickly.`,
+                'OKKU' : `${attributes.NAME} has been doing alright and is keeping up.`,
+                'OKNI' : `${attributes.NAME} has been doing alright but has not improved over the past five years.`,
+                'HDCQ' : `${attributes.NAME} is a historically disinvested area and is changing quickly`,
+                'HDKU' : `${attributes.NAME} is a historically disinvested area and is keeping up.`,
+                'HDNI' : `${attributes.NAME} is a historically disinvested area and has not improved over the past five years.`
+            };
+
+            const displayCondition = conditionText[condition]|| `No available data.`;
+                html = `
+                <div class="popup-header">${attributes.NAME}</div>
+                <div class="popup-content">${displayCondition}
+                </div>`;
+            break;
+            }
+
             // case "parcels-density": { //add density pop-up!!
             //     const propClassVal = attributes.PropClass;
             //     const propClassMatch = landUsePalette.find(entry => entry.key === propClassVal);
@@ -2272,16 +2360,16 @@ layerSelect.addEventListener('change', (e) => {
             // break;
             // }
 
-            case "parcels-ownership": {
-                const propTaxCredits = attributes.credits;
-                const taxCreditMatch = taxCreditPalette.find(entry => entry.key === propTaxCredits);
-                const displayCredits = taxCreditMatch ? taxCreditMatch.label : "data unavailable";
-                html = `
-                <div class="popup-header">${parcelDisplayName}</div>
-                <div class="popup-content">Tax credits received applied to this parcel: ${displayCredits}.
-                </div>`;
-            break;
-            }
+            // case "parcels-ownership": {
+            //     const propTaxCredits = attributes.credits;
+            //     const taxCreditMatch = taxCreditPalette.find(entry => entry.key === propTaxCredits);
+            //     const displayCredits = taxCreditMatch ? taxCreditMatch.label : "data unavailable";
+            //     html = `
+            //     <div class="popup-header">${parcelDisplayName}</div>
+            //     <div class="popup-content">Tax credits received applied to this parcel: ${displayCredits}.
+            //     </div>`;
+            // break;
+            // }
 
             case "admin-layer": {
                 html = `
@@ -2493,6 +2581,10 @@ const layerDescriptions = { //edit as needed; some base text should be re-useabl
   'parcels-value': `
     <p><strong>Parcel value per acre</strong> normalizes parcel value over the acre and may provide insight into development value, potential tax revenue, and land prices.</p><br>
     <p><em>Source(s):</em> 2024 Johnson County, IA Assessor's Office parcel database; CommunityScale.</p>
+  `,
+  'tracts-mva': `
+    <p>This <strong>market value analysis</strong> measures both the relative change in and the current conditions of market value and desirability in Marion County from 2020-2025. Working at the Census tract geography, the analysis assigns two composite scores to inform where each geography falls along a bivariate spectrum of investment and improvement.</p><br> 
+    <p><em>Source(s):</em> Tables B01001, B08303, B25004, B25016, B25074, B25095, 2020 & 2023 ACS 5-year estimates; Zillow ZHVI, March 2020 & March 2025; Realtor.com, 2020 & 2025; Mortgage actions, FFIEC, 2020 & 2024; TIGER/line road network shapefiles;  CommunityScale.</p>
   `,
   'zip-currentZHVI': `
     <p>This layer examines <strong>current typical home price</strong> trends across Massachusetts by zipcode. Zipcodes may be missing values due to a lack of substantial sales and listing data in rural areas.</p><br>
