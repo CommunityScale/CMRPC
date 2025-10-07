@@ -121,8 +121,11 @@
       <p id="layer-description" class="mt-1 text-xs text-gray-600 hidden"></p>
     </div>
 
+
+</div>
+
 <!-- Collapsible Overlays Section -->
-<div id="overlay-wrapper" class="border-t border-gray-300 w-full">
+<div id="overlay-wrapper" class="border-t border-gray-300 w-full mt-auto">
 
   <!-- Header -->
   <button
@@ -217,18 +220,16 @@
     <!-- add in colors/to legend via js?? -->
   </div>
 </div>
- 
-</div>
 
 <!-- Basemap settings toggle - relocate this in the scrollable part (but still have the panel open towards the top)?? -->
-<div id="basemap-toggle" class="border-t border-gray-300 mt-4 pt-2">
+<div id="basemap-toggle" class="border-t border-gray-300 pt-2">
   <button
     class="w-full flex items-center justify-between px-2 py-2 hover:bg-gray-100 text-sm font-medium"
     onclick="toggleBasemapSettings()"
   >
   <span class="flex items-center gap-1">
       <span class="material-icons align-text-bottom">settings</span>
-      Settings
+      Map settings
     </span> 
     <svg id="basemap-arrow" class="w-4 h-4 transform transition-transform" xmlns="http://www.w3.org/2000/svg" fill="none"
       viewBox="0 0 24 24" stroke="currentColor">
@@ -296,6 +297,7 @@
   <div id="zoom-controls" class="absolute top-4 right-4 z-10 flex flex-col bg-white shadow rounded overflow-hidden">
     <button id="zoom-in" class="p-2 text-xl hover:bg-gray-100 focus:outline-none">+</button>
     <button id="zoom-out" class="p-2 text-xl hover:bg-gray-100 focus:outline-none">−</button>
+    <div class="border-t border-gray-300"></div>
     <button id="clear-map" class="p-2 hover:bg-gray-100 focus:outline-none"><span class="material-icons">refresh</span></button>
   </div>  
   <!-- map -->
