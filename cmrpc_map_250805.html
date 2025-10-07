@@ -366,8 +366,9 @@
     //layer constants/arrays to use later 
     const dataLayers = [ // all fill data layers need to be listed here
         'tracts-medIncome',
-        'tracts-pctCostBurdenedRenters', 
+        'tracts-pctCostBurdenedRenters',
         'tracts-pctCostBurdenedOwners',
+        'bg-costs-HT',
         'tracts-rdAge',
         'tracts-rdRace',
         'ctysds-pctHH',
@@ -885,12 +886,13 @@ async function computeQuintileBreaks(source, property) {
     }
 
     // Return quintile breaks: 20th, 40th, 60th, 80th, 100th percentiles
+    // Round each break to the nearest 10
     return [
-      quantile(values, 0.2),
-      quantile(values, 0.4),
-      quantile(values, 0.6),
-      quantile(values, 0.8),
-      quantile(values, 1.0)
+      Math.round(quantile(values, 0.2) / 10) * 10,
+      Math.round(quantile(values, 0.4) / 10) * 10,
+      Math.round(quantile(values, 0.6) / 10) * 10,
+      Math.round(quantile(values, 0.8) / 10) * 10,
+      Math.round(quantile(values, 1.0) / 10) * 10
     ];
   } catch (err) {
     console.error("Failed to compute quintile breaks:", err);
@@ -1805,8 +1807,9 @@ const legendContent = document.getElementById('legend-content');
 
 const allFillLayers = [
     'tracts-medIncome',
-    'tracts-pctCostBurdenedRenters', 
+    'tracts-pctCostBurdenedRenters',
     'tracts-pctCostBurdenedOwners',
+    'bg-costs-HT',
     'tracts-rdAge',
     'tracts-rdRace',
     'ctysds-pctHH',
@@ -1894,7 +1897,7 @@ function renderBivariateLegend() {   // use image legend for MVA
 
 // Define formatting by layer type (univariate)
 const percentLayers = ['tracts-pctCostBurdenedRenters', 'tracts-pctCostBurdenedOwners', 'tracts-pctHH', 'zips-chZhvi', ];
-const currencyLayers = ['tracts-medIncome', 'zips-zhvi'];
+const currencyLayers = ['tracts-medIncome', 'zips-zhvi', 'bg-costs-HT'];
 const numberLayers  = ['tracts-rdAge', 'tracts-rdRace', 'parcels-density'];
 
 // Update formatting by way of layerId 
@@ -2247,6 +2250,7 @@ layerSelect.addEventListener('change', (e) => {
             'tracts-medIncome': "medIncome",
             'tracts-pctCostBurdenedRenters': 'pctRent30',
             'tracts-pctCostBurdenedOwners': 'pctOwned30',
+            'bg-costs-HT': 'H_T_renters',
             'tracts-rdAge': 'rd-propName',
             'tracts-rdRace': 'rd_nonWhitePops',
             'ctysds-pctHH': 'pctChangeHH',
@@ -2305,7 +2309,7 @@ layerSelect.addEventListener('change', (e) => {
 
     map.on('click', (e) => { //pop-up logic!! just add additional layers to the array and case logic below to create new pop-up!!
         const popUpLayers = [
-            //"parcels-pctLV", 
+            //"parcels-pctLV",
             //"parcels-value",
             //"parcels-landuse",
             //"parcels-ownership",
@@ -2313,6 +2317,7 @@ layerSelect.addEventListener('change', (e) => {
             "tracts-medIncome",
             "tracts-pctCostBurdenedRenters",
             "tracts-pctCostBurdenedOwners",
+            "bg-costs-HT",
             "tracts-rdAge",
             "tracts-rdRace",
             "tracts-mva",
@@ -2381,6 +2386,15 @@ layerSelect.addEventListener('change', (e) => {
                 html = `
                 <div class="popup-header">${attributes.NAME}</div>
                 <div class="popup-content">${pctOwned30 != null ? `${Math.round(pctOwned30 * 1000) / 10}% of homeowners in ${attributes.NAME} spend more than 30% of income on housing costs.` : 'No available data.'}
+                </div>`;
+            break;
+            }
+
+            case "bg-costs-HT": {
+                const htCost = attributes.H_T_renters;
+                html = `
+                <div class="popup-header">Block Group ${attributes.GEO_ID_clean}</div>
+                <div class="popup-content">${htCost != null ? `Monthly housing + transportation costs for renters: $${Math.round(htCost).toLocaleString()}` : 'No available data.'}
                 </div>`;
             break;
             }
