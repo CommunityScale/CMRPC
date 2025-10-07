@@ -14,6 +14,9 @@
 <!--Material UI icons-->
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+<!-- Roboto font -->
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
   /* Additional styling to match the original SVG appearance */
   .material-icons-outlined {
@@ -40,7 +43,7 @@
 
   .mapboxgl-popup {
       max-width: 150px;
-      font-family: 'Inter', sans-serif;
+      font-family: 'Roboto', sans-serif;
       font-size: 0.875rem; /* Tailwind's text-sm */
     }
   
@@ -67,6 +70,15 @@
       margin: 0;
       line-height: 1.4;
     }
+
+  #layer-select {
+      white-space: normal;
+      height: auto;
+      min-height: 2.25rem;
+      line-height: 1.4;
+      padding-top: 0.5rem;
+      padding-bottom: 0.5rem;
+    }
 </style>
 </head>
 <body class="overflow-hidden">
@@ -81,6 +93,7 @@
     <!-- Layer toggle - add all layers that will be in the dropdown menu  -->
     <div class="mb-4">
       <select id="layer-select" class="w-full border border-gray-300 rounded px-2 py-1">
+        <option value="" disabled selected>Select layer</option>
         <option value="tracts-medIncome">Median Annual Household Income</option> 
         <option value="tracts-pctCostBurdenedRenters">Percent of Renters, Cost Burdened</option> 
         <option value="tracts-pctCostBurdenedOwners">Percent of Homeowners, Cost Burdened</option> 
@@ -97,15 +110,11 @@
         <option value="parcels-value">Parcel Value Per Acre</option>-->
         <option value="admin-layer">Massachusetts tracts</option> <!--maybe just use outlines here?? add as toggle?? idk -->
     </select>
-    <div class="mt-2 flex items-center justify-between">
-        <label for="layer-select" class="font-medium">Select layer</label>
-        <button id="clear-map" class="hover:text-red-600"><span class="material-icons align-text-bottom">refresh</span></button> <!--needs java!!-->
-      </div>
     </div>
 
     <!-- Legend -->
     <div id="legend" class="mt-4 pb-4">
-      <h3 class="font-medium mb-2">Legend</h3>
+      <h3 id="legend-title" class="font-medium mb-2"></h3>
       <div id="legend-content" class="space-y-1 text-sm text-gray-700 mb-2">
       </div>
       <button id="layer-info" class="flex items-center text-sm"><span class="material-icons text-base mr-1">info</span>About this layer</button>
@@ -287,6 +296,7 @@
   <div id="zoom-controls" class="absolute top-4 right-4 z-10 flex flex-col bg-white shadow rounded overflow-hidden">
     <button id="zoom-in" class="p-2 text-xl hover:bg-gray-100 focus:outline-none">+</button>
     <button id="zoom-out" class="p-2 text-xl hover:bg-gray-100 focus:outline-none">−</button>
+    <button id="clear-map" class="p-2 hover:bg-gray-100 focus:outline-none"><span class="material-icons">refresh</span></button>
   </div>  
   <!-- map -->
   <div id="map" class="flex-grow"></div>
@@ -2000,6 +2010,8 @@ function renderLegend(layerId) {
 layerSelect.addEventListener('change', (e) => {
   const selected = e.target.value;
 
+  if (!selected) return;
+
   allFillLayers.forEach(id => {
     if (map.getLayer(id)) {
       map.setLayoutProperty(id, 'visibility', id === selected ? 'visible' : 'none');
@@ -2007,6 +2019,13 @@ layerSelect.addEventListener('change', (e) => {
   });
 
   renderLegend(selected);
+
+  // Update legend title with selected layer name
+  const selectedOption = e.target.options[e.target.selectedIndex];
+  document.getElementById('legend-title').textContent = selectedOption.text;
+
+  // Reset dropdown to placeholder
+  e.target.selectedIndex = 0;
 });
        
     function layerLegendVisibility() {
@@ -2204,19 +2223,8 @@ layerSelect.addEventListener('change', (e) => {
             ...featureState
         };
         let html = '';  
-        let coords;
-            if (selectedGeo.geometry.type === 'Point') {
-            coords = selectedGeo.geometry.coordinates;
-            } else {
-            const bounds = new mapboxgl.LngLatBounds();
-            selectedGeo.geometry.coordinates[0].forEach(coord => bounds.extend(coord));
-            coords = bounds.getCenter();
-            }
-
-            if (!coords || !coords.lng || !coords.lat) {
-            console.warn('Invalid coordinates for popup:', coords);
-            return;
-}
+        // Use click location for popup
+        const coords = e.lngLat;
 
         const name = attributes.SiteAddress; //for parcels/reused naming where it would be chaotic to reuse same lines in multiple blocks; use lines like these to deal with names of non-census geos that require some special formatting 
         const parcelDisplayName = (name === null || name === undefined || name.trim() === "") ? `Address unavailable` : `${name}`; //set blank strings to same value as null/undefined!!
@@ -2533,13 +2541,19 @@ document.getElementById('clear-map').addEventListener('click', () => {
   // clear the legend panel
   const legendContent = document.getElementById('legend-content');
   if (legendContent) {
-    legendContent.innerHTML = `<p class="italic text-gray-500">Legend cleared</p>`; //replace with text "select a layer to view a legend??"
+    legendContent.innerHTML = '';
+  }
+
+  // reset legend title to blank
+  const legendTitle = document.getElementById('legend-title');
+  if (legendTitle) {
+    legendTitle.textContent = '';
   }
 
   //Fly to default map center/zoom - potentially take out??
   map.flyTo({
-    center: [-91.58, 41.67], // default center
-    zoom: 9.5 //  default zoom
+    center: INITIAL_LOC, // default center
+    zoom: INITIAL_ZOOM //  default zoom
   });
 
   // remove any popups
