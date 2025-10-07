@@ -81,15 +81,15 @@
     <!-- Layer toggle - add all layers that will be in the dropdown menu  -->
     <div class="mb-4">
       <select id="layer-select" class="w-full border border-gray-300 rounded px-2 py-1">
-        <option value="tracts-medIncome">Median Annual Household Income</option> 
+        <!--<option value="tracts-medIncome">Median Annual Household Income</option> 
         <option value="tracts-pctCostBurdenedRenters">Percent of Renters, Cost Burdened</option> 
-        <option value="tracts-pctCostBurdenedOwners">Percent of Homeowners, Cost Burdened</option> 
+        <option value="tracts-pctCostBurdenedOwners">Percent of Homeowners, Cost Burdened</option> -->
         <option value="ctysds-pctHH">Percent Change in Households (2015-2023)</option>
         <option value="zip-currentZHVI">Typical Home Price by Zip Code (2025)</option>
         <option value="zip-chZHVI"> Change in Typical Home Price (2020-2025)</option>
         <option value="tracts-rdAge">Risk Displacement - Age</option> 
         <option value="tracts-rdRace">Risk Displacement - Race & Ethnicity</option> 
-        <option value="parcels-density">Residential density</option> 
+        <!--<option value="parcels-density">Residential density</option> -->
         <option value="tracts-mva">Neighborhood Conditions</option>
         <!--<option value="parcels-landuse">Property Class</option> 
         <option value="parcels-ownership">Property Tax Credits</option>
@@ -141,7 +141,7 @@
           </div>
       <span class="leading-snug ms-2">CMRPC community boundaries</span>
     </label>
-    <label class="flex items-start text-sm text-gray-700">
+    <!--<label class="flex items-start text-sm text-gray-700">
         <div class="relative">
             <input type="checkbox" class="sr-only overlay-toggle peer" value="subregion-central" />
             <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
@@ -188,7 +188,7 @@
             <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
           </div>
         <span class="leading-snug ms-2">Southeast subregion</span>
-    </label>
+    </label> -->
     <!--<label class="flex items-center justify-between w-full text-sm text-gray-700">
         <div class="relative">
             <input type="checkbox" class="sr-only overlay-toggle peer" value="manufacturedHomes" checked />
@@ -2583,7 +2583,7 @@ const layerDescriptions = { //edit as needed; some base text should be re-useabl
     <p><em>Source(s):</em> 2024 Johnson County, IA Assessor's Office parcel database; CommunityScale.</p>
   `,
   'tracts-mva': `
-    <p>This <strong>market value analysis</strong> measures both the relative change in and the current conditions of market value and desirability in Marion County from 2020-2025. Working at the Census tract geography, the analysis assigns two composite scores to inform where each geography falls along a bivariate spectrum of investment and improvement.</p><br> 
+    <p>This <strong>market value analysis</strong> measures both the relative change in and the current conditions of market value and desirability across CMRPC communities from 2020-2025. Working at the Census tract geography, the analysis assigns two composite scores to inform where each geography falls along a bivariate spectrum of investment and improvement.</p><br> 
     <p><em>Source(s):</em> Tables B01001, B08303, B25004, B25016, B25074, B25095, 2020 & 2023 ACS 5-year estimates; Zillow ZHVI, March 2020 & March 2025; Realtor.com, 2020 & 2025; Mortgage actions, FFIEC, 2020 & 2024; TIGER/line road network shapefiles;  CommunityScale.</p>
   `,
   'zip-currentZHVI': `
