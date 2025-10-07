@@ -14,6 +14,9 @@
 <!--Material UI icons-->
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+<!-- Roboto font -->
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
   /* Additional styling to match the original SVG appearance */
   .material-icons-outlined {
@@ -40,7 +43,7 @@
 
   .mapboxgl-popup {
       max-width: 150px;
-      font-family: 'Inter', sans-serif;
+      font-family: 'Roboto', sans-serif;
       font-size: 0.875rem; /* Tailwind's text-sm */
     }
   
@@ -67,6 +70,15 @@
       margin: 0;
       line-height: 1.4;
     }
+
+  #layer-select {
+      white-space: normal;
+      height: auto;
+      min-height: 2.25rem;
+      line-height: 1.4;
+      padding-top: 0.5rem;
+      padding-bottom: 0.5rem;
+    }
 </style>
 </head>
 <body class="overflow-hidden">
@@ -81,9 +93,12 @@
     <!-- Layer toggle - add all layers that will be in the dropdown menu  -->
     <div class="mb-4">
       <select id="layer-select" class="w-full border border-gray-300 rounded px-2 py-1">
-        <!--<option value="tracts-medIncome">Median Annual Household Income</option> 
-        <option value="tracts-pctCostBurdenedRenters">Percent of Renters, Cost Burdened</option> 
-        <option value="tracts-pctCostBurdenedOwners">Percent of Homeowners, Cost Burdened</option> -->
+        <option value="" disabled selected>Select layer</option>
+        <option value="tracts-medIncome">Median Annual Household Income</option>
+        <option value="tracts-pctCostBurdenedRenters">Percent of Renters, Cost Burdened</option>
+        <option value="tracts-pctCostBurdenedOwners">Percent of Homeowners, Cost Burdened</option>
+        <option value="bg-costs-HT">Housing + Transportation Costs (Renters)</option>
+        <option value="bg-costs-HT-owner">Housing + Transportation Costs (Homeowners)</option>
         <option value="ctysds-pctHH">Percent Change in Households (2015-2023)</option>
         <option value="zip-currentZHVI">Typical Home Price by Zip Code (2025)</option>
         <option value="zip-chZHVI"> Change in Typical Home Price (2020-2025)</option>
@@ -97,23 +112,22 @@
         <option value="parcels-value">Parcel Value Per Acre</option>-->
         <option value="admin-layer">Massachusetts tracts</option> <!--maybe just use outlines here?? add as toggle?? idk -->
     </select>
-    <div class="mt-2 flex items-center justify-between">
-        <label for="layer-select" class="font-medium">Select layer</label>
-        <button id="clear-map" class="hover:text-red-600"><span class="material-icons align-text-bottom">refresh</span></button> <!--needs java!!-->
-      </div>
     </div>
 
     <!-- Legend -->
     <div id="legend" class="mt-4 pb-4">
-      <h3 class="font-medium mb-2">Legend</h3>
+      <h3 id="legend-title" class="font-medium mb-2"></h3>
       <div id="legend-content" class="space-y-1 text-sm text-gray-700 mb-2">
       </div>
       <button id="layer-info" class="flex items-center text-sm"><span class="material-icons text-base mr-1">info</span>About this layer</button>
       <p id="layer-description" class="mt-1 text-xs text-gray-600 hidden"></p>
     </div>
 
+
+</div>
+
 <!-- Collapsible Overlays Section -->
-<div id="overlay-wrapper" class="border-t border-gray-300 w-full">
+<div id="overlay-wrapper" class="border-t border-gray-300 w-full mt-auto">
 
   <!-- Header -->
   <button
@@ -188,7 +202,15 @@
             <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
           </div>
         <span class="leading-snug ms-2">Southeast subregion</span>
-    </label> -->
+    </label>
+    <label class="flex items-start text-sm text-gray-700">
+        <div class="relative">
+            <input type="checkbox" class="sr-only overlay-toggle peer" value="bus-stops-layer" />
+            <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
+            <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
+          </div>
+        <span class="leading-snug ms-2">Bus stops</span>
+    </label>
     <!--<label class="flex items-center justify-between w-full text-sm text-gray-700">
         <div class="relative">
             <input type="checkbox" class="sr-only overlay-toggle peer" value="manufacturedHomes" checked />
@@ -208,18 +230,16 @@
     <!-- add in colors/to legend via js?? -->
   </div>
 </div>
- 
-</div>
 
 <!-- Basemap settings toggle - relocate this in the scrollable part (but still have the panel open towards the top)?? -->
-<div id="basemap-toggle" class="border-t border-gray-300 mt-4 pt-2">
+<div id="basemap-toggle" class="border-t border-gray-300 pt-2">
   <button
     class="w-full flex items-center justify-between px-2 py-2 hover:bg-gray-100 text-sm font-medium"
     onclick="toggleBasemapSettings()"
   >
   <span class="flex items-center gap-1">
       <span class="material-icons align-text-bottom">settings</span>
-      Settings
+      Map settings
     </span> 
     <svg id="basemap-arrow" class="w-4 h-4 transform transition-transform" xmlns="http://www.w3.org/2000/svg" fill="none"
       viewBox="0 0 24 24" stroke="currentColor">
@@ -287,6 +307,8 @@
   <div id="zoom-controls" class="absolute top-4 right-4 z-10 flex flex-col bg-white shadow rounded overflow-hidden">
     <button id="zoom-in" class="p-2 text-xl hover:bg-gray-100 focus:outline-none">+</button>
     <button id="zoom-out" class="p-2 text-xl hover:bg-gray-100 focus:outline-none">−</button>
+    <div class="border-t border-gray-300"></div>
+    <button id="clear-map" class="p-2 hover:bg-gray-100 focus:outline-none"><span class="material-icons">refresh</span></button>
   </div>  
   <!-- map -->
   <div id="map" class="flex-grow"></div>
@@ -345,8 +367,10 @@
     //layer constants/arrays to use later 
     const dataLayers = [ // all fill data layers need to be listed here
         'tracts-medIncome',
-        'tracts-pctCostBurdenedRenters', 
+        'tracts-pctCostBurdenedRenters',
         'tracts-pctCostBurdenedOwners',
+        'bg-costs-HT',
+        'bg-costs-HT-owner',
         'tracts-rdAge',
         'tracts-rdRace',
         'ctysds-pctHH',
@@ -460,7 +484,21 @@
 
    const palettesByLayer = { //leave empty if not needed
 //             'parcels-landuse': landUsePalette,
-//             'parcels-ownership': taxCreditPalette
+//             'parcels-ownership': taxCreditPalette,
+       'tracts-rdAge': [
+           { value: 0, color: '#edf8fb', label: 'Relatively low displacement risk' },
+           { value: 0.23, color: '#b3cde3', label: 'Somewhat low' },
+           { value: 0.46, color: '#8c96c6', label: 'Moderate' },
+           { value: 0.71, color: '#8856a7', label: 'Somewhat high' },
+           { value: 0.94, color: '#810f7c', label: 'Higher displacement risk' }
+       ],
+       'tracts-rdRace': [
+           { value: 0, color: '#edf8fb', label: 'Relatively low displacement risk' },
+           { value: 0.23, color: '#b3cde3', label: 'Somewhat low' },
+           { value: 0.46, color: '#8c96c6', label: 'Moderate' },
+           { value: 0.71, color: '#8856a7', label: 'Somewhat high' },
+           { value: 0.94, color: '#810f7c', label: 'Higher displacement risk' }
+       ]
 //   //best way to match palettes to their respective layers ?? particularly for categorical layers
 };
 
@@ -571,10 +609,20 @@ function batchSetFeatureStates({ //batching experiment
             promoteId: "TOWN_ID"
         })
 
-        map.addSource("subregions", {    
+        map.addSource("subregions", {
             type: "geojson",
             data: '/CMRPC_Tigerlines_Regions_FromCytsds_250820.geojson',
             promoteId: "TOWN_ID"
+        })
+
+        map.addSource("bus-stops", {
+            type: "geojson",
+            data: 'bus_stops.geojson'
+        })
+
+        map.addSource("bg-costs", {
+            type: "geojson",
+            data: 'CMRPC_bg_costs.geojson'
         })
 
         map.addSource("ctysds", {
@@ -802,6 +850,58 @@ async function computeStatsFromSource(source_url, property) {
   }
 }
 
+// Compute quintile breaks (for 5 color classes)
+async function computeQuintileBreaks(source, property) {
+  try {
+    const response = await fetch(source);
+    const data = await response.json();
+
+    let features;
+    if (data.type === "FeatureCollection" && Array.isArray(data.features)) {
+      features = data.features;
+    } else if (Array.isArray(data)) {
+      features = data.map(d => ({ properties: d }));
+    } else if (data.data && Array.isArray(data.data)) {
+      features = data.data.map(d => ({ properties: d }));
+    } else {
+      console.warn("Unsupported data format for quintile breaks.");
+      return null;
+    }
+
+    const values = features
+      .map(f => Number(f.properties[property]))
+      .filter(v => !isNaN(v))
+      .sort((a, b) => a - b);
+
+    if (values.length < 5) {
+      console.warn("Not enough valid values to compute quintile breaks.");
+      return null;
+    }
+
+    function quantile(arr, q) {
+      const pos = (arr.length - 1) * q;
+      const base = Math.floor(pos);
+      const rest = pos - base;
+      return arr[base + 1] !== undefined
+        ? arr[base] + rest * (arr[base + 1] - arr[base])
+        : arr[base];
+    }
+
+    // Return quintile breaks: 20th, 40th, 60th, 80th, 100th percentiles
+    // Round each break to the nearest 10
+    return [
+      Math.round(quantile(values, 0.2) / 10) * 10,
+      Math.round(quantile(values, 0.4) / 10) * 10,
+      Math.round(quantile(values, 0.6) / 10) * 10,
+      Math.round(quantile(values, 0.8) / 10) * 10,
+      Math.round(quantile(values, 1.0) / 10) * 10
+    ];
+  } catch (err) {
+    console.error("Failed to compute quintile breaks:", err);
+    return null;
+  }
+}
+
 
 // function generateColorStopsFromStats(breaks, colors, property) {
 //   if (!breaks || breaks.length !== colors.length) return null;
@@ -859,9 +959,31 @@ const interpolateLayers = [
             data_source: "tracts",
             source_layer: "tracts",
             source_url: "https://raw.githubusercontent.com/CommunityScale/CMRPC/adc9df09b39883512a5175738efe5ace91ad2917/CMRPC_Tracts_MVA_CostBurden_250828.json",
-            colors: medIncomePalette, //replaced with medIncomePalette for color consistency 
+            colors: medIncomePalette, //replaced with medIncomePalette for color consistency
             defaultViz: "none",
             useFeatureState: true
+        },
+        {
+            id: "bg-costs-HT",
+            property: "H_T_renters",
+            data_source: "bg-costs",
+            source_layer: null,
+            source_url: "/CMRPC_bg_costs.geojson",
+            colors: medIncomePalette,
+            defaultViz: "none",
+            useFeatureState: false,
+            useQuintiles: true
+        },
+        {
+            id: "bg-costs-HT-owner",
+            property: "H_T_owner",
+            data_source: "bg-costs",
+            source_layer: null,
+            source_url: "/CMRPC_bg_costs.geojson",
+            colors: medIncomePalette,
+            defaultViz: "none",
+            useFeatureState: false,
+            useQuintiles: true
         },
         // {
         //     id: "parcels-density",
@@ -1003,10 +1125,14 @@ const interpolateLayers = [
     // }
 
     async function addInterpolatedLayers(opacity, visibleLayerId) {
-  for (const { id, property, data_source, source_layer, source_url, colors, defaultViz, useFeatureState } of interpolateLayers) {
+  for (const { id, property, data_source, source_layer, source_url, colors, defaultViz, useFeatureState, useQuintiles } of interpolateLayers) {
     console.log(`Processing layer: ${id}`);
 
-    const stats = await computeStatsFromSource(source_url, property);
+    // Use quintile breaks if specified, otherwise use default IQR-based breaks
+    const stats = useQuintiles
+      ? await computeQuintileBreaks(source_url, property)
+      : await computeStatsFromSource(source_url, property);
+
     if (!stats) {
       console.warn(`Skipping ${id} – insufficient data.`);
       continue;
@@ -1039,26 +1165,33 @@ const interpolateLayers = [
       continue;
     }
 
-    map.addLayer({
+    const layerConfig = {
       id,
       type: "fill",
       source: data_source,
-      "source-layer": source_layer, // if using vector tiles
       layout: {
         visibility: id === visibleLayerId ? "visible" : defaultViz || "none"
       },
       paint: {
         "fill-color": fillColorExpression,
         "fill-outline-color": "white",
-       "fill-opacity": [
-            "case",
-            ["any",
-              ["==", useFeatureState ? ["feature-state", property] : ["get", property], null],
-              ["==", useFeatureState ? ["feature-state", property] : ["get", property], ""]
-            ], 0,  // fully transparent if null or empty string
+        "fill-opacity": [
+          "case",
+          ["any",
+            ["==", useFeatureState ? ["feature-state", property] : ["get", property], null],
+            ["==", useFeatureState ? ["feature-state", property] : ["get", property], ""]
+          ], 0,  // fully transparent if null or empty string
+          opacity || 0.7  // default opacity
         ]
-}
-    }, labelLayerId);
+      }
+    };
+
+    // Only add source-layer if it exists (for vector tiles)
+    if (source_layer) {
+      layerConfig["source-layer"] = source_layer;
+    }
+
+    map.addLayer(layerConfig, labelLayerId);
 
     console.log(`Layer ${id} added.`);
   }
@@ -1389,11 +1522,9 @@ map.addLayer({
             paint: {
                 "fill-color": [
                     "case", ["==", ["feature-state", "density"], null], 'transparent',
-                    ["interpolate", 
-                    ["linear"],
+                    ["step",
                     ["feature-state", "density"],
-                    0.3,
-                    medIncomePalette[0], 
+                    medIncomePalette[0],
                     1,
                     medIncomePalette[1],
                     4,
@@ -1401,14 +1532,20 @@ map.addLayer({
                     8,
                     medIncomePalette[3],
                     16,
-                    medIncomePalette[4]]],
-                "fill-outline-color": "white",
+                    "#192f5e"]],
+                "fill-outline-color": [
+                    "step",
+                    ["zoom"],
+                    "transparent",
+                    14,
+                    "white"
+                ],
                 "fill-opacity": [
                     "case", ["==", ["feature-state", "density"], null], 0,
                     ["case",
                     ["boolean", ["feature-state", "hover"], false],
-                    0.95,
-                    0.6
+                    1,
+                    1
             ]]
              },
              layout: {
@@ -1496,7 +1633,7 @@ map.addLayer({
             source: "towns",
             'source-layer': 'massachusetts_towns-a8k14v',
             paint: {
-                "line-color": "black", 
+                "line-color": "black",
                 "line-width": 1.5
                 },
             layout: {
@@ -1586,7 +1723,7 @@ map.addLayer({
             type: "line",
             source: "subregions",
             paint: {
-                "line-color": "black", 
+                "line-color": "black",
                 "line-width": 1.5
                 },
             layout: {
@@ -1595,6 +1732,19 @@ map.addLayer({
             filter: ["==", ["get", "region"], "CENTRAL"]},
             labelLayerId
         )
+
+        map.addLayer({
+            id: "bus-stops-layer",
+            type: "circle",
+            source: "bus-stops",
+            paint: {
+                "circle-color": "#ff0000",
+                "circle-radius": 1
+            },
+            layout: {
+                visibility: "none"
+            }
+        })
 
 
     // map.loadImage(
@@ -1670,8 +1820,10 @@ const legendContent = document.getElementById('legend-content');
 
 const allFillLayers = [
     'tracts-medIncome',
-    'tracts-pctCostBurdenedRenters', 
+    'tracts-pctCostBurdenedRenters',
     'tracts-pctCostBurdenedOwners',
+    'bg-costs-HT',
+    'bg-costs-HT-owner',
     'tracts-rdAge',
     'tracts-rdRace',
     'ctysds-pctHH',
@@ -1759,7 +1911,7 @@ function renderBivariateLegend() {   // use image legend for MVA
 
 // Define formatting by layer type (univariate)
 const percentLayers = ['tracts-pctCostBurdenedRenters', 'tracts-pctCostBurdenedOwners', 'tracts-pctHH', 'zips-chZhvi', ];
-const currencyLayers = ['tracts-medIncome', 'zips-zhvi'];
+const currencyLayers = ['tracts-medIncome', 'zips-zhvi', 'bg-costs-HT', 'bg-costs-HT-owner'];
 const numberLayers  = ['tracts-rdAge', 'tracts-rdRace', 'parcels-density'];
 
 // Update formatting by way of layerId 
@@ -1773,6 +1925,11 @@ function formatLegendLabel(value, layerId) {
 
   // Currency
   if (currencyLayers.includes(layerId)) {
+    // For bg-costs layers, values are already rounded to nearest 10, so don't round further
+    if (layerId === 'bg-costs-HT' || layerId === 'bg-costs-HT-owner') {
+      return `$${Math.round(value).toLocaleString()}`;
+    }
+    // For other currency layers, round to nearest 1000 if >= 1500
     if (value >= 1500) {
       return `$${(Math.round(value / 1000) * 1000).toLocaleString()}`;
     }
@@ -1818,17 +1975,20 @@ function renderLegendFromStops(layerId) {
 // Generate HTML for the data-layer legend
 const dataLayerHtml = uniqueStops.map((stop, index) => {
   const next = uniqueStops[index + 1];
-  const label = getLabel(stop); 
+  const label = getLabel(stop);
 
-  // Show ranges if numeric
+  // Check if this layer has custom labels defined in palettesByLayer
+  const hasCustomLabels = palette.length > 0;
+
+  // Show ranges if numeric AND no custom labels exist
   let displayLabel = label;
   const isNumeric = typeof stop.value === 'number';
 
-  if (isNumeric && next) {
+  if (isNumeric && next && !hasCustomLabels) {
     displayLabel = index === 0
       ? `< ${getLabel(next)}`
       : `${label} – ${getLabel(next)}`;
-  } else if (isNumeric && index === uniqueStops.length - 1) {
+  } else if (isNumeric && index === uniqueStops.length - 1 && !hasCustomLabels) {
     displayLabel = `≥ ${label}`;
   }
 
@@ -2000,6 +2160,8 @@ function renderLegend(layerId) {
 layerSelect.addEventListener('change', (e) => {
   const selected = e.target.value;
 
+  if (!selected) return;
+
   allFillLayers.forEach(id => {
     if (map.getLayer(id)) {
       map.setLayoutProperty(id, 'visibility', id === selected ? 'visible' : 'none');
@@ -2007,6 +2169,13 @@ layerSelect.addEventListener('change', (e) => {
   });
 
   renderLegend(selected);
+
+  // Update legend title with selected layer name
+  const selectedOption = e.target.options[e.target.selectedIndex];
+  document.getElementById('legend-title').textContent = selectedOption.text;
+
+  // Reset dropdown to placeholder
+  e.target.selectedIndex = 0;
 });
        
     function layerLegendVisibility() {
@@ -2100,6 +2269,8 @@ layerSelect.addEventListener('change', (e) => {
             'tracts-medIncome': "medIncome",
             'tracts-pctCostBurdenedRenters': 'pctRent30',
             'tracts-pctCostBurdenedOwners': 'pctOwned30',
+            'bg-costs-HT': 'H_T_renters',
+            'bg-costs-HT-owner': 'H_T_owner',
             'tracts-rdAge': 'rd-propName',
             'tracts-rdRace': 'rd_nonWhitePops',
             'ctysds-pctHH': 'pctChangeHH',
@@ -2158,7 +2329,7 @@ layerSelect.addEventListener('change', (e) => {
 
     map.on('click', (e) => { //pop-up logic!! just add additional layers to the array and case logic below to create new pop-up!!
         const popUpLayers = [
-            //"parcels-pctLV", 
+            //"parcels-pctLV",
             //"parcels-value",
             //"parcels-landuse",
             //"parcels-ownership",
@@ -2166,6 +2337,8 @@ layerSelect.addEventListener('change', (e) => {
             "tracts-medIncome",
             "tracts-pctCostBurdenedRenters",
             "tracts-pctCostBurdenedOwners",
+            "bg-costs-HT",
+            "bg-costs-HT-owner",
             "tracts-rdAge",
             "tracts-rdRace",
             "tracts-mva",
@@ -2204,19 +2377,8 @@ layerSelect.addEventListener('change', (e) => {
             ...featureState
         };
         let html = '';  
-        let coords;
-            if (selectedGeo.geometry.type === 'Point') {
-            coords = selectedGeo.geometry.coordinates;
-            } else {
-            const bounds = new mapboxgl.LngLatBounds();
-            selectedGeo.geometry.coordinates[0].forEach(coord => bounds.extend(coord));
-            coords = bounds.getCenter();
-            }
-
-            if (!coords || !coords.lng || !coords.lat) {
-            console.warn('Invalid coordinates for popup:', coords);
-            return;
-}
+        // Use click location for popup
+        const coords = e.lngLat;
 
         const name = attributes.SiteAddress; //for parcels/reused naming where it would be chaotic to reuse same lines in multiple blocks; use lines like these to deal with names of non-census geos that require some special formatting 
         const parcelDisplayName = (name === null || name === undefined || name.trim() === "") ? `Address unavailable` : `${name}`; //set blank strings to same value as null/undefined!!
@@ -2245,6 +2407,24 @@ layerSelect.addEventListener('change', (e) => {
                 html = `
                 <div class="popup-header">${attributes.NAME}</div>
                 <div class="popup-content">${pctOwned30 != null ? `${Math.round(pctOwned30 * 1000) / 10}% of homeowners in ${attributes.NAME} spend more than 30% of income on housing costs.` : 'No available data.'}
+                </div>`;
+            break;
+            }
+
+            case "bg-costs-HT": {
+                const htCost = attributes.H_T_renters;
+                html = `
+                <div class="popup-header">Block Group ${attributes.GEO_ID_clean}</div>
+                <div class="popup-content">${htCost != null ? `Monthly housing + transportation costs for renters: $${Math.round(htCost).toLocaleString()}` : 'No available data.'}
+                </div>`;
+            break;
+            }
+
+            case "bg-costs-HT-owner": {
+                const htCostOwner = attributes.H_T_owner;
+                html = `
+                <div class="popup-header">Block Group ${attributes.GEO_ID_clean}</div>
+                <div class="popup-content">${htCostOwner != null ? `Monthly housing + transportation costs for homeowners: $${Math.round(htCostOwner).toLocaleString()}` : 'No available data.'}
                 </div>`;
             break;
             }
@@ -2533,13 +2713,19 @@ document.getElementById('clear-map').addEventListener('click', () => {
   // clear the legend panel
   const legendContent = document.getElementById('legend-content');
   if (legendContent) {
-    legendContent.innerHTML = `<p class="italic text-gray-500">Legend cleared</p>`; //replace with text "select a layer to view a legend??"
+    legendContent.innerHTML = '';
+  }
+
+  // reset legend title to blank
+  const legendTitle = document.getElementById('legend-title');
+  if (legendTitle) {
+    legendTitle.textContent = '';
   }
 
   //Fly to default map center/zoom - potentially take out??
   map.flyTo({
-    center: [-91.58, 41.67], // default center
-    zoom: 9.5 //  default zoom
+    center: INITIAL_LOC, // default center
+    zoom: INITIAL_ZOOM //  default zoom
   });
 
   // remove any popups
