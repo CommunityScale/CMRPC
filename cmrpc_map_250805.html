@@ -1401,11 +1401,9 @@ map.addLayer({
             paint: {
                 "fill-color": [
                     "case", ["==", ["feature-state", "density"], null], 'transparent',
-                    ["interpolate", 
-                    ["linear"],
+                    ["step",
                     ["feature-state", "density"],
-                    0.3,
-                    medIncomePalette[0], 
+                    medIncomePalette[0],
                     1,
                     medIncomePalette[1],
                     4,
@@ -1413,14 +1411,20 @@ map.addLayer({
                     8,
                     medIncomePalette[3],
                     16,
-                    medIncomePalette[4]]],
-                "fill-outline-color": "white",
+                    "#192f5e"]],
+                "fill-outline-color": [
+                    "step",
+                    ["zoom"],
+                    "transparent",
+                    14,
+                    "white"
+                ],
                 "fill-opacity": [
                     "case", ["==", ["feature-state", "density"], null], 0,
                     ["case",
                     ["boolean", ["feature-state", "hover"], false],
-                    0.95,
-                    0.6
+                    1,
+                    1
             ]]
              },
              layout: {
