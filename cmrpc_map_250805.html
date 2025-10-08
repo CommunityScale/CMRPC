@@ -270,18 +270,15 @@
   <div>
     <div>
         <label class="block mb-1 font-medium">Basemap style</label>
-        <div id="basemap-style-thumbnails" class="flex flex-wrap md:flex-nowrap gap-2 overflow-x-auto">
-            <button data-style="communityscale/cmcuwuwcv00xz01s1gn7xccqi" class="group border border-gray-300 rounded overflow-hidden hover:ring-2 ring-gray-500">
-                <img src="https://api.mapbox.com/styles/v1/communityscale/cmcuwuwcv00xz01s1gn7xccqi/static/-71.81, 42.21,9.5/300x200@2x?access_token=pk.eyJ1IjoiZW10em90MDEiLCJhIjoiY20zZ2kyd3RpMDRnajJscHoyMG5neGJldyJ9.poXi4pgd2CoXKV2B4kg1Cw" alt="Light monochrome" class="w-full h-auto">
-                <div class="text-xs text-center py-1 group-hover:font-medium">Basic</div>
+        <div id="basemap-style-thumbnails" class="flex gap-2">
+            <button data-style="communityscale/cmgicidwh007k01qdauae93b0" class="px-3 py-1 bg-black text-white text-xs rounded hover:bg-gray-800">
+                Gray
               </button>
-              <button data-style="communityscale/cmcntrq2h00hp01qv4paqhpwx" class="group border border-gray-300 rounded overflow-hidden hover:ring-2 ring-gray-500">
-                <img src="https://api.mapbox.com/styles/v1/communityscale/cmcntrq2h00hp01qv4paqhpwx/static/-71.81, 42.21,9.5/300x200@2x?access_token=pk.eyJ1IjoiZW10em90MDEiLCJhIjoiY20zZ2kyd3RpMDRnajJscHoyMG5neGJldyJ9.poXi4pgd2CoXKV2B4kg1Cw" alt="Light satellite" class="w-full h-auto">
-                <div class="text-xs text-center py-1 group-hover:font-medium">Satellite</div>
+              <button data-style="communityscale/cmgidsjne002c01qne3nf930s" class="px-3 py-1 bg-black text-white text-xs rounded hover:bg-gray-800">
+                Satellite
               </button>
-              <button data-style="communityscale/cmc96uych026401s6577egc2r" class="group border border-gray-300 rounded overflow-hidden hover:ring-2 ring-gray-500">
-                <img src="https://api.mapbox.com/styles/v1/communityscale/cmc96uych026401s6577egc2r/static/-71.81, 42.21,9.5/300x200@2x?access_token=pk.eyJ1IjoiZW10em90MDEiLCJhIjoiY20zZ2kyd3RpMDRnajJscHoyMG5neGJldyJ9.poXi4pgd2CoXKV2B4kg1Cw" alt="Grayscale satellite" class="w-full h-auto">
-                <div class="text-xs text-center py-1 group-hover:font-medium">B/W satellite</div>
+              <button data-style="communityscale/cmgidu19b00n301sb0jcihsuk" class="px-3 py-1 bg-black text-white text-xs rounded hover:bg-gray-800">
+                Light Satellite
               </button>
       </div>
     </div>
@@ -312,6 +309,7 @@
     <button id="zoom-in" class="p-2 text-xl hover:bg-gray-100 focus:outline-none">+</button>
     <button id="zoom-out" class="p-2 text-xl hover:bg-gray-100 focus:outline-none">−</button>
     <div class="border-t border-gray-300"></div>
+    <button id="zoom-home" class="p-2 hover:bg-gray-100 focus:outline-none" onclick="zoomToFullRegion()"><span class="material-icons">home</span></button>
     <button id="clear-map" class="p-2 hover:bg-gray-100 focus:outline-none"><span class="material-icons">refresh</span></button>
   </div>  
   <!-- map -->
@@ -554,8 +552,8 @@ function batchSetFeatureStates({ //batching experiment
     let map;
     const BASEMAP_STYLES = {
         gray: 'mapbox://styles/communityscale/cmgicidwh007k01qdauae93b0',
-        satellite: 'mapbox://styles/communityscale/cmc96uych026401s6577egc2r',
-        lightSatellite: 'mapbox://styles/communityscale/cmcntrq2h00hp01qv4paqhpwx'
+        satellite: 'mapbox://styles/communityscale/cmgidsjne002c01qne3nf930s',
+        lightSatellite: 'mapbox://styles/communityscale/cmgidu19b00n301sb0jcihsuk'
     };
 
     function initializeMap(styleKey = 'gray') {
@@ -1832,7 +1830,10 @@ map.addLayer({
                 "text-size": 11,
                 "text-transform": "uppercase",
                 "text-letter-spacing": 0.1,
-                "visibility": "visible"
+                "visibility": "visible",
+                "symbol-placement": "point",
+                "text-allow-overlap": false,
+                "text-optional": true
             },
             paint: {
                 "text-color": "#000000",
@@ -2684,7 +2685,7 @@ layerSelect.addEventListener('change', (e) => {
             .addTo(map);
     });
 
-    //KEEP LAYERS WHEN BASEMAP CHANGES 
+    //KEEP LAYERS WHEN BASEMAP CHANGES
     function toggleBasemapSettings() { //correct for the basemap toggle situation
         const panel = document.getElementById('basemap-settings');
         const arrow = document.getElementById('basemap-arrow');
@@ -2787,7 +2788,7 @@ document.querySelectorAll('#basemap-style-thumbnails button').forEach(button => 
 };
 
 
-//zoom in zoom out buttons 
+//zoom in zoom out buttons
 document.getElementById('zoom-in').addEventListener('click', () => {
   map.zoomIn();
 });
@@ -2795,6 +2796,48 @@ document.getElementById('zoom-in').addEventListener('click', () => {
 document.getElementById('zoom-out').addEventListener('click', () => {
   map.zoomOut();
 });
+
+// Full region zoom function
+function zoomToFullRegion() {
+    fetch('communityboundaries.geojson')
+        .then(response => {
+            if (!response.ok) throw new Error('Failed to fetch');
+            return response.json();
+        })
+        .then(data => {
+            const bounds = new mapboxgl.LngLatBounds();
+
+            // Process all features
+            data.features.forEach(feature => {
+                if (feature.geometry.type === 'Polygon') {
+                    feature.geometry.coordinates.forEach(ring => {
+                        ring.forEach(coord => bounds.extend(coord));
+                    });
+                } else if (feature.geometry.type === 'MultiPolygon') {
+                    feature.geometry.coordinates.forEach(polygon => {
+                        polygon.forEach(ring => {
+                            ring.forEach(coord => bounds.extend(coord));
+                        });
+                    });
+                }
+            });
+
+            // Zoom to bounds with padding
+            map.fitBounds(bounds, {
+                padding: 50,
+                duration: 1000
+            });
+        })
+        .catch(error => {
+            console.error('Error loading communityboundaries:', error);
+            // Fallback: zoom to approximate Central MA region
+            map.flyTo({
+                center: [-71.9, 42.25],
+                zoom: 9,
+                duration: 1000
+            });
+        });
+}
 
 //clear map
 document.getElementById('clear-map').addEventListener('click', () => {
