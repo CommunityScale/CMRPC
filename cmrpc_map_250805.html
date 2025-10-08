@@ -99,7 +99,7 @@
         <option value="tracts-pctCostBurdenedOwners">Percent of Homeowners, Cost Burdened</option>
         <option value="bg-costs-HT">Housing + Transportation Costs (Renters)</option>
         <option value="bg-costs-HT-owner">Housing + Transportation Costs (Homeowners)</option>
-        <option value="bg-costs-2veh-owner">Housing + Transportation Costs (2-vehicle, 2-3 bed, 100% AMI, 3+ person)</option>
+        <option value="bg-costs-2veh-owner">Example: Where can a 3+ person household with 2 cars at 100% AMI household income afford housing and transportation?</option>
         <option value="bg-costs-ownership">Monthly Ownership Costs</option>
         <option value="bg-costs-rental">Monthly Rental Costs</option>
         <option value="bg-costs-transport">Average Household Monthly Transportation Costs</option>
@@ -630,7 +630,8 @@ function batchSetFeatureStates({ //batching experiment
 
         map.addSource("bg-costs", {
             type: "geojson",
-            data: 'CMRPC_bg_costs.geojson'
+            data: 'CMRPC_bg_costs.geojson',
+            promoteId: 'GEO_ID_clean'
         })
 
         map.addSource("ctysds", {
@@ -1002,7 +1003,9 @@ const interpolateLayers = [
             colors: medIncomePalette,
             defaultViz: "none",
             useFeatureState: false,
-            useQuintiles: true
+            useQuintiles: false,
+            useCustomBreaks: true,
+            customBreaks: [0, 0.2, 0.4, 0.6, 0.8, 1.0]
         },
         {
             id: "bg-costs-ownership",
@@ -1177,35 +1180,51 @@ const interpolateLayers = [
     // }
 
     async function addInterpolatedLayers(opacity, visibleLayerId) {
-  for (const { id, property, data_source, source_layer, source_url, colors, defaultViz, useFeatureState, useQuintiles } of interpolateLayers) {
+  for (const { id, property, data_source, source_layer, source_url, colors, defaultViz, useFeatureState, useQuintiles, useCustomBreaks, customBreaks } of interpolateLayers) {
     console.log(`Processing layer: ${id}`);
-
-    // Use quintile breaks if specified, otherwise use default IQR-based breaks
-    const stats = useQuintiles
-      ? await computeQuintileBreaks(source_url, property)
-      : await computeStatsFromSource(source_url, property);
-
-    if (!stats) {
-      console.warn(`Skipping ${id} – insufficient data.`);
-      continue;
-    }
-
-    const stops = generateColorStopsFromStats(stats, colors);
-    if (!stops) {
-      console.warn(`Invalid stops for ${id}`);
-      continue;
-    }
 
     const expressionInput = useFeatureState
       ? ["feature-state", property]
       : ["get", property];
 
-    const fillColorExpression = [
-      "interpolate",
-      ["linear"],
-      expressionInput,
-      ...stops
-    ];
+    let fillColorExpression;
+
+    // Handle custom breaks
+    if (useCustomBreaks && customBreaks) {
+      const stops = [];
+      for (let i = 0; i < customBreaks.length && i < colors.length; i++) {
+        stops.push(customBreaks[i], colors[i]);
+      }
+      fillColorExpression = [
+        "interpolate",
+        ["linear"],
+        expressionInput,
+        ...stops
+      ];
+    } else {
+      // Use quintile breaks if specified, otherwise use default IQR-based breaks
+      const stats = useQuintiles
+        ? await computeQuintileBreaks(source_url, property)
+        : await computeStatsFromSource(source_url, property);
+
+      if (!stats) {
+        console.warn(`Skipping ${id} – insufficient data.`);
+        continue;
+      }
+
+      const stops = generateColorStopsFromStats(stats, colors);
+      if (!stops) {
+        console.warn(`Invalid stops for ${id}`);
+        continue;
+      }
+
+      fillColorExpression = [
+        "interpolate",
+        ["linear"],
+        expressionInput,
+        ...stops
+      ];
+    }
 
     if (!map.getSource(data_source)) {
       console.error(`Source ${data_source} not found for layer ${id}`);
@@ -2395,13 +2414,14 @@ layerSelect.addEventListener('change', (e) => {
             "tracts-pctCostBurdenedOwners",
             "bg-costs-HT",
             "bg-costs-HT-owner",
+            "bg-costs-2veh-owner",
             "tracts-rdAge",
             "tracts-rdRace",
             "tracts-mva",
             "zip-currentZHVI",
             "zip-chZHVI",
-            "ctysds-pctHH", 
-            "admin-layer", 
+            "ctysds-pctHH",
+            "admin-layer",
             "town-layer",
         ]
 
@@ -2481,6 +2501,16 @@ layerSelect.addEventListener('change', (e) => {
                 html = `
                 <div class="popup-header">Block Group ${attributes.GEO_ID_clean}</div>
                 <div class="popup-content">${htCostOwner != null ? `Monthly housing + transportation costs for homeowners: $${Math.round(htCostOwner).toLocaleString()}` : 'No available data.'}
+                </div>`;
+            break;
+            }
+
+            case "bg-costs-2veh-owner": {
+                const affordabilityShare = attributes.own_2veh_2_3_bd_AMI100_3p_cost_sh;
+                const affordabilityPct = affordabilityShare != null ? Math.round(affordabilityShare * 100) : null;
+                html = `
+                <div class="popup-header">Block Group ${attributes.GEO_ID_clean}</div>
+                <div class="popup-content">${affordabilityPct != null ? `A 3+ person household with 2 cars looking for a 2-3 bedroom home, making 100% AMI as a household, could afford ${affordabilityPct}% of homes here, given transportation costs.` : 'No available data.'}
                 </div>`;
             break;
             }
