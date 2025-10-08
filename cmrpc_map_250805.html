@@ -104,10 +104,10 @@
         <option value="zip-chZHVI"> Change in Typical Home Price (2020-2025)</option>
         <option value="tracts-rdAge">Risk Displacement - Age</option> 
         <option value="tracts-rdRace">Risk Displacement - Race & Ethnicity</option> 
-        <!--<option value="parcels-density">Residential density</option> -->
+        <option value="parcels-density">Residential density</option> 
         <option value="tracts-mva">Neighborhood Conditions</option>
-        <!--<option value="parcels-landuse">Property Class</option> 
-        <option value="parcels-ownership">Property Tax Credits</option>
+        <option value="parcels-landuse">Property Class</option> 
+        <!--<option value="parcels-ownership">Property Tax Credits</option>
         <option value="parcels-pctLV">Land Value as Percent of Assessed Value</option>
         <option value="parcels-value">Parcel Value Per Acre</option>-->
         <option value="admin-layer">Massachusetts tracts</option> <!--maybe just use outlines here?? add as toggle?? idk -->
@@ -392,11 +392,11 @@
         'ctysds-pctHH',
         'zip-currentZHVI',
         'zip-chZHVI',
-        //'parcels-landuse',
+        'parcels-landuse',
         //'parcels-pctLV',
         //'parcels-value',
         //'parcels-ownership',
-        //'parcels-density'
+        'parcels-density'
         //'admin-layer' //not sure if admin layer should be included here
     ];
 
@@ -494,21 +494,24 @@
     //             { key: "HMST,AG,MI", color: '#8b63ba', label: "Homestead, Agriculture, Military" },
     //             { key: "NONE", color: '#bdc9e1', label: "None"}
     //         ]
-    // const landUsePalette = [ //only set this up for custom legends unless there is a way to set inner html of breaks/stops dynamically??
-    //             { key: "A", color: "#24910a", label: "Agriculture" },
-    //             { key: "A,AD", color: "#d4f088", label: "Agricultural/residential" },
-    //             { key: "R", color: "#fff8bf", label: "Residential" },
-    //             { key: "M", color: "#ffa734", label: "Multifamily" },
-    //             { key: "C", color: "#da6262", label: "Commercial" }, 
-    //             { key: "C,R", color: "#b560bb", label: "Mixed use" },
-    //             { key: "C,M", color: "#b560bb", label: "Mixed use" }, //duplicate for viz purposes
-    //             { key: "I", color: "#323052", label: "Industrial" },
-    //             { key: "E", color: "#425A70", label: "Exempt" },
-    //             { color: "#bdc9e1", label: "Unknown" }
-    //         ]
+    const landUsePalette = [ //only set this up for custom legends unless there is a way to set inner html of breaks/stops dynamically??
+                { key: "R-L", color: "#fffbd7", label: "Low density residential" },
+                { key: "R-M", color: "#fff8bf", label: "Medium density residential" },
+                { key: "R-H", color: "#fff17f", label: "High density residential" },
+                { key: "R-O", color: "#ffab3c", label: "Other housing" },
+                { key: "MU-R", color: "#d899dd", label: "Mixed use with residential" },
+                { key: "COMM", color: "#df2d83", label: "Commercial" },
+                { key: "GR", color: "#d4f088", label: "Greenspace" },
+                { key: "IND", color: "#767676", label: "Industrial" },
+                { key: "IMP", color: "#f0f420", label: "Improved land" },
+                { key: "DEV-R", color: "#cf820f", label: "Developable as residential"},
+                { key: "UND", color: "#d5d5d5", label: "Undevelopable"},
+                { key: "EXE", color: "#425A70", label: "Exempt" },
+                { key: "UNK", color: "#bdc9e1", label: "Unknown" }
+            ]
 
    const palettesByLayer = { //leave empty if not needed
-//             'parcels-landuse': landUsePalette,
+            'parcels-landuse': landUsePalette,
 //             'parcels-ownership': taxCreditPalette,
        'tracts-rdAge': [
            { value: 0, color: '#edf8fb', label: 'Relatively low displacement risk' },
@@ -535,7 +538,7 @@ function batchSetFeatureStates({ //batching experiment
   delay = 50,
   propertyParser = (f) => ({
     density: Number(f["DUA"]),
-    useCode: f["StandardizedUseCodes"],
+    useCode: f["use"],
     SiteAddress: f["SiteAddress"],
     description: f["UseDesc"]
   })
@@ -618,7 +621,7 @@ function batchSetFeatureStates({ //batching experiment
 
         map.addSource("parcels", {    
             type: "vector",
-            url: 'mapbox://communityscale.centralmass-parcels', //update to stream json source + join!!
+            url: 'mapbox://communityscale.csy6z5wg', //update to stream json source + join!!
             promoteId: "LOC_ID"
         })
    
@@ -747,13 +750,13 @@ function batchSetFeatureStates({ //batching experiment
                 // .catch(err => console.error("Failed to load parcel data:", err));
 
 
-                fetch('https://raw.githubusercontent.com/CommunityScale/CMRPC/main/CMRPC_2025_Residensity_Parcel_250801.json') //batching experiment!
+                fetch('/Users/emtzot/Library/CloudStorage/GoogleDrive-emma@communityscale.com/Mon Drive/CMRPC/CMRPC_Parcels_Use_Residensity_251008.json') //batching experiment!
                     .then(response => response.json())
                     .then(data => {
                         batchSetFeatureStates({
                         data,
                         source: 'parcels',
-                        sourceLayer: 'parcels',
+                        sourceLayer: 'CMRPC_Parcels_Cleaned_NoData_251008',
                         batchSize: 1000,     // adjustable
                         delay: 50,           // ms delay between batches
                         });
@@ -1555,7 +1558,7 @@ map.addLayer({
             id: "parcels-density",  
             type: "fill",
             source: "parcels",
-            'source-layer': 'parcels',
+            'source-layer': 'CMRPC_Parcels_Cleaned_NoData_251008',
             paint: {
                 "fill-color": [
                     "case", ["==", ["feature-state", "density"], null], 'transparent',
@@ -1593,39 +1596,44 @@ map.addLayer({
     )
 
 
-    // map.addLayer({
-    //             id: "parcels-landuse", //update with parcel types!!
-    //             type: "fill",
-    //             source: "parcels",
-    //              'source-layer': 'parcels',
-    //             paint: {
-    //                 "fill-color": [
-    //                     "match",
-    //                     ["get", "PropClass"],
-    //                     "A", landUsePalette[0].color,
-    //                     "A,AD", landUsePalette[1].color,
-    //                     "C", landUsePalette[4].color,
-    //                     "C,M", landUsePalette[6].color,
-    //                     "C,R", landUsePalette[5].color,
-    //                     "E", landUsePalette[8].color,
-    //                     "I", landUsePalette[7].color,
-    //                     "R", landUsePalette[2].color,
-    //                     "M", landUsePalette[3].color,
-    //                     landUsePalette[9].color
-    //                 ],
-    //                 "fill-outline-color": communityScaleGray,
-    //                 "fill-opacity": [
-    //                 "case", ["==", ["get", "PropClass"], null], 0.3,
-    //                 ["case",
-    //                 ["boolean", ["feature-state", "hover"], false],
-    //                 0.95,
-    //                 0.66
-    //         ]]},
-    //             layout: {
-    //                 visibility: "none"
-    //             }
-    //         }, 
-    //         labelLayerId)
+    map.addLayer({
+                id: "parcels-landuse", //update with parcel types!!
+                type: "fill",
+                source: "parcels",
+                 'source-layer': 'CMRPC_Parcels_Cleaned_NoData_251008',
+                paint: {
+                    "fill-color": [
+                        "match",
+                        ["feature-state", "useCode"],
+                        "R-L", landUsePalette[0].color,
+                        "R-M", landUsePalette[1].color,
+                        "R-H", landUsePalette[2].color,
+                        "R-0", landUsePalette[3].color,
+                        "MU-R", landUsePalette[4].color,
+                        "COMM", landUsePalette[5].color,
+                        "GR", landUsePalette[6].color,
+                        "IND", landUsePalette[7].color,
+                        "IMP", landUsePalette[8].color,
+                        "DEV-R", landUsePalette[9].color,
+                        "UND", landUsePalette[10].color,
+                        "EXE", landUsePalette[11].color,
+                        "UNK", landUsePalette[12].color,
+                        "#fff"
+                    ],
+                    "fill-outline-color": "#777777",
+                    "fill-opacity": [
+                    "case", ["==", ["feature-state", "useCode"], null], 0.3,
+                    ["case",
+                    ["boolean", ["feature-state", "hover"], false],
+                    0.95,
+                    0.66
+            ]]},
+                layout: {
+                    visibility: "none"
+                }
+            }, 
+            labelLayerId)
+                  
 
     // map.addLayer({ 
     //         id: "parcels-pctLV",  
@@ -1894,7 +1902,7 @@ const allFillLayers = [
     'tracts-mva',
     'zip-chZHVI',
     'parcels-density',
-    //'parcels-landuse',
+    'parcels-landuse',
     //'parcels-pctLV',
     //'parcels-value',
     //'parcels-ownership',
@@ -2325,7 +2333,7 @@ layerSelect.addEventListener('change', (e) => {
     function updateLayerOpacity() {
         const currentOpacity = parseFloat(document.getElementById("opacity").value);
         const props = {
-            //"parcels-landuse": "PropClass", //make sure property names exist...
+            "parcels-landuse": "useCode", //make sure property names exist...
             //"parcels-pctLV": "pctLandVal",
             //"parcels-value": "acreVal",
             "parcels-density": "density",
@@ -2394,7 +2402,7 @@ layerSelect.addEventListener('change', (e) => {
         const popUpLayers = [
             //"parcels-pctLV",
             //"parcels-value",
-            //"parcels-landuse",
+            "parcels-landuse",
             //"parcels-ownership",
             "parcels-density",
             "tracts-medIncome",
@@ -2560,7 +2568,7 @@ layerSelect.addEventListener('change', (e) => {
             }
 
             case "parcels-landuse": {
-                const propClassVal = attributes.PropClass;
+                const propClassVal = attributes.useCode;
                 const propClassMatch = landUsePalette.find(entry => entry.key === propClassVal);
                 const displayPropClass = propClassMatch ? propClassMatch.label : "data unavailable";
                 html = `
@@ -2593,7 +2601,7 @@ layerSelect.addEventListener('change', (e) => {
             }
 
             // case "parcels-density": { //add density pop-up!!
-            //     const propClassVal = attributes.PropClass;
+            //     const propClassVal = attributes.useCode;
             //     const propClassMatch = landUsePalette.find(entry => entry.key === propClassVal);
             //     const displayPropClass = propClassMatch ? propClassMatch.label : "data unavailable";
             //     html = `
