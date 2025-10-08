@@ -211,15 +211,31 @@
           </div>
         <span class="leading-snug ms-2">Bus stops</span>
     </label>
-     <!-- <label class="flex items-center justify-between w-full text-sm text-gray-700">
+    <label class="flex items-start text-sm text-gray-700">
+      <div class="relative">
+          <input type="checkbox" class="sr-only overlay-toggle peer" value="transit-diversity-layer" />
+          <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
+          <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
+        </div>
+      <span class="leading-snug ms-2">Transit diversity</span>
+  </label>
+ <!-- <label class="flex items-start text-sm text-gray-700">
+    <div class="relative">
+        <input type="checkbox" class="sr-only overlay-toggle peer" value="transit-quality-layer" />
+        <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
+        <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
+      </div>
+    <span class="leading-snug ms-2">Transit quality</span>
+</label> -->
+    <!--<label class="flex items-center justify-between w-full text-sm text-gray-700">
         <div class="relative">
-            <input type="checkbox" class="sr-only overlay-toggle peer" value="manufacturedHomes" checked />
+            <input type="checkbox" class="sr-only overlay-toggle peer" value="transit-diversity-layer"/>
             <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
             <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
           </div>
-        <span class="ms-2 leading-snug">Manufactured home parks</span>
+        <span class="ms-2 leading-snug">Transit diversity</span>
     </label>
-    <label class="flex items-center justify-between w-full text-sm text-gray-700">
+   <label class="flex items-center justify-between w-full text-sm text-gray-700">
         <div class="relative">
             <input type="checkbox" id="toggleCounty" class="sr-only overlay-toggle peer" />
             <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
@@ -385,7 +401,16 @@
     ];
 
     const overlayLayers = [ // all overlay layers need to be listed here
-        "towns-layer"
+        "towns-layer",
+        "bus-stops-layer",
+        "transit-diversity-layer",
+        "transit-quality-layer"
+        //"subregion-southeast",
+        //"subregion-northeast",
+        //"subregion-central",
+        //"subregion-west",
+        //"subregion-north",
+        //"subregion-southeast"
         ];
 
     //all palettes here!!
@@ -618,6 +643,18 @@ function batchSetFeatureStates({ //batching experiment
         map.addSource("bus-stops", {
             type: "geojson",
             data: 'https://raw.githubusercontent.com/CommunityScale/CMRPC/refs/heads/main/bus_stops.geojson' //replace with re-projected version??
+        })
+
+        map.addSource("transit-diversity", {
+            type: 'geojson',
+            data: 'https://raw.githubusercontent.com/CommunityScale/CMRPC/e1f70fdb0d8f63d60fef2b96eaacfee5879ca632/parcels_transportation_diversity_marg_onlytrue.geojson',
+            promoteId: 'loc_id'
+        })
+
+        map.addSource("transit-quality", { //replace!!
+            type: 'geojson',
+            data: 'https://raw.githubusercontent.com/CommunityScale/CMRPC/e1f70fdb0d8f63d60fef2b96eaacfee5879ca632/transit_quality_dissolved.geojson',
+            promoteId: 'fid'
         })
 
         map.addSource("bg-costs", {
@@ -1626,6 +1663,32 @@ map.addLayer({
     //     },
     //     labelLayerId
     // )
+
+    map.addLayer({
+            id: 'transit-diversity-layer',
+            type: 'fill',
+            source: 'transit-diversity',
+            paint: {
+              'fill-color': '#9e1583' //mbta purple lol
+            },
+          layout: {
+            visibility: 'none'
+          }}, 
+        labelLayerId
+  )
+
+  map.addLayer({
+            id: 'transit-quality-layer',
+            type: 'fill',
+            source: 'transit-quality',
+            paint: {
+              'fill-color': '#028b57' //mbta green lol
+            },
+          layout: {
+            visibility: 'none'
+          }}, 
+        labelLayerId
+  )
 
     map.addLayer({
             id: "town-layer",
