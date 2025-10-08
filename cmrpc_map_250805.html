@@ -101,6 +101,7 @@
         <option value="bg-costs-HT-owner">Housing + Transportation Costs (Homeowners)</option>
         <option value="bg-costs-ownership">Monthly Ownership Costs</option>
         <option value="bg-costs-rental">Monthly Rental Costs</option>
+        <option value="bg-costs-transport">Average Household Monthly Transportation Costs</option>
         <option value="ctysds-pctHH">Percent Change in Households (2015-2023)</option>
         <option value="zip-currentZHVI">Typical Home Price by Zip Code (2025)</option>
         <option value="zip-chZHVI"> Change in Typical Home Price (2020-2025)</option>
@@ -375,6 +376,7 @@
         'bg-costs-HT-owner',
         'bg-costs-ownership',
         'bg-costs-rental',
+        'bg-costs-transport',
         'tracts-rdAge',
         'tracts-rdRace',
         'ctysds-pctHH',
@@ -1003,6 +1005,17 @@ const interpolateLayers = [
         {
             id: "bg-costs-rental",
             property: "monthly_rental_costs_overall",
+            data_source: "bg-costs",
+            source_layer: null,
+            source_url: "/CMRPC_bg_costs.geojson",
+            colors: medIncomePalette,
+            defaultViz: "none",
+            useFeatureState: false,
+            useQuintiles: true
+        },
+        {
+            id: "bg-costs-transport",
+            property: "monthly_t_costs_avg_hh",
             data_source: "bg-costs",
             source_layer: null,
             source_url: "/CMRPC_bg_costs.geojson",
@@ -1852,6 +1865,7 @@ const allFillLayers = [
     'bg-costs-HT-owner',
     'bg-costs-ownership',
     'bg-costs-rental',
+    'bg-costs-transport',
     'tracts-rdAge',
     'tracts-rdRace',
     'ctysds-pctHH',
@@ -1939,7 +1953,7 @@ function renderBivariateLegend() {   // use image legend for MVA
 
 // Define formatting by layer type (univariate)
 const percentLayers = ['tracts-pctCostBurdenedRenters', 'tracts-pctCostBurdenedOwners', 'tracts-pctHH', 'zips-chZhvi', ];
-const currencyLayers = ['tracts-medIncome', 'zips-zhvi', 'bg-costs-HT', 'bg-costs-HT-owner', 'bg-costs-ownership', 'bg-costs-rental'];
+const currencyLayers = ['tracts-medIncome', 'zips-zhvi', 'bg-costs-HT', 'bg-costs-HT-owner', 'bg-costs-ownership', 'bg-costs-rental', 'bg-costs-transport'];
 const numberLayers  = ['tracts-rdAge', 'tracts-rdRace', 'parcels-density'];
 
 // Update formatting by way of layerId 
@@ -1954,7 +1968,7 @@ function formatLegendLabel(value, layerId) {
   // Currency
   if (currencyLayers.includes(layerId)) {
     // For bg-costs layers, values are already rounded to nearest 10, so don't round further
-    if (layerId === 'bg-costs-HT' || layerId === 'bg-costs-HT-owner' || layerId === 'bg-costs-ownership' || layerId === 'bg-costs-rental') {
+    if (layerId === 'bg-costs-HT' || layerId === 'bg-costs-HT-owner' || layerId === 'bg-costs-ownership' || layerId === 'bg-costs-rental' || layerId === 'bg-costs-transport') {
       return `$${Math.round(value).toLocaleString()}`;
     }
     // For other currency layers, round to nearest 1000 if >= 1500
@@ -2818,6 +2832,10 @@ const layerDescriptions = { //edit as needed; some base text should be re-useabl
   `,
   'bg-costs-rental': `
     <p><strong>Monthly rental costs</strong> by Census block group, including rent and utilities for renters.</p><br>
+    <p><em>Source(s):</em> CMRPC housing and transportation cost analysis; CommunityScale.</p>
+  `,
+  'bg-costs-transport': `
+    <p><strong>Average household monthly transportation costs</strong> by Census block group, based on average vehicle ownership and commuting patterns.</p><br>
     <p><em>Source(s):</em> CMRPC housing and transportation cost analysis; CommunityScale.</p>
   `
 };
