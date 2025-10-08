@@ -155,7 +155,7 @@
           </div>
       <span class="leading-snug ms-2">CMRPC community boundaries</span>
     </label>
-    <!--<label class="flex items-start text-sm text-gray-700">
+    <label class="flex items-start text-sm text-gray-700">
         <div class="relative">
             <input type="checkbox" class="sr-only overlay-toggle peer" value="subregion-central" />
             <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
@@ -211,7 +211,7 @@
           </div>
         <span class="leading-snug ms-2">Bus stops</span>
     </label>
-    <!--<label class="flex items-center justify-between w-full text-sm text-gray-700">
+     <!-- <label class="flex items-center justify-between w-full text-sm text-gray-700">
         <div class="relative">
             <input type="checkbox" class="sr-only overlay-toggle peer" value="manufacturedHomes" checked />
             <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
@@ -617,7 +617,7 @@ function batchSetFeatureStates({ //batching experiment
 
         map.addSource("bus-stops", {
             type: "geojson",
-            data: 'bus_stops.geojson'
+            data: 'https://raw.githubusercontent.com/CommunityScale/CMRPC/refs/heads/main/bus_stops.geojson' //replace with re-projected version??
         })
 
         map.addSource("bg-costs", {
@@ -644,8 +644,8 @@ function batchSetFeatureStates({ //batching experiment
                         },
                         {
                         medIncome: f["medIncome"]
-                        //pctRent30: f["pctRent30"],
-                        //pctOwned30: f["pctOwned30"]
+                        //pctrent30_23: f["pctrent30_23"],
+                        //pctowned30_23: f["pctowned30_23"]
                         }
                     )
                     });
@@ -754,8 +754,8 @@ function batchSetFeatureStates({ //batching experiment
                         id: id
                         },
                         {
-                        pctOwned30: Number(f["pctowned30_23"]),
-                        pctRent30: Number(f["pctrent30_23"]),
+                        pctowned30_23: Number(f["pctowned30_23"]),
+                        pctrent30_23: Number(f["pctrent30_23"]),
                         mva: (f["class"])
                         }
                     )
@@ -945,7 +945,7 @@ const interpolateLayers = [
         },
         {
             id: "tracts-pctCostBurdenedRenters",
-            property: "pctRent30",
+            property: "pctrent30_23",
             data_source: "tracts",
             source_layer: "tracts",
             source_url: "https://raw.githubusercontent.com/CommunityScale/CMRPC/adc9df09b39883512a5175738efe5ace91ad2917/CMRPC_Tracts_MVA_CostBurden_250828.json",
@@ -955,7 +955,7 @@ const interpolateLayers = [
         },
         {
             id: "tracts-pctCostBurdenedOwners",
-            property:"pctOwned30",
+            property:"pctowned30_23",
             data_source: "tracts",
             source_layer: "tracts",
             source_url: "https://raw.githubusercontent.com/CommunityScale/CMRPC/adc9df09b39883512a5175738efe5ace91ad2917/CMRPC_Tracts_MVA_CostBurden_250828.json",
@@ -2224,7 +2224,7 @@ layerSelect.addEventListener('change', (e) => {
           newOpacity // otherwise use slider opacity
         ];
 
-        map.setPaintProperty(layerId, "fill-opacity", fillOpacityExpression); //I don't think this is
+        map.setPaintProperty(layerId, "fill-opacity", fillOpacityExpression); //I don't think this is working
       });
     });
 
@@ -2237,8 +2237,8 @@ layerSelect.addEventListener('change', (e) => {
     //         //"parcels-value": "acreVal",
     //         //"parcels-density": "DUA",
     //         'tracts-medIncome': "medIncome",
-    //         'tracts-pctCostBurdenedRenters': 'pctRent30',
-    //         'tracts-pctCostBurdenedOwners': 'pctOwned30',
+    //         'tracts-pctCostBurdenedRenters': 'pctrent30_23',
+    //         'tracts-pctCostBurdenedOwners': 'pctowned30_23',
     //         'tracts-rdAge': 'rd-propName',
     //         'tracts-rdRace': 'rd_nonWhitePops',
     //         'ctysds-pctHH': 'pctChangeHH',
@@ -2267,8 +2267,8 @@ layerSelect.addEventListener('change', (e) => {
             //"parcels-value": "acreVal",
             "parcels-density": "density",
             'tracts-medIncome': "medIncome",
-            'tracts-pctCostBurdenedRenters': 'pctRent30',
-            'tracts-pctCostBurdenedOwners': 'pctOwned30',
+            'tracts-pctCostBurdenedRenters': 'pctrent30_23',
+            'tracts-pctCostBurdenedOwners': 'pctowned30_23',
             'bg-costs-HT': 'H_T_renters',
             'bg-costs-HT-owner': 'H_T_owner',
             'tracts-rdAge': 'rd-propName',
@@ -2394,19 +2394,19 @@ layerSelect.addEventListener('change', (e) => {
             }
 
             case "tracts-pctCostBurdenedRenters": {
-                const pctRent30 = attributes.pctRent30;
+                const pctrent30_23 = attributes.pctrent30_23;
                 html = `
                 <div class="popup-header">${attributes.NAME}</div>
-                <div class="popup-content">${pctRent30 != null ? `${Math.round(pctRent30 * 1000) / 10}% of renters in ${attributes.NAME} spend more than 30% of income on housing costs.` : 'No available data.'}
+                <div class="popup-content">${pctrent30_23 != null ? `${Math.round(pctrent30_23 * 1000) / 10}% of renters in ${attributes.NAME} spend more than 30% of income on housing costs.` : 'No available data.'}
                 </div>`;
             break;
             }
 
             case "tracts-pctCostBurdenedOwners": {
-                const pctOwned30 = attributes.pctOwned30;
+                const pctowned30_23 = attributes.pctowned30_23;
                 html = `
                 <div class="popup-header">${attributes.NAME}</div>
-                <div class="popup-content">${pctOwned30 != null ? `${Math.round(pctOwned30 * 1000) / 10}% of homeowners in ${attributes.NAME} spend more than 30% of income on housing costs.` : 'No available data.'}
+                <div class="popup-content">${pctowned30_23 != null ? `${Math.round(pctowned30_23 * 1000) / 10}% of homeowners in ${attributes.NAME} spend more than 30% of income on housing costs.` : 'No available data.'}
                 </div>`;
             break;
             }
