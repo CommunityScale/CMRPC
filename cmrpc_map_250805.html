@@ -99,6 +99,7 @@
         <option value="tracts-pctCostBurdenedOwners">Percent of Homeowners, Cost Burdened</option>
         <option value="bg-costs-HT">Housing + Transportation Costs (Renters)</option>
         <option value="bg-costs-HT-owner">Housing + Transportation Costs (Homeowners)</option>
+        <option value="bg-costs-2veh-owner">Housing + Transportation Costs (2-vehicle, 2-3 bed, 100% AMI, 3+ person)</option>
         <option value="bg-costs-ownership">Monthly Ownership Costs</option>
         <option value="bg-costs-rental">Monthly Rental Costs</option>
         <option value="bg-costs-transport">Average Household Monthly Transportation Costs</option>
@@ -374,6 +375,7 @@
         'tracts-pctCostBurdenedOwners',
         'bg-costs-HT',
         'bg-costs-HT-owner',
+        'bg-costs-2veh-owner',
         'bg-costs-ownership',
         'bg-costs-rental',
         'bg-costs-transport',
@@ -983,6 +985,17 @@ const interpolateLayers = [
         {
             id: "bg-costs-HT-owner",
             property: "H_T_owner",
+            data_source: "bg-costs",
+            source_layer: null,
+            source_url: "/CMRPC_bg_costs.geojson",
+            colors: medIncomePalette,
+            defaultViz: "none",
+            useFeatureState: false,
+            useQuintiles: true
+        },
+        {
+            id: "bg-costs-2veh-owner",
+            property: "own_2veh_2_3_bd_AMI100_3p_cost_sh",
             data_source: "bg-costs",
             source_layer: null,
             source_url: "/CMRPC_bg_costs.geojson",
@@ -1863,6 +1876,7 @@ const allFillLayers = [
     'tracts-pctCostBurdenedOwners',
     'bg-costs-HT',
     'bg-costs-HT-owner',
+    'bg-costs-2veh-owner',
     'bg-costs-ownership',
     'bg-costs-rental',
     'bg-costs-transport',
@@ -1952,7 +1966,7 @@ function renderBivariateLegend() {   // use image legend for MVA
 
 
 // Define formatting by layer type (univariate)
-const percentLayers = ['tracts-pctCostBurdenedRenters', 'tracts-pctCostBurdenedOwners', 'tracts-pctHH', 'zips-chZhvi', ];
+const percentLayers = ['tracts-pctCostBurdenedRenters', 'tracts-pctCostBurdenedOwners', 'tracts-pctHH', 'zips-chZhvi', 'bg-costs-2veh-owner'];
 const currencyLayers = ['tracts-medIncome', 'zips-zhvi', 'bg-costs-HT', 'bg-costs-HT-owner', 'bg-costs-ownership', 'bg-costs-rental', 'bg-costs-transport'];
 const numberLayers  = ['tracts-rdAge', 'tracts-rdRace', 'parcels-density'];
 
@@ -2836,6 +2850,10 @@ const layerDescriptions = { //edit as needed; some base text should be re-useabl
   `,
   'bg-costs-transport': `
     <p><strong>Average household monthly transportation costs</strong> by Census block group, based on average vehicle ownership and commuting patterns.</p><br>
+    <p><em>Source(s):</em> CMRPC housing and transportation cost analysis; CommunityScale.</p>
+  `,
+  'bg-costs-2veh-owner': `
+    <p><strong>Housing and transportation cost share</strong> for a 2-vehicle homeowner household with 2-3 bedrooms at 100% AMI (Area Median Income) with 3+ persons, by Census block group. Values represent the proportion of household income spent on combined housing and transportation costs.</p><br>
     <p><em>Source(s):</em> CMRPC housing and transportation cost analysis; CommunityScale.</p>
   `
 };
