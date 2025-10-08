@@ -99,6 +99,10 @@
         <option value="tracts-pctCostBurdenedOwners">Percent of Homeowners, Cost Burdened</option>
         <option value="bg-costs-HT">Housing + Transportation Costs (Renters)</option>
         <option value="bg-costs-HT-owner">Housing + Transportation Costs (Homeowners)</option>
+        <option value="bg-costs-2veh-owner">Example: Where can a 3+ person household with 2 cars at 100% AMI household income afford housing and transportation?</option>
+        <option value="bg-costs-ownership">Monthly Ownership Costs</option>
+        <option value="bg-costs-rental">Monthly Rental Costs</option>
+        <option value="bg-costs-transport">Average Household Monthly Transportation Costs</option>
         <option value="ctysds-pctHH">Percent Change in Households (2015-2023)</option>
         <option value="zip-currentZHVI">Typical Home Price by Zip Code (2025)</option>
         <option value="zip-chZHVI"> Change in Typical Home Price (2020-2025)</option>
@@ -282,18 +286,15 @@
   <div>
     <div>
         <label class="block mb-1 font-medium">Basemap style</label>
-        <div id="basemap-style-thumbnails" class="flex flex-wrap md:flex-nowrap gap-2 overflow-x-auto">
-            <button data-style="communityscale/cmcuwuwcv00xz01s1gn7xccqi" class="group border border-gray-300 rounded overflow-hidden hover:ring-2 ring-gray-500">
-                <img src="https://api.mapbox.com/styles/v1/communityscale/cmcuwuwcv00xz01s1gn7xccqi/static/-71.81, 42.21,9.5/300x200@2x?access_token=pk.eyJ1IjoiZW10em90MDEiLCJhIjoiY20zZ2kyd3RpMDRnajJscHoyMG5neGJldyJ9.poXi4pgd2CoXKV2B4kg1Cw" alt="Light monochrome" class="w-full h-auto">
-                <div class="text-xs text-center py-1 group-hover:font-medium">Basic</div>
+        <div id="basemap-style-thumbnails" class="flex gap-2">
+            <button data-style="communityscale/cmgicidwh007k01qdauae93b0" class="px-3 py-1 bg-black text-white text-xs rounded hover:bg-gray-800">
+                Gray
               </button>
-              <button data-style="communityscale/cmcntrq2h00hp01qv4paqhpwx" class="group border border-gray-300 rounded overflow-hidden hover:ring-2 ring-gray-500">
-                <img src="https://api.mapbox.com/styles/v1/communityscale/cmcntrq2h00hp01qv4paqhpwx/static/-71.81, 42.21,9.5/300x200@2x?access_token=pk.eyJ1IjoiZW10em90MDEiLCJhIjoiY20zZ2kyd3RpMDRnajJscHoyMG5neGJldyJ9.poXi4pgd2CoXKV2B4kg1Cw" alt="Light satellite" class="w-full h-auto">
-                <div class="text-xs text-center py-1 group-hover:font-medium">Satellite</div>
+              <button data-style="communityscale/cmgidsjne002c01qne3nf930s" class="px-3 py-1 bg-black text-white text-xs rounded hover:bg-gray-800">
+                Satellite
               </button>
-              <button data-style="communityscale/cmc96uych026401s6577egc2r" class="group border border-gray-300 rounded overflow-hidden hover:ring-2 ring-gray-500">
-                <img src="https://api.mapbox.com/styles/v1/communityscale/cmc96uych026401s6577egc2r/static/-71.81, 42.21,9.5/300x200@2x?access_token=pk.eyJ1IjoiZW10em90MDEiLCJhIjoiY20zZ2kyd3RpMDRnajJscHoyMG5neGJldyJ9.poXi4pgd2CoXKV2B4kg1Cw" alt="Grayscale satellite" class="w-full h-auto">
-                <div class="text-xs text-center py-1 group-hover:font-medium">B/W satellite</div>
+              <button data-style="communityscale/cmgidu19b00n301sb0jcihsuk" class="px-3 py-1 bg-black text-white text-xs rounded hover:bg-gray-800">
+                Light Satellite
               </button>
       </div>
     </div>
@@ -324,6 +325,7 @@
     <button id="zoom-in" class="p-2 text-xl hover:bg-gray-100 focus:outline-none">+</button>
     <button id="zoom-out" class="p-2 text-xl hover:bg-gray-100 focus:outline-none">−</button>
     <div class="border-t border-gray-300"></div>
+    <button id="zoom-home" class="p-2 hover:bg-gray-100 focus:outline-none" onclick="zoomToFullRegion()"><span class="material-icons">home</span></button>
     <button id="clear-map" class="p-2 hover:bg-gray-100 focus:outline-none"><span class="material-icons">refresh</span></button>
   </div>  
   <!-- map -->
@@ -387,6 +389,10 @@
         'tracts-pctCostBurdenedOwners',
         'bg-costs-HT',
         'bg-costs-HT-owner',
+        'bg-costs-2veh-owner',
+        'bg-costs-ownership',
+        'bg-costs-rental',
+        'bg-costs-transport',
         'tracts-rdAge',
         'tracts-rdRace',
         'ctysds-pctHH',
@@ -573,9 +579,9 @@ function batchSetFeatureStates({ //batching experiment
     mapboxgl.accessToken = 'pk.eyJ1IjoiY29tbXVuaXR5c2NhbGUiLCJhIjoiY21hZ3Y4azlmMDU5YTJqb2NqbzRsa3psbSJ9.eJlBVHcMSB88Czl3ti2i5g';
     let map;
     const BASEMAP_STYLES = {
-        gray: 'mapbox://styles/communityscale/cmcuwuwcv00xz01s1gn7xccqi',
-        satellite: 'mapbox://styles/communityscale/cmc96uych026401s6577egc2r',
-        lightSatellite: 'mapbox://styles/communityscale/cmcntrq2h00hp01qv4paqhpwx'
+        gray: 'mapbox://styles/communityscale/cmgicidwh007k01qdauae93b0',
+        satellite: 'mapbox://styles/communityscale/cmgidsjne002c01qne3nf930s',
+        lightSatellite: 'mapbox://styles/communityscale/cmgidu19b00n301sb0jcihsuk'
     };
 
     function initializeMap(styleKey = 'gray') {
@@ -631,10 +637,15 @@ function batchSetFeatureStates({ //batching experiment
             promoteId: 'ZCTA5'
         })
    
-        map.addSource("towns", {    
+        map.addSource("towns", {
             type: "vector",
             url: "mapbox://emtzot01.4s34saee",
             promoteId: "TOWN_ID"
+        })
+
+        map.addSource("communityboundaries", {
+            type: "geojson",
+            data: 'communityboundaries.geojson'
         })
 
         map.addSource("subregions", {
@@ -662,7 +673,8 @@ function batchSetFeatureStates({ //batching experiment
 
         map.addSource("bg-costs", {
             type: "geojson",
-            data: 'CMRPC_bg_costs.geojson'
+            data: 'CMRPC_bg_costs.geojson',
+            promoteId: 'GEO_ID_clean'
         })
 
         map.addSource("ctysds", {
@@ -1025,6 +1037,52 @@ const interpolateLayers = [
             useFeatureState: false,
             useQuintiles: true
         },
+        {
+            id: "bg-costs-2veh-owner",
+            property: "own_2veh_2_3_bd_AMI100_3p_cost_sh",
+            data_source: "bg-costs",
+            source_layer: null,
+            source_url: "/CMRPC_bg_costs.geojson",
+            colors: medIncomePalette,
+            defaultViz: "none",
+            useFeatureState: false,
+            useQuintiles: false,
+            useCustomBreaks: true,
+            customBreaks: [0, 0.2, 0.4, 0.6, 0.8, 1.0]
+        },
+        {
+            id: "bg-costs-ownership",
+            property: "monthly_ownership_costs_overall",
+            data_source: "bg-costs",
+            source_layer: null,
+            source_url: "/CMRPC_bg_costs.geojson",
+            colors: medIncomePalette,
+            defaultViz: "none",
+            useFeatureState: false,
+            useQuintiles: true
+        },
+        {
+            id: "bg-costs-rental",
+            property: "monthly_rental_costs_overall",
+            data_source: "bg-costs",
+            source_layer: null,
+            source_url: "/CMRPC_bg_costs.geojson",
+            colors: medIncomePalette,
+            defaultViz: "none",
+            useFeatureState: false,
+            useQuintiles: true
+        },
+        {
+            id: "bg-costs-transport",
+            property: "monthly_t_costs_avg_hh",
+            data_source: "bg-costs",
+            source_layer: null,
+            source_url: "/CMRPC_bg_costs.geojson",
+            colors: medIncomePalette,
+            defaultViz: "none",
+            useFeatureState: false,
+            useQuintiles: true
+        },
         // {
         //     id: "parcels-density",
         //     property: "density",
@@ -1165,35 +1223,51 @@ const interpolateLayers = [
     // }
 
     async function addInterpolatedLayers(opacity, visibleLayerId) {
-  for (const { id, property, data_source, source_layer, source_url, colors, defaultViz, useFeatureState, useQuintiles } of interpolateLayers) {
+  for (const { id, property, data_source, source_layer, source_url, colors, defaultViz, useFeatureState, useQuintiles, useCustomBreaks, customBreaks } of interpolateLayers) {
     console.log(`Processing layer: ${id}`);
-
-    // Use quintile breaks if specified, otherwise use default IQR-based breaks
-    const stats = useQuintiles
-      ? await computeQuintileBreaks(source_url, property)
-      : await computeStatsFromSource(source_url, property);
-
-    if (!stats) {
-      console.warn(`Skipping ${id} – insufficient data.`);
-      continue;
-    }
-
-    const stops = generateColorStopsFromStats(stats, colors);
-    if (!stops) {
-      console.warn(`Invalid stops for ${id}`);
-      continue;
-    }
 
     const expressionInput = useFeatureState
       ? ["feature-state", property]
       : ["get", property];
 
-    const fillColorExpression = [
-      "interpolate",
-      ["linear"],
-      expressionInput,
-      ...stops
-    ];
+    let fillColorExpression;
+
+    // Handle custom breaks
+    if (useCustomBreaks && customBreaks) {
+      const stops = [];
+      for (let i = 0; i < customBreaks.length && i < colors.length; i++) {
+        stops.push(customBreaks[i], colors[i]);
+      }
+      fillColorExpression = [
+        "interpolate",
+        ["linear"],
+        expressionInput,
+        ...stops
+      ];
+    } else {
+      // Use quintile breaks if specified, otherwise use default IQR-based breaks
+      const stats = useQuintiles
+        ? await computeQuintileBreaks(source_url, property)
+        : await computeStatsFromSource(source_url, property);
+
+      if (!stats) {
+        console.warn(`Skipping ${id} – insufficient data.`);
+        continue;
+      }
+
+      const stops = generateColorStopsFromStats(stats, colors);
+      if (!stops) {
+        console.warn(`Invalid stops for ${id}`);
+        continue;
+      }
+
+      fillColorExpression = [
+        "interpolate",
+        ["linear"],
+        expressionInput,
+        ...stops
+      ];
+    }
 
     if (!map.getSource(data_source)) {
       console.error(`Source ${data_source} not found for layer ${id}`);
@@ -1817,6 +1891,30 @@ map.addLayer({
             }
         })
 
+        map.addLayer({
+            id: "town-labels",
+            type: "symbol",
+            source: "communityboundaries",
+            layout: {
+                "text-field": ["get", "TOWN"],
+                "text-font": ["Roboto Regular", "Arial Unicode MS Bold"],
+                "text-size": 11,
+                "text-transform": "uppercase",
+                "text-letter-spacing": 0.1,
+                "visibility": "visible",
+                "symbol-placement": "point",
+                "text-allow-overlap": false,
+                "text-optional": true
+            },
+            paint: {
+                "text-color": "#000000",
+                "text-halo-color": "#ffffff",
+                "text-halo-width": 1.5
+            },
+            minzoom: 9,
+            maxzoom: 13
+        })
+
 
     // map.loadImage(
     //         'https://mits003.github.io/studio_null/img/mapbox_texture/dot_xs.png',
@@ -1895,6 +1993,10 @@ const allFillLayers = [
     'tracts-pctCostBurdenedOwners',
     'bg-costs-HT',
     'bg-costs-HT-owner',
+    'bg-costs-2veh-owner',
+    'bg-costs-ownership',
+    'bg-costs-rental',
+    'bg-costs-transport',
     'tracts-rdAge',
     'tracts-rdRace',
     'ctysds-pctHH',
@@ -1981,8 +2083,8 @@ function renderBivariateLegend() {   // use image legend for MVA
 
 
 // Define formatting by layer type (univariate)
-const percentLayers = ['tracts-pctCostBurdenedRenters', 'tracts-pctCostBurdenedOwners', 'tracts-pctHH', 'zips-chZhvi', ];
-const currencyLayers = ['tracts-medIncome', 'zips-zhvi', 'bg-costs-HT', 'bg-costs-HT-owner'];
+const percentLayers = ['tracts-pctCostBurdenedRenters', 'tracts-pctCostBurdenedOwners', 'tracts-pctHH', 'zips-chZhvi', 'bg-costs-2veh-owner'];
+const currencyLayers = ['tracts-medIncome', 'zips-zhvi', 'bg-costs-HT', 'bg-costs-HT-owner', 'bg-costs-ownership', 'bg-costs-rental', 'bg-costs-transport'];
 const numberLayers  = ['tracts-rdAge', 'tracts-rdRace', 'parcels-density'];
 
 // Update formatting by way of layerId 
@@ -1997,7 +2099,7 @@ function formatLegendLabel(value, layerId) {
   // Currency
   if (currencyLayers.includes(layerId)) {
     // For bg-costs layers, values are already rounded to nearest 10, so don't round further
-    if (layerId === 'bg-costs-HT' || layerId === 'bg-costs-HT-owner') {
+    if (layerId === 'bg-costs-HT' || layerId === 'bg-costs-HT-owner' || layerId === 'bg-costs-ownership' || layerId === 'bg-costs-rental' || layerId === 'bg-costs-transport') {
       return `$${Math.round(value).toLocaleString()}`;
     }
     // For other currency layers, round to nearest 1000 if >= 1500
@@ -2410,13 +2512,14 @@ layerSelect.addEventListener('change', (e) => {
             "tracts-pctCostBurdenedOwners",
             "bg-costs-HT",
             "bg-costs-HT-owner",
+            "bg-costs-2veh-owner",
             "tracts-rdAge",
             "tracts-rdRace",
             "tracts-mva",
             "zip-currentZHVI",
             "zip-chZHVI",
-            "ctysds-pctHH", 
-            "admin-layer", 
+            "ctysds-pctHH",
+            "admin-layer",
             "town-layer",
         ]
 
@@ -2496,6 +2599,16 @@ layerSelect.addEventListener('change', (e) => {
                 html = `
                 <div class="popup-header">Block Group ${attributes.GEO_ID_clean}</div>
                 <div class="popup-content">${htCostOwner != null ? `Monthly housing + transportation costs for homeowners: $${Math.round(htCostOwner).toLocaleString()}` : 'No available data.'}
+                </div>`;
+            break;
+            }
+
+            case "bg-costs-2veh-owner": {
+                const affordabilityShare = attributes.own_2veh_2_3_bd_AMI100_3p_cost_sh;
+                const affordabilityPct = affordabilityShare != null ? Math.round(affordabilityShare * 100) : null;
+                html = `
+                <div class="popup-header">Block Group ${attributes.GEO_ID_clean}</div>
+                <div class="popup-content">${affordabilityPct != null ? `A 3+ person household with 2 cars looking for a 2-3 bedroom home, making 100% AMI as a household, could afford ${affordabilityPct}% of homes here, given transportation costs.` : 'No available data.'}
                 </div>`;
             break;
             }
@@ -2643,7 +2756,7 @@ layerSelect.addEventListener('change', (e) => {
             .addTo(map);
     });
 
-    //KEEP LAYERS WHEN BASEMAP CHANGES 
+    //KEEP LAYERS WHEN BASEMAP CHANGES
     function toggleBasemapSettings() { //correct for the basemap toggle situation
         const panel = document.getElementById('basemap-settings');
         const arrow = document.getElementById('basemap-arrow');
@@ -2746,7 +2859,7 @@ document.querySelectorAll('#basemap-style-thumbnails button').forEach(button => 
 };
 
 
-//zoom in zoom out buttons 
+//zoom in zoom out buttons
 document.getElementById('zoom-in').addEventListener('click', () => {
   map.zoomIn();
 });
@@ -2754,6 +2867,48 @@ document.getElementById('zoom-in').addEventListener('click', () => {
 document.getElementById('zoom-out').addEventListener('click', () => {
   map.zoomOut();
 });
+
+// Full region zoom function
+function zoomToFullRegion() {
+    fetch('communityboundaries.geojson')
+        .then(response => {
+            if (!response.ok) throw new Error('Failed to fetch');
+            return response.json();
+        })
+        .then(data => {
+            const bounds = new mapboxgl.LngLatBounds();
+
+            // Process all features
+            data.features.forEach(feature => {
+                if (feature.geometry.type === 'Polygon') {
+                    feature.geometry.coordinates.forEach(ring => {
+                        ring.forEach(coord => bounds.extend(coord));
+                    });
+                } else if (feature.geometry.type === 'MultiPolygon') {
+                    feature.geometry.coordinates.forEach(polygon => {
+                        polygon.forEach(ring => {
+                            ring.forEach(coord => bounds.extend(coord));
+                        });
+                    });
+                }
+            });
+
+            // Zoom to bounds with padding
+            map.fitBounds(bounds, {
+                padding: 50,
+                duration: 1000
+            });
+        })
+        .catch(error => {
+            console.error('Error loading communityboundaries:', error);
+            // Fallback: zoom to approximate Central MA region
+            map.flyTo({
+                center: [-71.9, 42.25],
+                zoom: 9,
+                duration: 1000
+            });
+        });
+}
 
 //clear map
 document.getElementById('clear-map').addEventListener('click', () => {
@@ -2854,6 +3009,22 @@ const layerDescriptions = { //edit as needed; some base text should be re-useabl
   'ctysds-pctHH': `
     <p><strong>Parcel value per acre</strong> normalizes parcel value over the acre and may provide insight into development value, potential tax revenue, and land prices.</p><br>
     <p><em>Source(s):</em> Table BXXXXXX, 2023 ACS 5-year estimates, 2020 ACS 5-year estimates; CommunityScale.</p>
+  `,
+  'bg-costs-ownership': `
+    <p><strong>Monthly ownership costs</strong> by Census block group, including mortgage payments, property taxes, insurance, and utilities for homeowners.</p><br>
+    <p><em>Source(s):</em> CMRPC housing and transportation cost analysis; CommunityScale.</p>
+  `,
+  'bg-costs-rental': `
+    <p><strong>Monthly rental costs</strong> by Census block group, including rent and utilities for renters.</p><br>
+    <p><em>Source(s):</em> CMRPC housing and transportation cost analysis; CommunityScale.</p>
+  `,
+  'bg-costs-transport': `
+    <p><strong>Average household monthly transportation costs</strong> by Census block group, based on average vehicle ownership and commuting patterns.</p><br>
+    <p><em>Source(s):</em> CMRPC housing and transportation cost analysis; CommunityScale.</p>
+  `,
+  'bg-costs-2veh-owner': `
+    <p><strong>Housing and transportation cost share</strong> for a 2-vehicle homeowner household with 2-3 bedrooms at 100% AMI (Area Median Income) with 3+ persons, by Census block group. Values represent the proportion of household income spent on combined housing and transportation costs.</p><br>
+    <p><em>Source(s):</em> CMRPC housing and transportation cost analysis; CommunityScale.</p>
   `
 };
 
