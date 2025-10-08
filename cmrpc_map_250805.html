@@ -553,7 +553,7 @@ function batchSetFeatureStates({ //batching experiment
     mapboxgl.accessToken = 'pk.eyJ1IjoiY29tbXVuaXR5c2NhbGUiLCJhIjoiY21hZ3Y4azlmMDU5YTJqb2NqbzRsa3psbSJ9.eJlBVHcMSB88Czl3ti2i5g';
     let map;
     const BASEMAP_STYLES = {
-        gray: 'mapbox://styles/communityscale/cmcuwuwcv00xz01s1gn7xccqi',
+        gray: 'mapbox://styles/communityscale/cmgicidwh007k01qdauae93b0',
         satellite: 'mapbox://styles/communityscale/cmc96uych026401s6577egc2r',
         lightSatellite: 'mapbox://styles/communityscale/cmcntrq2h00hp01qv4paqhpwx'
     };
@@ -611,10 +611,15 @@ function batchSetFeatureStates({ //batching experiment
             promoteId: 'ZCTA5'
         })
    
-        map.addSource("towns", {    
+        map.addSource("towns", {
             type: "vector",
             url: "mapbox://emtzot01.4s34saee",
             promoteId: "TOWN_ID"
+        })
+
+        map.addSource("communityboundaries", {
+            type: "geojson",
+            data: 'communityboundaries.geojson'
         })
 
         map.addSource("subregions", {
@@ -1815,6 +1820,27 @@ map.addLayer({
             layout: {
                 visibility: "none"
             }
+        })
+
+        map.addLayer({
+            id: "town-labels",
+            type: "symbol",
+            source: "communityboundaries",
+            layout: {
+                "text-field": ["get", "TOWN"],
+                "text-font": ["Roboto Regular", "Arial Unicode MS Bold"],
+                "text-size": 11,
+                "text-transform": "uppercase",
+                "text-letter-spacing": 0.1,
+                "visibility": "visible"
+            },
+            paint: {
+                "text-color": "#000000",
+                "text-halo-color": "#ffffff",
+                "text-halo-width": 1.5
+            },
+            minzoom: 9,
+            maxzoom: 13
         })
 
 
