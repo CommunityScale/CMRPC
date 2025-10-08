@@ -309,7 +309,11 @@
     <button id="zoom-in" class="p-2 text-xl hover:bg-gray-100 focus:outline-none">+</button>
     <button id="zoom-out" class="p-2 text-xl hover:bg-gray-100 focus:outline-none">−</button>
     <div class="border-t border-gray-300"></div>
-    <button id="zoom-home" class="p-2 hover:bg-gray-100 focus:outline-none" onclick="zoomToFullRegion()"><span class="material-icons">home</span></button>
+    <button id="zoom-home" class="p-2 hover:bg-gray-100 focus:outline-none" onclick="zoomToFullRegion()">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="5" y="7" width="14" height="10" stroke="currentColor" stroke-width="1.5" fill="none"/>
+      </svg>
+    </button>
     <button id="clear-map" class="p-2 hover:bg-gray-100 focus:outline-none"><span class="material-icons">refresh</span></button>
   </div>  
   <!-- map -->
@@ -2877,11 +2881,8 @@ document.getElementById('clear-map').addEventListener('click', () => {
     legendTitle.textContent = '';
   }
 
-  //Fly to default map center/zoom - potentially take out??
-  map.flyTo({
-    center: INITIAL_LOC, // default center
-    zoom: INITIAL_ZOOM //  default zoom
-  });
+  // reset to gray basemap
+  map.setStyle('mapbox://styles/communityscale/cmgicidwh007k01qdauae93b0');
 
   // remove any popups
   if (typeof popup !== 'undefined') {
