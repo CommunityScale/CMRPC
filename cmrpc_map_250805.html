@@ -94,27 +94,43 @@
     <div class="mb-4">
       <select id="layer-select" class="w-full border border-gray-300 rounded px-2 py-1">
         <option value="" disabled selected>Select layer</option>
-        <option value="tracts-medIncome">Median Annual Household Income</option>
-        <option value="tracts-pctCostBurdenedRenters">Percent of Renters, Cost Burdened</option>
-        <option value="tracts-pctCostBurdenedOwners">Percent of Homeowners, Cost Burdened</option>
-        <option value="bg-costs-HT">Housing + Transportation Costs (Renters)</option>
-        <option value="bg-costs-HT-owner">Housing + Transportation Costs (Homeowners)</option>
-        <option value="bg-costs-2veh-owner">Example: Where can a 3+ person household with 2 cars at 100% AMI household income afford housing and transportation?</option>
-        <option value="bg-costs-ownership">Monthly Ownership Costs</option>
-        <option value="bg-costs-rental">Monthly Rental Costs</option>
-        <option value="bg-costs-transport">Average Household Monthly Transportation Costs</option>
-        <option value="ctysds-pctHH">Percent Change in Households (2015-2023)</option>
-        <option value="zip-currentZHVI">Typical Home Price by Zip Code (2025)</option>
-        <option value="zip-chZHVI"> Change in Typical Home Price (2020-2025)</option>
-        <option value="tracts-rdAge">Risk Displacement - Age</option> 
-        <option value="tracts-rdRace">Risk Displacement - Race & Ethnicity</option> 
-        <option value="parcels-density">Residential density</option> 
-        <option value="tracts-mva">Neighborhood Conditions</option>
-        <option value="parcels-landuse">Property Class</option> 
+
+        <optgroup label="Housing and People">
+          <option value="ctysds-pctHH">Recent growth (change in households, 2015-2023)</option>
+          <option value="tracts-medIncome">Median annual household income</option>
+          <option value="zip-currentZHVI">Typical home price by zip code (2025)</option>
+          <option value="zip-chZHVI">Change in typical home price by zip code (2020-2025)</option>
+          <option value="tracts-pctCostBurdenedOwners">Percent of homeowners cost burdened</option>
+          <option value="tracts-pctCostBurdenedRenters">Percent of renters cost burdened</option>
+          <option value="tracts-rdAge">Displacement risk of seniors</option>
+          <option value="tracts-rdRace">Displacement risk of non-white populations</option>
+          <option value="parcels-landuse">Land use (property class)</option>
+          <option value="parcels-density">Actual residential density</option>
+          <option value="tracts-mva">Neighborhood conditions</option>
+        </optgroup>
+
+        <optgroup label="Transportation">
+        </optgroup>
+
+        <optgroup label="Cost Analysis">
+          <option value="bg-costs-ownership">Monthly ownership costs</option>
+          <option value="bg-costs-rental">Monthly rental costs</option>
+          <option value="bg-costs-transport">Average household monthly transportation costs</option>
+          <option value="bg-costs-HT-owner">Housing + transportation costs (homeowners)</option>
+          <option value="bg-costs-HT">Housing + transportation costs (renters)</option>
+        </optgroup>
+
+        <optgroup label="Illustrative Personas">
+          <option value="bg-costs-2veh-owner">Homeowner family of 3</option>
+        </optgroup>
+
+        <optgroup label="Other">
+          <option value="admin-layer">Massachusetts tracts</option>
+        </optgroup>
+
         <!--<option value="parcels-ownership">Property Tax Credits</option>
         <option value="parcels-pctLV">Land Value as Percent of Assessed Value</option>
         <option value="parcels-value">Parcel Value Per Acre</option>-->
-        <option value="admin-layer">Massachusetts tracts</option> <!--maybe just use outlines here?? add as toggle?? idk -->
     </select>
     </div>
 
