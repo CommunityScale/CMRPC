@@ -124,6 +124,10 @@
           <option value="bg-costs-2veh-owner">Homeowner family of 3</option>
         </optgroup>
 
+        <optgroup label="Suitability Analysis">
+          <option value="buildable-land">Buildable land</option>
+        </optgroup>
+
         <optgroup label="Other">
           <option value="admin-layer">Massachusetts tracts</option>
         </optgroup>
@@ -419,6 +423,7 @@
         'zip-currentZHVI',
         'zip-chZHVI',
         'parcels-landuse',
+        'buildable-land',
         //'parcels-pctLV',
         //'parcels-value',
         //'parcels-ownership',
@@ -536,8 +541,15 @@
                 { key: "UNK", color: "#bdc9e1", label: "Unknown" }
             ]
 
+    const buildablePalette = [
+                { key: "NZN", color: "#ddb6db", label: "Buildable, no sewer" },
+                { key: "SZN", color: "#975391", label: "Buildable, sewer" },
+                { key: "NBN/SBN", color: "#000000", label: "Suitable land, but already built" }
+            ]
+
    const palettesByLayer = { //leave empty if not needed
             'parcels-landuse': landUsePalette,
+            'buildable-land': buildablePalette,
 //             'parcels-ownership': taxCreditPalette,
        'tracts-rdAge': [
            { value: 0, color: '#edf8fb', label: 'Relatively low displacement risk' },
@@ -695,6 +707,11 @@ function batchSetFeatureStates({ //batching experiment
             type: "geojson",
             data: 'CMRPC_bg_costs.geojson',
             promoteId: 'GEO_ID_clean'
+        })
+
+        map.addSource("buildable", {
+            type: "geojson",
+            data: 'buildable.geojson'
         })
 
         map.addSource("ctysds", {
@@ -1725,9 +1742,37 @@ map.addLayer({
                 layout: {
                     visibility: "none"
                 }
-            }, 
+            },
             labelLayerId)
-                  
+
+    map.addLayer({
+                id: "buildable-land",
+                type: "fill",
+                source: "buildable",
+                paint: {
+                    "fill-color": [
+                        "match",
+                        ["get", "CLASSTYP"],
+                        "NZN", "#ddb6db",
+                        "SZN", "#975391",
+                        "NBN", "#000000",
+                        "SBN", "#000000",
+                        "transparent"
+                    ],
+                    "fill-outline-color": "white",
+                    "fill-opacity": [
+                        "case",
+                        ["in", ["get", "CLASSTYP"], ["literal", ["NZN", "SZN", "NBN", "SBN"]]],
+                        0.66,
+                        0
+                    ]
+                },
+                layout: {
+                    visibility: "none"
+                }
+            },
+            labelLayerId)
+
 
     // map.addLayer({ 
     //         id: "parcels-pctLV",  
@@ -2025,6 +2070,7 @@ const allFillLayers = [
     'zip-chZHVI',
     'parcels-density',
     'parcels-landuse',
+    'buildable-land',
     //'parcels-pctLV',
     //'parcels-value',
     //'parcels-ownership',
