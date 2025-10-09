@@ -110,6 +110,7 @@
         </optgroup>
 
         <optgroup label="Transportation">
+         <!-- <option value="bg-transit-diversity-layer">Transportation diversity</option> -->
         </optgroup>
 
         <optgroup label="Cost Analysis">
@@ -239,6 +240,22 @@
         </div>
       <span class="leading-snug ms-2">Transit diversity</span>
   </label>
+  <label class="flex items-start text-sm text-gray-700">
+    <div class="relative">
+        <input type="checkbox" class="sr-only overlay-toggle peer" value="mf-by-right-layer" />
+        <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
+        <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
+      </div>
+    <span class="leading-snug ms-2">Multifamily allowed by right</span>
+</label>
+<label class="flex items-start text-sm text-gray-700">
+  <div class="relative">
+      <input type="checkbox" class="sr-only overlay-toggle peer" value="mf-by-sp-layer" />
+      <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
+      <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
+    </div>
+  <span class="leading-snug ms-2">Multifamily allowed by special permit/review</span>
+</label>
  <!-- <label class="flex items-start text-sm text-gray-700">
     <div class="relative">
         <input type="checkbox" class="sr-only overlay-toggle peer" value="transit-quality-layer" />
@@ -430,7 +447,9 @@
         "towns-layer",
         "bus-stops-layer",
         "transit-diversity-layer",
-        "transit-quality-layer"
+        "transit-quality-layer",
+        "mf-by-right-layer",
+        "mf-by-sp-layer"
         //"subregion-southeast",
         //"subregion-northeast",
         //"subregion-central",
@@ -701,6 +720,22 @@ function batchSetFeatureStates({ //batching experiment
             type: "vector",
             url: "mapbox://emtzot01.7fsgy5ln",
             promoteId: 'GEOID'
+        })
+
+        map.addSource("mf-by-right", {
+            type: 'geojson',
+            data: "CMRPC_MFByRight_251009.geojson"
+        })
+
+        map.addSource("bg-transit-diversity", {
+            type: 'geojson',
+            data: "CMRPC_bg_transportation_diverse_marg.geojson",
+            promoteId: 'geoid'
+        })
+
+        map.addSource("mf-by-sp", {
+            type: "geojson",
+            data: "CMRPC_MFBySpecialPermit_SpecialReview_251009.geojson"
         })
 
         fetch('https://raw.githubusercontent.com/emtzot/mapSources/main/mass_basicHNA_2023acs_250620.json')
@@ -1076,6 +1111,18 @@ const interpolateLayers = [
             data_source: "bg-costs",
             source_layer: null,
             source_url: "/CMRPC_bg_costs.geojson",
+            colors: medIncomePalette,
+            defaultViz: "none",
+            useFeatureState: false,
+            useQuintiles: true
+        },
+        {
+          
+            id: "bg-transit-diversity-layer",
+            property: "transpo_diverse_perc_marginal",
+            data_source: "bg-transit-diversity",
+            source_layer: null,
+            source_url: "/CMRPC_bg_transportation_diverse_marg.geojson",
             colors: medIncomePalette,
             defaultViz: "none",
             useFeatureState: false,
@@ -1771,7 +1818,8 @@ map.addLayer({
             type: 'fill',
             source: 'transit-diversity',
             paint: {
-              'fill-color': '#9e1583' //mbta purple lol
+              'fill-color': '#9e1583', //mbta purple lol
+              'fill-opacity': 0.7
             },
           layout: {
             visibility: 'none'
@@ -1780,11 +1828,26 @@ map.addLayer({
   )
 
   map.addLayer({
-            id: 'transit-quality-layer',
+            id: 'mf-by-right-layer',
             type: 'fill',
-            source: 'transit-quality',
+            source: 'mf-by-right',
             paint: {
-              'fill-color': '#028b57' //mbta green lol
+              'fill-color': '#00843d', //mbta green lol
+              'fill-opacity': 0.7
+            },
+          layout: {
+            visibility: 'none'
+          }}, 
+        labelLayerId
+  )
+
+  map.addLayer({
+            id: 'mf-by-sp-layer',
+            type: 'fill',
+            source: 'mf-by-sp',
+            paint: {
+              'fill-color': '#ffb202', //mbta orange lol
+              "fill-opacity": 0.7
             },
           layout: {
             visibility: 'none'
