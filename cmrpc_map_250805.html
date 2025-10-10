@@ -2678,7 +2678,7 @@ layerSelect.addEventListener('change', (e) => {
                 const affordabilityPct = affordabilityShare != null ? Math.round(affordabilityShare * 100) : null;
                 html = `
                 <div class="popup-header">Block Group ${attributes.GEO_ID_clean}</div>
-                <div class="popup-content">${affordabilityPct != null ? `A 3+ person household with 2 cars looking for a 2-3 bedroom home, making 100% AMI as a household, spends ${affordabilityPct}% of their monthly income on housing and transportation costs, on average.` : 'No available data.'}
+                <div class="popup-content">${affordabilityPct != null ? `A 3+ person household with 2 cars looking for a 2-3 bedroom home, making 100% AMI as a household, spends ${affordabilityPct}% of their monthly income on housing and transportation costs here, on average.` : 'No available data.'}
                 </div>`;
             break;
             }
