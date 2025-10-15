@@ -456,6 +456,12 @@
                 '#4956C5',
                 '#071A43'
             ]
+
+    const affordabilityPalette = [ //Custom blue-orange-red ramp for affordability
+                '#6e79dd', // Blue for <45%
+                '#F0B2A2', // Orange for 45-60%
+                '#F95738'  // Red for >60%
+            ]
     // const cbRentersPalette = [ //Sequential colorBrewer GrnBlu ramp
     //             '#f6eff7',
     //             '#bdc9e1',
@@ -1085,12 +1091,12 @@ const interpolateLayers = [
             data_source: "bg-costs",
             source_layer: null,
             source_url: "/CMRPC_bg_costs.geojson",
-            colors: medIncomePalette,
+            colors: affordabilityPalette,
             defaultViz: "none",
             useFeatureState: false,
             useQuintiles: false,
             useCustomBreaks: true,
-            customBreaks: [0, 0.2, 0.4, 0.6, 0.8, 1.0]
+            customBreaks: [0.45, 0.60]
         },
         {
             id: "bg-costs-ownership",
@@ -1277,13 +1283,14 @@ const interpolateLayers = [
     // Handle custom breaks
     if (useCustomBreaks && customBreaks) {
       const stops = [];
-      for (let i = 0; i < customBreaks.length && i < colors.length; i++) {
-        stops.push(customBreaks[i], colors[i]);
+      // For step: first color is default (< first break), then iterate through breaks
+      for (let i = 0; i < customBreaks.length && i + 1 < colors.length; i++) {
+        stops.push(customBreaks[i], colors[i + 1]);
       }
       fillColorExpression = [
-        "interpolate",
-        ["linear"],
+        "step",
         expressionInput,
+        colors[0],  // default color for values < first break
         ...stops
       ];
     } else {
@@ -2112,14 +2119,41 @@ function getStopsFromLayer(layerId) {
 
   // Handle 'interpolate' or 'step' expressions
   if (type === 'interpolate' || type === 'step') {
-    const stops = expression.slice(3); 
     const result = [];
 
-    for (let i = 0; i < stops.length; i += 2) {
+    if (type === 'step') {
+      // For step: ["step", input, defaultColor, threshold1, color1, threshold2, color2, ...]
+      const defaultColor = expression[2];
+      const stops = expression.slice(3);
+
+      // Get the first threshold value
+      const firstThreshold = stops.length > 0 ? stops[0] : 0;
+
+      // Add an entry for the default color (values below first threshold)
+      // Use 0 or a representative value to mark this as the "less than" range
       result.push({
-        value: stops[i],
-        color: stops[i + 1]
+        value: 0,
+        color: defaultColor,
+        isDefaultStep: true,
+        upperBound: firstThreshold
       });
+
+      // Add the rest of the thresholds
+      for (let i = 0; i < stops.length; i += 2) {
+        result.push({
+          value: stops[i],
+          color: stops[i + 1]
+        });
+      }
+    } else {
+      // For interpolate: ["interpolate", type, input, value1, color1, value2, color2, ...]
+      const stops = expression.slice(3);
+      for (let i = 0; i < stops.length; i += 2) {
+        result.push({
+          value: stops[i],
+          color: stops[i + 1]
+        });
+      }
     }
 
     return result;
@@ -2227,8 +2261,12 @@ const dataLayerHtml = uniqueStops.map((stop, index) => {
   let displayLabel = label;
   const isNumeric = typeof stop.value === 'number';
 
-  if (isNumeric && next && !hasCustomLabels) {
-    displayLabel = index === 0
+  // Special handling for step expression default color
+  if (stop.isDefaultStep && stop.upperBound !== undefined && !hasCustomLabels) {
+    displayLabel = `< ${formatLegendLabel(stop.upperBound, layerId)}`;
+  } else if (isNumeric && next && !hasCustomLabels) {
+    // Don't show range for the first stop if it's the default step (already handled above)
+    displayLabel = stop.isDefaultStep
       ? `< ${getLabel(next)}`
       : `${label} – ${getLabel(next)}`;
   } else if (isNumeric && index === uniqueStops.length - 1 && !hasCustomLabels) {
