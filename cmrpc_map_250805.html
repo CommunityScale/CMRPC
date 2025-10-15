@@ -458,7 +458,7 @@
             ]
 
     const affordabilityPalette = [ //Custom blue-orange-red ramp for affordability
-                '#6e79dd', // Blue for <45%
+                '#82ac21', // Blue for <45%
                 '#F0B2A2', // Orange for 45-60%
                 '#F95738'  // Red for >60%
             ]
@@ -574,6 +574,11 @@
            { value: 0.46, color: '#8c96c6', label: 'Moderate' },
            { value: 0.71, color: '#8856a7', label: 'Somewhat high' },
            { value: 0.94, color: '#810f7c', label: 'Higher displacement risk' }
+       ],
+       'bg-costs-2veh-owner': [
+           { value: 0, color: '#dce18b', label: 'Likely to spend <45% of income on housing and transportation costs' },
+           { value: 0.45, color: '#f97316', label: '45-60% of income' },
+           { value: 0.60, color: '#ef4444', label: '>60% of income' }
        ]
 //   //best way to match palettes to their respective layers ?? particularly for categorical layers
 };
@@ -2274,9 +2279,9 @@ const dataLayerHtml = uniqueStops.map((stop, index) => {
   }
 
   return `
-    <div class="flex items-center gap-2">
-      <span class="w-3.5 h-3.5 inline-block rounded-sm" style="background-color: ${stop.color};"></span>
-      <span>${displayLabel}</span>
+    <div class="flex items-start gap-2 mb-2">
+      <span class="w-3.5 h-3.5 inline-block rounded-sm flex-shrink-0 mt-0.5" style="background-color: ${stop.color};"></span>
+      <span class="leading-tight">${displayLabel}</span>
     </div>
   `;
 }).join('');
