@@ -746,23 +746,22 @@ function batchSetFeatureStates({ //batching experiment
             promoteId: 'GEOID'
         })
 
+        // Load median income data without filtering
         fetch('https://raw.githubusercontent.com/emtzot/mapSources/main/mass_basicHNA_2023acs_250620.json')
                 .then(response => response.json())
                 .then(data => {
                     data.forEach(f => {
-                    const id = f.GEOID.toString(); // Ensure ID is a string
-                    map.setFeatureState(
-                        {
-                        source: 'tracts',
-                        sourceLayer: 'tracts',
-                        id: id
-                        },
-                        {
-                        medIncome: f["medIncome"]
-                        //pctrent30_23: f["pctrent30_23"],
-                        //pctowned30_23: f["pctowned30_23"]
-                        }
-                    )
+                        const id = f.GEOID.toString();
+                        map.setFeatureState(
+                            {
+                            source: 'tracts',
+                            sourceLayer: 'tracts',
+                            id: id
+                            },
+                            {
+                            medIncome: f["medIncome"]
+                            }
+                        );
                     });
                 });
 
@@ -839,24 +838,51 @@ function batchSetFeatureStates({ //batching experiment
                     .catch(err => console.error("Failed to load parcel density data:", err));
 
 
-                fetch('https://raw.githubusercontent.com/CommunityScale/CMRPC/main/rd_tracts_250731.json')
+                // Load CTfilter2 to get valid tract GEOIDs for filtering displacement risk data
+                let validTractsRD = new Set();
+                fetch('/CTfilter2.geojson')
+                .then(response => response.json())
+                .then(filterData => {
+                    console.log('CTfilter2 loaded for displacement risk filtering');
+                    // Build set of valid tract GEOIDs from CTfilter2
+                    const features = filterData.features || filterData;
+                    features.forEach(f => {
+                        const geoid = f.properties?.GEOID || f.GEOID;
+                        if (geoid) {
+                            validTractsRD.add(geoid.toString());
+                        }
+                    });
+
+                    console.log('Valid tracts for displacement risk:', validTractsRD.size);
+
+                    // Now load displacement risk data and filter to valid tracts only
+                    return fetch('https://raw.githubusercontent.com/CommunityScale/CMRPC/main/rd_tracts_250731.json');
+                })
                 .then(response => response.json())
                 .then(data => {
+                    let matchedRD = 0;
                     data.forEach(f => {
-                    const id = f.GEOID.toString(); // Ensure id is a string to match with geometry's geoid 
-                    map.setFeatureState(
-                        {
-                        source: 'tracts',
-                        sourceLayer: 'tracts',
-                        id: id
-                        },
-                        {
-                        rd_seniors: Number(f["rd_seniors"]),
-                        rd_nonwhitePops: Number(f["rd_nonWhitePops"])
+                        const id = f.GEOID.toString(); // Ensure id is a string to match with geometry's geoid
+
+                        // Only set feature state for valid tracts from CTfilter2
+                        if (validTractsRD.has(id)) {
+                            matchedRD++;
+                            map.setFeatureState(
+                                {
+                                source: 'tracts',
+                                sourceLayer: 'tracts',
+                                id: id
+                                },
+                                {
+                                rd_seniors: Number(f["rd_seniors"]),
+                                rd_nonwhitePops: Number(f["rd_nonWhitePops"])
+                                }
+                            );
                         }
-                    )
                     });
-                });
+                    console.log('Displacement risk data loaded for', matchedRD, 'tracts from CTfilter2');
+                })
+                .catch(err => console.error('Error loading displacement risk data:', err));
 
                 fetch('https://raw.githubusercontent.com/CommunityScale/CMRPC/adc9df09b39883512a5175738efe5ace91ad2917/CMRPC_Tracts_MVA_CostBurden_250828.json') 
                 .then(response => response.json())
@@ -1055,9 +1081,9 @@ const interpolateLayers = [
             data_source: "tracts",
             source_layer: "tracts",
             source_url: "https://raw.githubusercontent.com/emtzot/mapSources/main/mass_basicHNA_2023acs_250620.json",
-            colors: medIncomePalette, 
+            colors: medIncomePalette,
             defaultViz: "visible",
-            useFeatureState: true 
+            useFeatureState: true
         },
         {
             id: "tracts-pctCostBurdenedRenters",
@@ -1287,7 +1313,7 @@ const interpolateLayers = [
     // }
 
     async function addInterpolatedLayers(opacity, visibleLayerId) {
-  for (const { id, property, data_source, source_layer, source_url, colors, defaultViz, useFeatureState, useQuintiles, useCustomBreaks, customBreaks } of interpolateLayers) {
+  for (const { id, property, data_source, source_layer, source_url, colors, defaultViz, useFeatureState, useQuintiles, useCustomBreaks, customBreaks, useFilter, filterProperty } of interpolateLayers) {
     console.log(`Processing layer: ${id}`);
 
     const expressionInput = useFeatureState
@@ -1304,10 +1330,15 @@ const interpolateLayers = [
         stops.push(customBreaks[i], colors[i + 1]);
       }
       fillColorExpression = [
-        "step",
-        expressionInput,
-        colors[0],  // default color for values < first break
-        ...stops
+        "case",
+        ["==", expressionInput, null],
+        "transparent",
+        [
+          "step",
+          expressionInput,
+          colors[0],  // default color for values < first break
+          ...stops
+        ]
       ];
     } else {
       // Use quintile breaks if specified, otherwise use default IQR-based breaks
@@ -1327,10 +1358,15 @@ const interpolateLayers = [
       }
 
       fillColorExpression = [
-        "interpolate",
-        ["linear"],
-        expressionInput,
-        ...stops
+        "case",
+        ["==", expressionInput, null],
+        "transparent",
+        [
+          "interpolate",
+          ["linear"],
+          expressionInput,
+          ...stops
+        ]
       ];
     }
 
@@ -1368,6 +1404,11 @@ const interpolateLayers = [
     // Only add source-layer if it exists (for vector tiles)
     if (source_layer) {
       layerConfig["source-layer"] = source_layer;
+    }
+
+    // Add filter if specified
+    if (useFilter && filterProperty) {
+      layerConfig.filter = ["in", filterProperty, ...regionOfInterest];
     }
 
     map.addLayer(layerConfig, labelLayerId);
@@ -2749,7 +2790,7 @@ layerSelect.addEventListener('change', (e) => {
             case "tracts-rdAge": {
                 html = `
                 <div class="popup-header">${attributes.NAME}</div>
-                <div class="popup-content">${attributes.rd_seniors != null ? `Risk displacement score, with respect to age: ${attributes.rd_seniors}.` : 'No score available.'}
+                <div class="popup-content">${attributes.rd_seniors != null ? `Displacement risk for seniors: ${Math.round(attributes.rd_seniors*100)} out of 100, with 100 indicating highest risk.` : 'No score available.'}
                 </div>`;
             break;
             }
