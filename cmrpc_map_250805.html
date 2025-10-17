@@ -288,7 +288,9 @@
           <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
           <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
         </div>
-      <span class="leading-snug ms-2">Exceeds zoned density</span>
+      <span class="leading-snug ms-2">Exceeds zoned density
+        <button id="exceeds-capacity-info-btn" class="ml-1 text-gray-500 hover:text-gray-700" style="font-size: 10px;">ⓘ</button>
+      </span>
     </label>
     <label class="flex items-start text-sm text-gray-700">
       <div class="relative">
@@ -296,7 +298,9 @@
           <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
           <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
         </div>
-      <span class="leading-snug ms-2">Excess capacity by zoning</span>
+      <span class="leading-snug ms-2">Excess capacity by zoning
+        <button id="excess-capacity-info-btn" class="ml-1 text-gray-500 hover:text-gray-700" style="font-size: 10px;">ⓘ</button>
+      </span>
     </label>
  <!-- <label class="flex items-start text-sm text-gray-700">
     <div class="relative">
@@ -328,6 +332,20 @@
     <div id="transit-diversity-info" class="hidden mt-3 pt-3 border-t border-gray-200">
       <p class="text-xs text-gray-700" style="font-family: Roboto, sans-serif;">
         Areas with stronger transportation diversity, shown here, are areas where some everyday trips don't require a car and can be completed on foot, on a bike, or by using transit.
+      </p>
+    </div>
+
+    <!-- Excess capacity info text -->
+    <div id="excess-capacity-info" class="hidden mt-3 pt-3 border-t border-gray-200">
+      <p class="text-xs text-gray-700" style="font-family: Roboto, sans-serif;">
+        This area either allows multi-family development by-right or by special permit/special review. Current development does not exceed three units per acre. There may be excess capacity for additional units should there be interest in further development or redevelopment.
+      </p>
+    </div>
+
+    <!-- Exceeds capacity info text -->
+    <div id="exceeds-capacity-info" class="hidden mt-3 pt-3 border-t border-gray-200">
+      <p class="text-xs text-gray-700" style="font-family: Roboto, sans-serif;">
+        This area does not allow multi-family development. Current development patterns, however, exceed a three unit/acre density. It may be worth up-zoning this area should relatively dense development trends continue.
       </p>
     </div>
   </div>
@@ -2716,9 +2734,17 @@ function getOverlayDisplayName(layerId) {
 
   // Clone the span and remove any info icon elements
   const clone = labelSpan.cloneNode(true);
-  const infoIcon = clone.querySelector('#transit-diversity-info-btn');
-  if (infoIcon) {
-    infoIcon.parentElement?.remove(); // Remove the parent span that contains the icon
+  const transitInfoIcon = clone.querySelector('#transit-diversity-info-btn');
+  if (transitInfoIcon) {
+    transitInfoIcon.remove();
+  }
+  const excessInfoIcon = clone.querySelector('#excess-capacity-info-btn');
+  if (excessInfoIcon) {
+    excessInfoIcon.remove();
+  }
+  const exceedsInfoIcon = clone.querySelector('#exceeds-capacity-info-btn');
+  if (exceedsInfoIcon) {
+    exceedsInfoIcon.remove();
   }
 
   return clone.textContent?.trim() || layerId;
@@ -3700,6 +3726,30 @@ if (transitDiversityInfoBtn && transitDiversityInfo) {
     e.preventDefault();
     e.stopPropagation();
     transitDiversityInfo.classList.toggle('hidden');
+  });
+}
+
+// Excess capacity info toggle
+const excessCapacityInfoBtn = document.getElementById('excess-capacity-info-btn');
+const excessCapacityInfo = document.getElementById('excess-capacity-info');
+
+if (excessCapacityInfoBtn && excessCapacityInfo) {
+  excessCapacityInfoBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    excessCapacityInfo.classList.toggle('hidden');
+  });
+}
+
+// Exceeds capacity info toggle
+const exceedsCapacityInfoBtn = document.getElementById('exceeds-capacity-info-btn');
+const exceedsCapacityInfo = document.getElementById('exceeds-capacity-info');
+
+if (exceedsCapacityInfoBtn && exceedsCapacityInfo) {
+  exceedsCapacityInfoBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    exceedsCapacityInfo.classList.toggle('hidden');
   });
 }
 
