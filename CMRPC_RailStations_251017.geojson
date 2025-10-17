@@ -1,0 +1,19 @@
+{
+"type": "FeatureCollection",
+"name": "CMRPC_RailStations_251017",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "STATION": "SHAY", "C_RAILSTAT": null, "AMTRAK": null, "MAP_STA": "Y", "LINE_BRNCH": null, "STATE": "MA" }, "geometry": { "type": "Point", "coordinates": [ -71.799762812290084, 42.307376704287478 ] } },
+{ "type": "Feature", "properties": { "STATION": "WESTBOROUGH", "C_RAILSTAT": "Y", "AMTRAK": null, "MAP_STA": null, "LINE_BRNCH": "FRAMINGHAM/WORCESTER LINE", "STATE": "MA" }, "geometry": { "type": "Point", "coordinates": [ -71.648597355493493, 42.269224581067483 ] } },
+{ "type": "Feature", "properties": { "STATION": "GRAFTON", "C_RAILSTAT": "Y", "AMTRAK": null, "MAP_STA": null, "LINE_BRNCH": "FRAMINGHAM/WORCESTER LINE", "STATE": "MA" }, "geometry": { "type": "Point", "coordinates": [ -71.684476056997426, 42.247125365541656 ] } },
+{ "type": "Feature", "properties": { "STATION": "WESTBOROUGH", "C_RAILSTAT": "Y", "AMTRAK": null, "MAP_STA": "Y", "LINE_BRNCH": "FRAMINGHAM/WORCESTER LINE", "STATE": "MA" }, "geometry": { "type": "Point", "coordinates": [ -71.648601812533116, 42.269267902041697 ] } },
+{ "type": "Feature", "properties": { "STATION": "GRAFTON", "C_RAILSTAT": "Y", "AMTRAK": null, "MAP_STA": "Y", "LINE_BRNCH": "FRAMINGHAM/WORCESTER LINE", "STATE": "MA" }, "geometry": { "type": "Point", "coordinates": [ -71.68461522178292, 42.247126829886355 ] } },
+{ "type": "Feature", "properties": { "STATION": "GREENDALE EAST", "C_RAILSTAT": null, "AMTRAK": null, "MAP_STA": "Y", "LINE_BRNCH": null, "STATE": "MA" }, "geometry": { "type": "Point", "coordinates": [ -71.795815006803892, 42.321182214107026 ] } },
+{ "type": "Feature", "properties": { "STATION": "BARBER", "C_RAILSTAT": null, "AMTRAK": null, "MAP_STA": "Y", "LINE_BRNCH": null, "STATE": "MA" }, "geometry": { "type": "Point", "coordinates": [ -71.801346620939142, 42.302135667278421 ] } },
+{ "type": "Feature", "properties": { "STATION": "BURNCOAT STREET", "C_RAILSTAT": null, "AMTRAK": null, "MAP_STA": "Y", "LINE_BRNCH": null, "STATE": "MA" }, "geometry": { "type": "Point", "coordinates": [ -71.790991535564586, 42.324630818399065 ] } },
+{ "type": "Feature", "properties": { "STATION": "GREENDALE WEST", "C_RAILSTAT": null, "AMTRAK": null, "MAP_STA": "Y", "LINE_BRNCH": null, "STATE": "MA" }, "geometry": { "type": "Point", "coordinates": [ -71.797116179980549, 42.316114159716619 ] } },
+{ "type": "Feature", "properties": { "STATION": "WEST BOYLSTON", "C_RAILSTAT": null, "AMTRAK": null, "MAP_STA": "Y", "LINE_BRNCH": null, "STATE": "MA" }, "geometry": { "type": "Point", "coordinates": [ -71.782514007549793, 42.369719661338458 ] } },
+{ "type": "Feature", "properties": { "STATION": "HOPEDALE (P)", "C_RAILSTAT": null, "AMTRAK": null, "MAP_STA": null, "LINE_BRNCH": "FRANKLIN LINE(P)", "STATE": "MA" }, "geometry": { "type": "Point", "coordinates": [ -71.541221987993154, 42.12871341608917 ] } },
+{ "type": "Feature", "properties": { "STATION": "WORCESTER", "C_RAILSTAT": "Y", "AMTRAK": "Y", "MAP_STA": "Y", "LINE_BRNCH": "FRAMINGHAM/WORCESTER LINE", "STATE": "MA" }, "geometry": { "type": "Point", "coordinates": [ -71.794637764585602, 42.261008334736886 ] } }
+]
+}
