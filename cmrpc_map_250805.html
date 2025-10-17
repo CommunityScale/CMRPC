@@ -129,7 +129,7 @@
         </optgroup>
 
         <optgroup label="Suitability Analysis">
-          <option value="buildable-land">Buildable land</option>
+          <option value="buildable-land">Land without environmental constraints</option>
         </optgroup>
 
         <optgroup label="Other">
@@ -565,7 +565,8 @@
     const buildablePalette = [
                 { key: "NZN", color: "#6e79dd", label: "Buildable, no sewer" },
                 { key: "SZN", color: "#ecd731", label: "Buildable, sewer" },
-                { key: "NBN/SBN", color: "#cccccc", label: "Built" }
+                { key: "NBN", color: "#000000", label: "Developed or exempt" },
+                { key: "SBN", color: "#000000", label: "Developed or exempt" }
             ]
 
    const palettesByLayer = { //leave empty if not needed
@@ -1815,6 +1816,22 @@ map.addLayer({
             labelLayerId)
 
     map.addLayer({
+                id: "cmrpc-region-fill",
+                type: "fill",
+                source: "towns",
+                'source-layer': 'massachusetts_towns-a8k14v',
+                paint: {
+                    "fill-color": "#d3d3d3",
+                    "fill-opacity": 0.5
+                },
+                layout: {
+                    visibility: "none"
+                },
+                filter: ["in", "TOWN",...regionOfInterest]
+            },
+            labelLayerId)
+
+    map.addLayer({
                 id: "buildable-land",
                 type: "fill",
                 source: "buildable",
@@ -2109,6 +2126,11 @@ map.on('load', () => {
                 map.setLayoutProperty(id, "visibility", id === initialLayer ? "visible" : "none");
             }
         });
+
+        // Show CMRPC region fill layer if buildable land is the initial layer
+        if (map.getLayer('cmrpc-region-fill')) {
+            map.setLayoutProperty('cmrpc-region-fill', 'visibility', initialLayer === 'buildable-land' ? 'visible' : 'none');
+        }
 
         renderLegendFromStops(initialLayer)
     });
@@ -2514,6 +2536,11 @@ layerSelect.addEventListener('change', (e) => {
       map.setLayoutProperty(id, 'visibility', id === selected ? 'visible' : 'none');
     }
   });
+
+  // Show CMRPC region fill layer when buildable land is selected
+  if (map.getLayer('cmrpc-region-fill')) {
+    map.setLayoutProperty('cmrpc-region-fill', 'visibility', selected === 'buildable-land' ? 'visible' : 'none');
+  }
 
   renderLegend(selected);
 
