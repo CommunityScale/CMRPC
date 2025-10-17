@@ -941,7 +941,7 @@ function batchSetFeatureStates({ //batching experiment
 
                 // Load CTfilter2 to get valid tract GEOIDs for filtering displacement risk data
                 let validTractsRD = new Set();
-                fetch('/CTfilter2.geojson')
+                fetch('https://raw.githubusercontent.com/CommunityScale/CMRPC/refs/heads/main/CTfilter2.geojson')
                 .then(response => response.json())
                 .then(filterData => {
                     console.log('CTfilter2 loaded for displacement risk filtering');
