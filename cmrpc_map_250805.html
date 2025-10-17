@@ -773,12 +773,12 @@ function batchSetFeatureStates({ //batching experiment
 
         map.addSource("communityboundaries", {
             type: "geojson",
-            data: 'communityboundaries.geojson'
+            data: 'https://raw.githubusercontent.com/CommunityScale/CMRPC/refs/heads/main/communityboundaries.geojson'
         })
 
         map.addSource("subregions", {
             type: "geojson",
-            data: '/CMRPC_Tigerlines_Regions_FromCytsds_250820.geojson',
+            data: 'https://raw.githubusercontent.com/CommunityScale/CMRPC/refs/heads/main/CMRPC_Tigerlines_Regions_FromCytsds_250820.geojson',
             promoteId: "TOWN_ID"
         })
 
@@ -789,7 +789,7 @@ function batchSetFeatureStates({ //batching experiment
 
         map.addSource("train-stops", {
             type: "geojson",
-            data: "CMRPC_RailStations_251017.geojson"
+            data: 'https://raw.githubusercontent.com/CommunityScale/CMRPC/refs/heads/main/CMRPC_RailStations_251017.geojson'
         })
 
         map.addSource("transit-diversity", {
@@ -806,12 +806,12 @@ function batchSetFeatureStates({ //batching experiment
 
         map.addSource("mf-byright", {
             type: 'geojson',
-            data: 'CMRPC_MFByRight_251009.geojson'
+            data: 'https://raw.githubusercontent.com/CommunityScale/CMRPC/refs/heads/main/CMRPC_MFByRight_251009.geojson'
         })
 
         map.addSource("mf-specialpermit", {
             type: 'geojson',
-            data: 'CMRPC_MFBySpecialPermit_SpecialReview_251009.geojson'
+            data: 'https://raw.githubusercontent.com/CommunityScale/CMRPC/refs/heads/main/CMRPC_MFBySpecialPermit_SpecialReview_251009.geojson'
         })
 
         map.addSource("bg-costs", {
@@ -822,23 +822,23 @@ function batchSetFeatureStates({ //batching experiment
 
         map.addSource("bg-transport-diversity", {
             type: 'geojson',
-            data: "CMRPC_bg_transportation_diverse_marg.geojson",
+            data: 'https://raw.githubusercontent.com/CommunityScale/CMRPC/refs/heads/main/CMRPC_bg_transportation_diverse_marg.geojson',
             promoteId: 'geoid'
         })
 
         map.addSource("buildable", {
             type: "geojson",
-            data: 'buildable4.geojson'
+            data: 'https://raw.githubusercontent.com/CommunityScale/CMRPC/refs/heads/main/buildable4.geojson'
         })
 
         map.addSource("excess-capacity", {
             type: "geojson",
-            data: "CMRPC_DissolvedParcels_ExcessCapacity_251017.geojson" 
+            data: 'https://raw.githubusercontent.com/CommunityScale/CMRPC/refs/heads/main/CMRPC_DissolvedParcels_ExcessCapacity_251017.geojson'
         })
 
         map.addSource("exceeds-capacity", {
             type: "geojson",
-            data: "CMRPC_DissolvedParcels_ExceedsCapacity_251017.geojson"
+            data: 'https://raw.githubusercontent.com/CommunityScale/CMRPC/refs/heads/main/CMRPC_DissolvedParcels_ExceedsCapacity_251017.geojson'
         })
 
         map.addSource("ctysds", {
