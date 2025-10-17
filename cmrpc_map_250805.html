@@ -2798,7 +2798,7 @@ layerSelect.addEventListener('change', (e) => {
             case "tracts-rdRace": {
                 html = `
                 <div class="popup-header">${attributes.NAME}</div>
-                <div class="popup-content">${attributes.rd_nonWhitePops != null ? `Risk displacement score, with respect to race and ethnicity: ${attributes.rd_nonWhitePops}.` : 'No score available.'} 
+                <div class="popup-content">${attributes.rd_nonwhitePops != null ? `Displacement risk for nonwhite population: ${Math.round(attributes.rd_nonwhitePops*100)} out of 100, with 100 indicating highest risk.` : 'No score available.'}
                 </div>`;
             break;
             }
