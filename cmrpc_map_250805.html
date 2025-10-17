@@ -112,7 +112,7 @@
         <optgroup label="Transportation">
 <<<<<<< HEAD
 =======
-        <!--<option value="bg-transport-diversity-layer">Transportation diversity</option> -->
+       <!-- <option value="bg-transport-diversity-layer">Transportation diversity</option> -->
 >>>>>>> e00fd6365de46ccc9d6454c9b35693d2be6484e0
         </optgroup>
 
@@ -261,7 +261,7 @@
         <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
         <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
       </div>
-    <span class="leading-snug ms-2">Multifamily allowed by special permit or special review</span>
+    <span class="leading-snug ms-2">Multifamily allowed by special permit/review</span>
   </label>
     <label class="flex items-start text-sm text-gray-700">
       <div class="relative">
@@ -270,11 +270,6 @@
           <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
         </div>
       <span class="leading-snug ms-2">Transportation diversity</span>
-      <span class="leading-snug ms-2">Transportation diversity
-        <span class="inline-block align-super ml-1">
-          <span id="transit-diversity-info-btn" class="inline-flex items-center justify-center w-3 h-3 text-[8px] text-gray-600 border border-gray-400 rounded-full cursor-pointer hover:bg-gray-100">i</span>
-        </span>
-      </span>
   </label>
  <!-- <label class="flex items-start text-sm text-gray-700">
     <div class="relative">
@@ -773,10 +768,10 @@ function batchSetFeatureStates({ //batching experiment
             promoteId: 'GEO_ID_clean'
         })
 
-        map.addSource("bg-tranport-diversity", {
+        map.addSource("bg-transport-diversity", {
             type: 'geojson',
             data: "CMRPC_bg_transportation_diverse_marg.geojson",
-            promoteId: ''
+            promoteId: 'geoid'
         })
 
         map.addSource("buildable", {
@@ -1217,17 +1212,17 @@ const interpolateLayers = [
             useFeatureState: false,
             useQuintiles: true
         },
-        // {
-        //     id: "bg-transport-diversity-layer",
-        //     property: "density", <-- replace!!
-        //     data_source: "bg-transport-diversity",
-        //     source_layer: null,
-        //     source_url: "CMRPC_bg_transportation_diverse_marg.geojson",
-        //     colors: medIncomePalette, //replaced with medIncomePalette for color consistency 
-        //     defaultViz: "none",
-        //     useFeatureState: false,
-        //     useQuintiles: false
-        // },
+        {
+            id: "bg-transport-diversity-layer",
+            property: "transpo_diverse_perc_marginal",
+            data_source: "bg-transport-diversity",
+            source_layer: null,
+            source_url: "CMRPC_bg_transportation_diverse_marg.geojson",
+            colors: medIncomePalette, //replaced with medIncomePalette for color consistency 
+            defaultViz: "none",
+            useFeatureState: false,
+            useQuintiles: false
+        },
         // {
         //     id: "parcels-pctLV",
         //     property: "pctLandVal",
