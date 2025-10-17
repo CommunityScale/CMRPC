@@ -816,7 +816,7 @@ function batchSetFeatureStates({ //batching experiment
 
         map.addSource("bg-costs", {
             type: "geojson",
-            data: 'CMRPC_bg_costs.geojson',
+            data: 'https://raw.githubusercontent.com/CommunityScale/CMRPC/refs/heads/main/CMRPC_bg_costs.geojson',
             promoteId: 'GEO_ID_clean'
         })
 
@@ -3568,8 +3568,9 @@ function zoomToFullRegion() {
         });
 }
 
-//clear map
+//clear map - turn off all layers and overlays
 document.getElementById('clear-map').addEventListener('click', () => {
+  // Turn off all overlay layers
   const overlayInputs = document.querySelectorAll('.overlay-toggle');
 
   overlayInputs.forEach(input => {
@@ -3578,38 +3579,61 @@ document.getElementById('clear-map').addEventListener('click', () => {
 
     if (layer && map.getLayoutProperty(layerId, 'visibility') !== 'none') {
       map.setLayoutProperty(layerId, 'visibility', 'none');
+
+      // Also hide companion outline layers
+      if (layerId === 'transit-diversity-layer' && map.getLayer('transit-diversity-outline')) {
+        map.setLayoutProperty('transit-diversity-outline', 'visibility', 'none');
+      }
+      if (layerId === 'excess-capacity-layer' && map.getLayer('excess-capacity-outline')) {
+        map.setLayoutProperty('excess-capacity-outline', 'visibility', 'none');
+      }
+      if (layerId === 'exceeds-capacity-layer' && map.getLayer('exceeds-capacity-outline')) {
+        map.setLayoutProperty('exceeds-capacity-outline', 'visibility', 'none');
+      }
     }
 
     input.checked = false; // uncheck toggle in UI
   });
 
-// wipe the fills 
-  map.getStyle().layers.forEach(layer => {
-    if (layer.type === 'fill') {
-      try {
-        map.setLayoutProperty(layer.id, 'visibility', 'none');
-      } catch (e) {
-        console.warn(`Could not hide layer ${layer.id}:`, e);
-      }
+  // Turn off all data layers from dropdown
+  console.log('Clearing all data layers...');
+  allFillLayers.forEach(layerId => {
+    if (map.getLayer(layerId)) {
+      map.setLayoutProperty(layerId, 'visibility', 'none');
+      console.log('Hid layer:', layerId);
     }
   });
 
-  // clear the legend panel
+  // Hide companion layer for buildable land
+  if (map.getLayer('cmrpc-region-fill')) {
+    map.setLayoutProperty('cmrpc-region-fill', 'visibility', 'none');
+    console.log('Hid cmrpc-region-fill');
+  }
+
+  // Reset dropdown to placeholder
+  const dropdown = document.getElementById('layer-select');
+  if (dropdown) {
+    dropdown.selectedIndex = 0; // Reset to first option (placeholder)
+    console.log('Reset dropdown to placeholder');
+  }
+
+  // Clear the currently selected data layer tracking variable
+  currentlySelectedDataLayer = null;
+  console.log('Cleared currentlySelectedDataLayer');
+
+  // Clear the legend panel
   const legendContent = document.getElementById('legend-content');
   if (legendContent) {
     legendContent.innerHTML = '';
   }
 
-  // reset legend title to blank
+  // Reset legend title to blank
   const legendTitle = document.getElementById('legend-title');
   if (legendTitle) {
     legendTitle.textContent = '';
   }
 
-  // reset to gray basemap
-  map.setStyle('mapbox://styles/communityscale/cmgicidwh007k01qdauae93b0');
-
-  // remove any popups
+  // Remove any popups
   if (typeof popup !== 'undefined') {
     popup.remove();
   }
