@@ -263,6 +263,22 @@
       </div>
     <span class="leading-snug ms-2">Multifamily allowed by special permit/review</span>
   </label>
+  <label class="flex items-start text-sm text-gray-700">
+    <div class="relative">
+        <input type="checkbox" class="sr-only overlay-toggle peer" value="exceeds-capacity-layer" />
+        <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
+        <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
+      </div>
+    <span class="leading-snug ms-2">Exceeds zoned density</span>
+</label>
+<label class="flex items-start text-sm text-gray-700">
+  <div class="relative">
+      <input type="checkbox" class="sr-only overlay-toggle peer" value="excess-capacity-layer" />
+      <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
+      <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
+    </div>
+  <span class="leading-snug ms-2">Excess capacity by zoning</span>
+</label>
     <label class="flex items-start text-sm text-gray-700">
       <div class="relative">
           <input type="checkbox" class="sr-only overlay-toggle peer" value="transit-diversity-layer" />
@@ -781,12 +797,12 @@ function batchSetFeatureStates({ //batching experiment
 
         map.addSource("excess-capacity", {
             type: "geojson",
-            data: "" //replace
+            data: "CMRPC_DissolvedParcels_ExcessCapacityByZoningDensity_251017.geojson" //replace
         })
 
         map.addSource("exceeds-capacity", {
             type: "geojson",
-            data: "" //replace
+            data: "CMRPC_DissolvedParcels_ExceedsDensityByZoningStandards_251017.geojson" //replace
         })
 
         map.addSource("ctysds", {
@@ -1990,6 +2006,32 @@ map.addLayer({
             source: 'mf-specialpermit',
             paint: {
               'fill-color': '#9e1583' //mbta purple lol
+            },
+          layout: {
+            visibility: 'none'
+          }}, 
+        labelLayerId
+  )
+
+  map.addLayer({
+            id: 'excess-capacity-layer',
+            type: 'fill',
+            source: 'excess-capacity',
+            paint: {
+              'fill-color': '#008eaa' //mbta teal lol
+            },
+          layout: {
+            visibility: 'none'
+          }}, 
+        labelLayerId
+  )
+
+  map.addLayer({
+            id: 'exceeds-capacity-layer',
+            type: 'fill',
+            source: 'exceeds-capacity',
+            paint: {
+              'fill-color': '#ffc72c' //mbta yellow lol
             },
           layout: {
             visibility: 'none'
