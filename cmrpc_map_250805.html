@@ -125,11 +125,11 @@
         </optgroup>
 
         <optgroup label="Illustrative Personas">
-          <option value="bg-costs-2veh-owner">Homeowner family of 3</option>
+          <option value="bg-costs-2veh-owner">Persona: Costs for a family of 3</option>
         </optgroup>
 
         <optgroup label="Suitability Analysis">
-          <option value="buildable-land">Buildable land</option>
+          <option value="buildable-land">Land without environmental constraints</option>
         </optgroup>
 
         <optgroup label="Other">
@@ -160,7 +160,7 @@
   <!-- Header -->
   <button
   id="overlay-toggle"
-  class="w-full px-2 py-2 flex items-center justify-between bg-gray-100 hover:bg-gray-200 font-medium"
+  class="w-full px-2 py-2 flex items-center justify-between bg-gray-100 hover:bg-gray-200 text-sm font-medium"
   >
 
   <span class="flex items-center gap-1">
@@ -270,6 +270,11 @@
           <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
         </div>
       <span class="leading-snug ms-2">Transportation diversity</span>
+      <span class="leading-snug ms-2">Transportation diversity
+        <span class="inline-block align-super ml-1">
+          <span id="transit-diversity-info-btn" class="inline-flex items-center justify-center w-3 h-3 text-[8px] text-gray-600 border border-gray-400 rounded-full cursor-pointer hover:bg-gray-100">i</span>
+        </span>
+      </span>
   </label>
  <!-- <label class="flex items-start text-sm text-gray-700">
     <div class="relative">
@@ -296,6 +301,13 @@
         <span class="ms-2 leading-snug">Hide surrounding counties</span>
     </label> -->
     <!-- add in colors/to legend via js?? -->
+
+    <!-- Transportation diversity info text -->
+    <div id="transit-diversity-info" class="hidden mt-3 pt-3 border-t border-gray-200">
+      <p class="text-xs text-gray-700" style="font-family: Roboto, sans-serif;">
+        Areas with stronger transportation diversity, shown here, are areas where some everyday trips don't require a car and can be completed on foot, on a bike, or by using transit.
+      </p>
+    </div>
   </div>
 </div>
 
@@ -483,6 +495,26 @@
                 '#071A43'
             ]
 
+    const affordabilityPalette = [ //Custom blue-orange-red ramp for affordability
+                '#82ac21', // Blue for <45%
+                '#F0B2A2', // Orange for 45-60%
+                '#F95738'  // Red for >60%
+            ]
+    // const cbRentersPalette = [ //Sequential colorBrewer GrnBlu ramp
+    //             '#f6eff7',
+    //             '#bdc9e1',
+    //             '#67a9cf',
+    //             '#1c9099',
+    //             '#016c59'
+    //         ]
+    // const cbOwnersPalette = [ //Sequential colorBrewer BluPur ramp
+    //             '#edf8fb',
+    //             '#b3cde3',
+    //             '#8c96c6',
+    //             '#8856a7',
+    //             '#810f7c'
+    //         ]
+
     const pricePalette = [
                 '#f1eef6',
                 '#bdc9e1',
@@ -558,9 +590,10 @@
             ]
 
     const buildablePalette = [
-                { key: "NZN", color: "#ddb6db", label: "Buildable, no sewer" },
-                { key: "SZN", color: "#975391", label: "Buildable, sewer" },
-                { key: "NBN/SBN", color: "#000000", label: "Built" }
+                { key: "NZN", color: "#6e79dd", label: "Buildable, no sewer" },
+                { key: "SZN", color: "#ecd731", label: "Buildable, sewer" },
+                { key: "NBN", color: "#000000", label: "Developed or exempt" },
+                { key: "SBN", color: "#000000", label: "Developed or exempt" }
             ]
 
    const palettesByLayer = { //leave empty if not needed
@@ -580,6 +613,11 @@
            { value: 0.46, color: '#8c96c6', label: 'Moderate' },
            { value: 0.71, color: '#8856a7', label: 'Somewhat high' },
            { value: 0.94, color: '#810f7c', label: 'Higher displacement risk' }
+       ],
+       'bg-costs-2veh-owner': [
+           { value: 0, color: '#dce18b', label: 'Likely to spend <45% of income on housing and transportation costs' },
+           { value: 0.45, color: '#f97316', label: '45-60% of income' },
+           { value: 0.60, color: '#ef4444', label: '>60% of income' }
        ]
 //   //best way to match palettes to their respective layers ?? particularly for categorical layers
 };
@@ -752,23 +790,22 @@ function batchSetFeatureStates({ //batching experiment
             promoteId: 'GEOID'
         })
 
+        // Load median income data without filtering
         fetch('https://raw.githubusercontent.com/emtzot/mapSources/main/mass_basicHNA_2023acs_250620.json')
                 .then(response => response.json())
                 .then(data => {
                     data.forEach(f => {
-                    const id = f.GEOID.toString(); // Ensure ID is a string
-                    map.setFeatureState(
-                        {
-                        source: 'tracts',
-                        sourceLayer: 'tracts',
-                        id: id
-                        },
-                        {
-                        medIncome: f["medIncome"]
-                        //pctrent30_23: f["pctrent30_23"],
-                        //pctowned30_23: f["pctowned30_23"]
-                        }
-                    )
+                        const id = f.GEOID.toString();
+                        map.setFeatureState(
+                            {
+                            source: 'tracts',
+                            sourceLayer: 'tracts',
+                            id: id
+                            },
+                            {
+                            medIncome: f["medIncome"]
+                            }
+                        );
                     });
                 });
 
@@ -845,24 +882,51 @@ function batchSetFeatureStates({ //batching experiment
                     .catch(err => console.error("Failed to load parcel density data:", err));
 
 
-                fetch('https://raw.githubusercontent.com/CommunityScale/CMRPC/main/rd_tracts_250731.json')
+                // Load CTfilter2 to get valid tract GEOIDs for filtering displacement risk data
+                let validTractsRD = new Set();
+                fetch('/CTfilter2.geojson')
+                .then(response => response.json())
+                .then(filterData => {
+                    console.log('CTfilter2 loaded for displacement risk filtering');
+                    // Build set of valid tract GEOIDs from CTfilter2
+                    const features = filterData.features || filterData;
+                    features.forEach(f => {
+                        const geoid = f.properties?.GEOID || f.GEOID;
+                        if (geoid) {
+                            validTractsRD.add(geoid.toString());
+                        }
+                    });
+
+                    console.log('Valid tracts for displacement risk:', validTractsRD.size);
+
+                    // Now load displacement risk data and filter to valid tracts only
+                    return fetch('https://raw.githubusercontent.com/CommunityScale/CMRPC/main/rd_tracts_250731.json');
+                })
                 .then(response => response.json())
                 .then(data => {
+                    let matchedRD = 0;
                     data.forEach(f => {
-                    const id = f.GEOID.toString(); // Ensure id is a string to match with geometry's geoid 
-                    map.setFeatureState(
-                        {
-                        source: 'tracts',
-                        sourceLayer: 'tracts',
-                        id: id
-                        },
-                        {
-                        rd_seniors: Number(f["rd_seniors"]),
-                        rd_nonwhitePops: Number(f["rd_nonWhitePops"])
+                        const id = f.GEOID.toString(); // Ensure id is a string to match with geometry's geoid
+
+                        // Only set feature state for valid tracts from CTfilter2
+                        if (validTractsRD.has(id)) {
+                            matchedRD++;
+                            map.setFeatureState(
+                                {
+                                source: 'tracts',
+                                sourceLayer: 'tracts',
+                                id: id
+                                },
+                                {
+                                rd_seniors: Number(f["rd_seniors"]),
+                                rd_nonwhitePops: Number(f["rd_nonWhitePops"])
+                                }
+                            );
                         }
-                    )
                     });
-                });
+                    console.log('Displacement risk data loaded for', matchedRD, 'tracts from CTfilter2');
+                })
+                .catch(err => console.error('Error loading displacement risk data:', err));
 
                 fetch('https://raw.githubusercontent.com/CommunityScale/CMRPC/adc9df09b39883512a5175738efe5ace91ad2917/CMRPC_Tracts_MVA_CostBurden_250828.json') 
                 .then(response => response.json())
@@ -1061,9 +1125,9 @@ const interpolateLayers = [
             data_source: "tracts",
             source_layer: "tracts",
             source_url: "https://raw.githubusercontent.com/emtzot/mapSources/main/mass_basicHNA_2023acs_250620.json",
-            colors: medIncomePalette, 
+            colors: medIncomePalette,
             defaultViz: "visible",
-            useFeatureState: true 
+            useFeatureState: true
         },
         {
             id: "tracts-pctCostBurdenedRenters",
@@ -1113,12 +1177,12 @@ const interpolateLayers = [
             data_source: "bg-costs",
             source_layer: null,
             source_url: "/CMRPC_bg_costs.geojson",
-            colors: medIncomePalette,
+            colors: affordabilityPalette,
             defaultViz: "none",
             useFeatureState: false,
             useQuintiles: false,
             useCustomBreaks: true,
-            customBreaks: [0, 0.2, 0.4, 0.6, 0.8, 1.0]
+            customBreaks: [0.45, 0.60]
         },
         {
             id: "bg-costs-ownership",
@@ -1294,7 +1358,7 @@ const interpolateLayers = [
     // }
 
     async function addInterpolatedLayers(opacity, visibleLayerId) {
-  for (const { id, property, data_source, source_layer, source_url, colors, defaultViz, useFeatureState, useQuintiles, useCustomBreaks, customBreaks } of interpolateLayers) {
+  for (const { id, property, data_source, source_layer, source_url, colors, defaultViz, useFeatureState, useQuintiles, useCustomBreaks, customBreaks, useFilter, filterProperty } of interpolateLayers) {
     console.log(`Processing layer: ${id}`);
 
     const expressionInput = useFeatureState
@@ -1306,14 +1370,20 @@ const interpolateLayers = [
     // Handle custom breaks
     if (useCustomBreaks && customBreaks) {
       const stops = [];
-      for (let i = 0; i < customBreaks.length && i < colors.length; i++) {
-        stops.push(customBreaks[i], colors[i]);
+      // For step: first color is default (< first break), then iterate through breaks
+      for (let i = 0; i < customBreaks.length && i + 1 < colors.length; i++) {
+        stops.push(customBreaks[i], colors[i + 1]);
       }
       fillColorExpression = [
-        "interpolate",
-        ["linear"],
-        expressionInput,
-        ...stops
+        "case",
+        ["==", expressionInput, null],
+        "transparent",
+        [
+          "step",
+          expressionInput,
+          colors[0],  // default color for values < first break
+          ...stops
+        ]
       ];
     } else {
       // Use quintile breaks if specified, otherwise use default IQR-based breaks
@@ -1333,10 +1403,15 @@ const interpolateLayers = [
       }
 
       fillColorExpression = [
-        "interpolate",
-        ["linear"],
-        expressionInput,
-        ...stops
+        "case",
+        ["==", expressionInput, null],
+        "transparent",
+        [
+          "interpolate",
+          ["linear"],
+          expressionInput,
+          ...stops
+        ]
       ];
     }
 
@@ -1374,6 +1449,11 @@ const interpolateLayers = [
     // Only add source-layer if it exists (for vector tiles)
     if (source_layer) {
       layerConfig["source-layer"] = source_layer;
+    }
+
+    // Add filter if specified
+    if (useFilter && filterProperty) {
+      layerConfig.filter = ["in", filterProperty, ...regionOfInterest];
     }
 
     map.addLayer(layerConfig, labelLayerId);
@@ -1780,6 +1860,22 @@ map.addLayer({
             labelLayerId)
 
     map.addLayer({
+                id: "cmrpc-region-fill",
+                type: "fill",
+                source: "towns",
+                'source-layer': 'massachusetts_towns-a8k14v',
+                paint: {
+                    "fill-color": "#d3d3d3",
+                    "fill-opacity": 0.5
+                },
+                layout: {
+                    visibility: "none"
+                },
+                filter: ["in", "TOWN",...regionOfInterest]
+            },
+            labelLayerId)
+
+    map.addLayer({
                 id: "buildable-land",
                 type: "fill",
                 source: "buildable",
@@ -1787,8 +1883,8 @@ map.addLayer({
                     "fill-color": [
                         "match",
                         ["get", "CLASSTYP"],
-                        "NZN", "#ddb6db",
-                        "SZN", "#975391",
+                        "NZN", "#6e79dd",
+                        "SZN", "#ecd731",
                         "NBN", "#000000",
                         "SBN", "#000000",
                         "transparent"
@@ -2102,6 +2198,11 @@ map.on('load', () => {
             }
         });
 
+        // Show CMRPC region fill layer if buildable land is the initial layer
+        if (map.getLayer('cmrpc-region-fill')) {
+            map.setLayoutProperty('cmrpc-region-fill', 'visibility', initialLayer === 'buildable-land' ? 'visible' : 'none');
+        }
+
         renderLegendFromStops(initialLayer)
     });
 });
@@ -2168,14 +2269,41 @@ function getStopsFromLayer(layerId) {
 
   // Handle 'interpolate' or 'step' expressions
   if (type === 'interpolate' || type === 'step') {
-    const stops = expression.slice(3); 
     const result = [];
 
-    for (let i = 0; i < stops.length; i += 2) {
+    if (type === 'step') {
+      // For step: ["step", input, defaultColor, threshold1, color1, threshold2, color2, ...]
+      const defaultColor = expression[2];
+      const stops = expression.slice(3);
+
+      // Get the first threshold value
+      const firstThreshold = stops.length > 0 ? stops[0] : 0;
+
+      // Add an entry for the default color (values below first threshold)
+      // Use 0 or a representative value to mark this as the "less than" range
       result.push({
-        value: stops[i],
-        color: stops[i + 1]
+        value: 0,
+        color: defaultColor,
+        isDefaultStep: true,
+        upperBound: firstThreshold
       });
+
+      // Add the rest of the thresholds
+      for (let i = 0; i < stops.length; i += 2) {
+        result.push({
+          value: stops[i],
+          color: stops[i + 1]
+        });
+      }
+    } else {
+      // For interpolate: ["interpolate", type, input, value1, color1, value2, color2, ...]
+      const stops = expression.slice(3);
+      for (let i = 0; i < stops.length; i += 2) {
+        result.push({
+          value: stops[i],
+          color: stops[i + 1]
+        });
+      }
     }
 
     return result;
@@ -2283,8 +2411,12 @@ const dataLayerHtml = uniqueStops.map((stop, index) => {
   let displayLabel = label;
   const isNumeric = typeof stop.value === 'number';
 
-  if (isNumeric && next && !hasCustomLabels) {
-    displayLabel = index === 0
+  // Special handling for step expression default color
+  if (stop.isDefaultStep && stop.upperBound !== undefined && !hasCustomLabels) {
+    displayLabel = `< ${formatLegendLabel(stop.upperBound, layerId)}`;
+  } else if (isNumeric && next && !hasCustomLabels) {
+    // Don't show range for the first stop if it's the default step (already handled above)
+    displayLabel = stop.isDefaultStep
       ? `< ${getLabel(next)}`
       : `${label} – ${getLabel(next)}`;
   } else if (isNumeric && index === uniqueStops.length - 1 && !hasCustomLabels) {
@@ -2292,9 +2424,9 @@ const dataLayerHtml = uniqueStops.map((stop, index) => {
   }
 
   return `
-    <div class="flex items-center gap-2">
-      <span class="w-3.5 h-3.5 inline-block rounded-sm" style="background-color: ${stop.color};"></span>
-      <span>${displayLabel}</span>
+    <div class="flex items-start gap-2 mb-2">
+      <span class="w-3.5 h-3.5 inline-block rounded-sm flex-shrink-0 mt-0.5" style="background-color: ${stop.color};"></span>
+      <span class="leading-tight">${displayLabel}</span>
     </div>
   `;
 }).join('');
@@ -2337,8 +2469,17 @@ function getOverlayDisplayName(layerId) {
   if (!input) return layerId;
 
   // Find the <span> containing the text inside the parent <label>
-  const labelSpan = input.closest('label')?.querySelector('span');
-  return labelSpan?.textContent?.trim() || layerId;
+  const labelSpan = input.closest('label')?.querySelector('span.leading-snug');
+  if (!labelSpan) return layerId;
+
+  // Clone the span and remove any info icon elements
+  const clone = labelSpan.cloneNode(true);
+  const infoIcon = clone.querySelector('#transit-diversity-info-btn');
+  if (infoIcon) {
+    infoIcon.parentElement?.remove(); // Remove the parent span that contains the icon
+  }
+
+  return clone.textContent?.trim() || layerId;
 }
 
 function getOverlayColor(layerId) {
@@ -2466,6 +2607,11 @@ layerSelect.addEventListener('change', (e) => {
       map.setLayoutProperty(id, 'visibility', id === selected ? 'visible' : 'none');
     }
   });
+
+  // Show CMRPC region fill layer when buildable land is selected
+  if (map.getLayer('cmrpc-region-fill')) {
+    map.setLayoutProperty('cmrpc-region-fill', 'visibility', selected === 'buildable-land' ? 'visible' : 'none');
+  }
 
   renderLegend(selected);
 
@@ -2734,7 +2880,7 @@ layerSelect.addEventListener('change', (e) => {
                 const affordabilityPct = affordabilityShare != null ? Math.round(affordabilityShare * 100) : null;
                 html = `
                 <div class="popup-header">Block Group ${attributes.GEO_ID_clean}</div>
-                <div class="popup-content">${affordabilityPct != null ? `A 3+ person household with 2 cars looking for a 2-3 bedroom home, making 100% AMI as a household, spends ${affordabilityPct}% of their monthly income on housing and transportation costs, on average.` : 'No available data.'}
+                <div class="popup-content">${affordabilityPct != null ? `A 3+ person household with 2 cars looking for a 2-3 bedroom home, making 100% AMI as a household, is estimated to spend ${affordabilityPct}% of their monthly income on housing and transportation costs here.` : 'No available data.'}
                 </div>`;
             break;
             }
@@ -2742,7 +2888,7 @@ layerSelect.addEventListener('change', (e) => {
             case "tracts-rdAge": {
                 html = `
                 <div class="popup-header">${attributes.NAME}</div>
-                <div class="popup-content">${attributes.rd_seniors != null ? `Risk displacement score, with respect to age: ${attributes.rd_seniors}.` : 'No score available.'}
+                <div class="popup-content">${attributes.rd_seniors != null ? `Displacement risk for seniors: ${Math.round(attributes.rd_seniors*100)} out of 100, with 100 indicating highest risk.` : 'No score available.'}
                 </div>`;
             break;
             }
@@ -2750,7 +2896,7 @@ layerSelect.addEventListener('change', (e) => {
             case "tracts-rdRace": {
                 html = `
                 <div class="popup-header">${attributes.NAME}</div>
-                <div class="popup-content">${attributes.rd_nonWhitePops != null ? `Risk displacement score, with respect to race and ethnicity: ${attributes.rd_nonWhitePops}.` : 'No score available.'} 
+                <div class="popup-content">${attributes.rd_nonwhitePops != null ? `Displacement risk for nonwhite population: ${Math.round(attributes.rd_nonwhitePops*100)} out of 100, with 100 indicating highest risk.` : 'No score available.'}
                 </div>`;
             break;
             }
@@ -3184,6 +3330,18 @@ overlayToggle.addEventListener('click', () => {
   const isOpen = !overlayContent.classList.contains('hidden');
   overlayContent.classList.toggle('hidden');
   overlayArrow.classList.toggle('rotate-180')});
+
+// Transportation diversity info toggle
+const transitDiversityInfoBtn = document.getElementById('transit-diversity-info-btn');
+const transitDiversityInfo = document.getElementById('transit-diversity-info');
+
+if (transitDiversityInfoBtn && transitDiversityInfo) {
+  transitDiversityInfoBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    transitDiversityInfo.classList.toggle('hidden');
+  });
+}
 
     initializeMap();
 
