@@ -175,6 +175,9 @@
 
   <!-- Hidden content -->
   <div id="overlay-content" class="hidden px-2 py-2 space-y-2 bg-white">
+
+    <!-- Boundaries Section -->
+    <div class="text-xs font-semibold text-gray-600 uppercase tracking-wide mt-2 mb-1">Boundaries</div>
     <label class="flex items-start text-sm text-gray-700"> <!--for single line overlay labels, please use this label class. Preserves spacing and is slightly different than multi-line labels-->
         <div class="relative">
             <input type="checkbox" class="sr-only overlay-toggle peer" value="town-layer" checked/>
@@ -199,7 +202,7 @@
           </div>
         <span class="leading-snug ms-2">North subregion</span>
     </label>
-    <label class="flex items-start text-sm text-gray-700"> 
+    <label class="flex items-start text-sm text-gray-700">
         <div class="relative">
             <input type="checkbox" class="sr-only overlay-toggle peer" value="subregion-northeast" />
             <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
@@ -207,7 +210,7 @@
           </div>
         <span class="leading-snug ms-2">Northeast subregion</span>
     </label>
-    <label class="flex items-start text-sm text-gray-700"> 
+    <label class="flex items-start text-sm text-gray-700">
         <div class="relative">
             <input type="checkbox" class="sr-only overlay-toggle peer" value="subregion-west" />
             <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
@@ -231,6 +234,9 @@
           </div>
         <span class="leading-snug ms-2">Southeast subregion</span>
     </label>
+
+    <!-- Transportation Section -->
+    <div class="text-xs font-semibold text-gray-600 uppercase tracking-wide mt-3 mb-1">Transportation</div>
     <label class="flex items-start text-sm text-gray-700">
         <div class="relative">
             <input type="checkbox" class="sr-only overlay-toggle peer" value="bus-stops-layer" />
@@ -246,39 +252,7 @@
           <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
         </div>
       <span class="leading-snug ms-2">Rail stops</span>
-  </label>
-  <label class="flex items-start text-sm text-gray-700">
-    <div class="relative">
-        <input type="checkbox" class="sr-only overlay-toggle peer" value="mf-byright-layer" />
-        <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
-        <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
-      </div>
-    <span class="leading-snug ms-2">Multifamily allowed by-right</span>
-  </label>
-  <label class="flex items-start text-sm text-gray-700">
-    <div class="relative">
-        <input type="checkbox" class="sr-only overlay-toggle peer" value="mf-specialpermit-layer" />
-        <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
-        <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
-      </div>
-    <span class="leading-snug ms-2">Multifamily allowed by special permit/review</span>
-  </label>
-  <label class="flex items-start text-sm text-gray-700">
-    <div class="relative">
-        <input type="checkbox" class="sr-only overlay-toggle peer" value="exceeds-capacity-layer" />
-        <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
-        <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
-      </div>
-    <span class="leading-snug ms-2">Exceeds zoned density</span>
-</label>
-<label class="flex items-start text-sm text-gray-700">
-  <div class="relative">
-      <input type="checkbox" class="sr-only overlay-toggle peer" value="excess-capacity-layer" />
-      <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
-      <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
-    </div>
-  <span class="leading-snug ms-2">Excess capacity by zoning</span>
-</label>
+    </label>
     <label class="flex items-start text-sm text-gray-700">
       <div class="relative">
           <input type="checkbox" class="sr-only overlay-toggle peer" value="transit-diversity-layer" />
@@ -288,7 +262,42 @@
       <span class="leading-snug ms-2">Transportation diversity
         <button id="transit-diversity-info-btn" class="ml-1 text-gray-500 hover:text-gray-700" style="font-size: 10px;">ⓘ</button>
       </span>
-  </label>
+    </label>
+
+    <!-- Zoning Section -->
+    <div class="text-xs font-semibold text-gray-600 uppercase tracking-wide mt-3 mb-1">Zoning</div>
+    <label class="flex items-start text-sm text-gray-700">
+      <div class="relative">
+          <input type="checkbox" class="sr-only overlay-toggle peer" value="mf-byright-layer" />
+          <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
+          <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
+        </div>
+      <span class="leading-snug ms-2">Multifamily allowed by-right</span>
+    </label>
+    <label class="flex items-start text-sm text-gray-700">
+      <div class="relative">
+          <input type="checkbox" class="sr-only overlay-toggle peer" value="mf-specialpermit-layer" />
+          <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
+          <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
+        </div>
+      <span class="leading-snug ms-2">Multifamily allowed by special permit/review</span>
+    </label>
+    <label class="flex items-start text-sm text-gray-700">
+      <div class="relative">
+          <input type="checkbox" class="sr-only overlay-toggle peer" value="exceeds-capacity-layer" />
+          <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
+          <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
+        </div>
+      <span class="leading-snug ms-2">Exceeds zoned density</span>
+    </label>
+    <label class="flex items-start text-sm text-gray-700">
+      <div class="relative">
+          <input type="checkbox" class="sr-only overlay-toggle peer" value="excess-capacity-layer" />
+          <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
+          <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
+        </div>
+      <span class="leading-snug ms-2">Excess capacity by zoning</span>
+    </label>
  <!-- <label class="flex items-start text-sm text-gray-700">
     <div class="relative">
         <input type="checkbox" class="sr-only overlay-toggle peer" value="transit-quality-layer" />
@@ -496,7 +505,9 @@
         "subregion-north",
         "subregion-southeast",
         "mf-byright-layer",
-        "mf-specialpermit-layer"
+        "mf-specialpermit-layer",
+        "excess-capacity-layer",
+        "exceeds-capacity-layer"
         ];
 
     //all palettes here!!
@@ -2052,29 +2063,89 @@ map.addLayer({
         labelLayerId
   )
 
+  // Excess capacity fill layer (polygon fill)
   map.addLayer({
             id: 'excess-capacity-layer',
             type: 'fill',
             source: 'excess-capacity',
             paint: {
-              'fill-color': '#008eaa' //mbta teal lol
+              'fill-color': '#ecd731', // yellow
+              'fill-opacity': [
+                'interpolate',
+                ['linear'],
+                ['zoom'],
+                0, 0.95,   // 95% opacity before zoom 15
+                15, 0.3    // 30% opacity at zoom 15 and beyond
+              ]
             },
           layout: {
             visibility: 'none'
-          }}, 
+          }},
         labelLayerId
   )
 
+  // Excess capacity outline layer (appears at zoom 15+)
+  map.addLayer({
+            id: 'excess-capacity-outline',
+            type: 'line',
+            source: 'excess-capacity',
+            paint: {
+              'line-color': '#ecd731', // yellow
+              'line-width': 2.5,
+              'line-opacity': [
+                'interpolate',
+                ['linear'],
+                ['zoom'],
+                14, 0,      // invisible before zoom 15
+                15, 1       // fully visible at zoom 15+
+              ]
+            },
+          layout: {
+            visibility: 'none'
+          }},
+        labelLayerId
+  )
+
+  // Exceeds capacity fill layer (polygon fill)
   map.addLayer({
             id: 'exceeds-capacity-layer',
             type: 'fill',
             source: 'exceeds-capacity',
             paint: {
-              'fill-color': '#ffc72c' //mbta yellow lol
+              'fill-color': '#ecd731', // yellow
+              'fill-opacity': [
+                'interpolate',
+                ['linear'],
+                ['zoom'],
+                0, 0.95,   // 95% opacity before zoom 15
+                15, 0.3    // 30% opacity at zoom 15 and beyond
+              ]
             },
           layout: {
             visibility: 'none'
-          }}, 
+          }},
+        labelLayerId
+  )
+
+  // Exceeds capacity outline layer (appears at zoom 15+)
+  map.addLayer({
+            id: 'exceeds-capacity-outline',
+            type: 'line',
+            source: 'exceeds-capacity',
+            paint: {
+              'line-color': '#ecd731', // yellow
+              'line-width': 2.5,
+              'line-opacity': [
+                'interpolate',
+                ['linear'],
+                ['zoom'],
+                14, 0,      // invisible before zoom 15
+                15, 1       // fully visible at zoom 15+
+              ]
+            },
+          layout: {
+            visibility: 'none'
+          }},
         labelLayerId
   )
   
@@ -2237,6 +2308,37 @@ map.addLayer({
         })
 
 
+    // Create diagonal line pattern for buildable-land layer
+    const createDiagonalLinePattern = () => {
+      const size = 16; // Size of the pattern tile
+      const canvas = document.createElement('canvas');
+      canvas.width = size;
+      canvas.height = size;
+      const ctx = canvas.getContext('2d');
+
+      // Clear canvas
+      ctx.clearRect(0, 0, size, size);
+
+      // Draw diagonal lines at 45 degrees
+      ctx.strokeStyle = '#000000'; // Black lines
+      ctx.lineWidth = 1; // 1pt width
+      ctx.beginPath();
+
+      // Draw multiple diagonal lines to fill the pattern
+      // We need to draw lines offset to create the pattern
+      for (let i = -size; i < size * 2; i += 6) { // spacing of 6 pixels (moderately close)
+        ctx.moveTo(i, 0);
+        ctx.lineTo(i + size, size);
+      }
+
+      ctx.stroke();
+      return canvas;
+    };
+
+    // Add the diagonal pattern to the map
+    const diagonalPattern = createDiagonalLinePattern();
+    map.addImage('diagonal-lines-black', diagonalPattern);
+
     // map.loadImage(
     //         'https://mits003.github.io/studio_null/img/mapbox_texture/dot_xs.png',
     //         (err, image) => {
@@ -2258,7 +2360,7 @@ map.addLayer({
         //                 visibility: "visible"
         //         },
         //         });
-                
+
         //     }
         // );
 
@@ -2572,12 +2674,28 @@ document.querySelectorAll('.overlay-toggle').forEach(input => {
       if (layerId === 'transit-diversity-layer' && map.getLayer('transit-diversity-outline')) {
         map.setLayoutProperty('transit-diversity-outline', 'visibility', 'visible');
       }
+      // Also toggle the outline layer for excess-capacity
+      if (layerId === 'excess-capacity-layer' && map.getLayer('excess-capacity-outline')) {
+        map.setLayoutProperty('excess-capacity-outline', 'visibility', 'visible');
+      }
+      // Also toggle the outline layer for exceeds-capacity
+      if (layerId === 'exceeds-capacity-layer' && map.getLayer('exceeds-capacity-outline')) {
+        map.setLayoutProperty('exceeds-capacity-outline', 'visibility', 'visible');
+      }
       renderOverlayLegend(layerId); // append overlay to legend
     } else {
       map.setLayoutProperty(layerId, 'visibility', 'none');
       // Also hide the outline layer for transit-diversity
       if (layerId === 'transit-diversity-layer' && map.getLayer('transit-diversity-outline')) {
         map.setLayoutProperty('transit-diversity-outline', 'visibility', 'none');
+      }
+      // Also hide the outline layer for excess-capacity
+      if (layerId === 'excess-capacity-layer' && map.getLayer('excess-capacity-outline')) {
+        map.setLayoutProperty('excess-capacity-outline', 'visibility', 'none');
+      }
+      // Also hide the outline layer for exceeds-capacity
+      if (layerId === 'exceeds-capacity-layer' && map.getLayer('exceeds-capacity-outline')) {
+        map.setLayoutProperty('exceeds-capacity-outline', 'visibility', 'none');
       }
       // optionally remove overlay entry from legend
     }
@@ -3213,6 +3331,14 @@ document.querySelectorAll('#basemap-style-thumbnails button').forEach(button => 
         // Also restore the outline layer for transit-diversity
         if (id === 'transit-diversity-layer' && map.getLayer('transit-diversity-outline')) {
           map.setLayoutProperty('transit-diversity-outline', 'visibility', 'visible');
+        }
+        // Also restore the outline layer for excess-capacity
+        if (id === 'excess-capacity-layer' && map.getLayer('excess-capacity-outline')) {
+          map.setLayoutProperty('excess-capacity-outline', 'visibility', 'visible');
+        }
+        // Also restore the outline layer for exceeds-capacity
+        if (id === 'exceeds-capacity-layer' && map.getLayer('exceeds-capacity-outline')) {
+          map.setLayoutProperty('exceeds-capacity-outline', 'visibility', 'visible');
         }
       }
     });
