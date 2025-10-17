@@ -776,7 +776,7 @@ function batchSetFeatureStates({ //batching experiment
 
         map.addSource("buildable", {
             type: "geojson",
-            data: 'buildable2.geojson'
+            data: 'buildable3.geojson'
         })
 
         map.addSource("excess-capacity", {
@@ -1945,13 +1945,42 @@ map.addLayer({
     //     labelLayerId
     // )
 
+    // Transit diversity fill layer (polygon fill)
     map.addLayer({
             id: 'transit-diversity-layer',
             type: 'fill',
             source: 'transit-diversity',
             paint: {
-              'fill-color': 'transparent',
-              'fill-outline-color': '#000000'
+              'fill-color': '#ecd731', // yellow
+              'fill-opacity': [
+                'interpolate',
+                ['linear'],
+                ['zoom'],
+                0, 0.95,   // 95% opacity before zoom 15
+                15, 0.3    // 30% opacity at zoom 15 and beyond
+              ]
+            },
+          layout: {
+            visibility: 'none'
+          }},
+        labelLayerId
+  )
+
+  // Transit diversity outline layer (appears at zoom 15+)
+  map.addLayer({
+            id: 'transit-diversity-outline',
+            type: 'line',
+            source: 'transit-diversity',
+            paint: {
+              'line-color': '#ecd731', // yellow
+              'line-width': 2,
+              'line-opacity': [
+                'interpolate',
+                ['linear'],
+                ['zoom'],
+                13, 0,      // invisible before zoom 15
+                14, 1       // fully visible at zoom 15+
+              ]
             },
           layout: {
             visibility: 'none'
@@ -2460,9 +2489,17 @@ document.querySelectorAll('.overlay-toggle').forEach(input => {
 
     if (input.checked) {
       map.setLayoutProperty(layerId, 'visibility', 'visible');
+      // Also toggle the outline layer for transit-diversity
+      if (layerId === 'transit-diversity-layer' && map.getLayer('transit-diversity-outline')) {
+        map.setLayoutProperty('transit-diversity-outline', 'visibility', 'visible');
+      }
       renderOverlayLegend(layerId); // append overlay to legend
     } else {
       map.setLayoutProperty(layerId, 'visibility', 'none');
+      // Also hide the outline layer for transit-diversity
+      if (layerId === 'transit-diversity-layer' && map.getLayer('transit-diversity-outline')) {
+        map.setLayoutProperty('transit-diversity-outline', 'visibility', 'none');
+      }
       // optionally remove overlay entry from legend
     }
   });
@@ -3049,16 +3086,19 @@ document.querySelectorAll('#basemap-style-thumbnails button').forEach(button => 
     const style = button.getAttribute('data-style');
 
     // Capture visible data layers before switching
-    const visibleLayers = allFillLayers.filter(id => { //or dataLayers?? troubleshooting bc it doesn't seem to want to work rn 
+    const visibleLayers = dataLayers.filter(id => {
       const layer = map.getLayer(id);
       return layer && map.getLayoutProperty(id, 'visibility') === 'visible';
     });
 
-    // Capture visible overlays prior to switch 
+    // Capture visible overlays prior to switch
     const visibleOverlays = overlayLayers.filter(id => {
       const layer = map.getLayer(id);
       return layer && map.getLayoutProperty(id, 'visibility') === 'visible';
     });
+
+    // Capture the selected layer from dropdown
+    const selectedDropdownLayer = document.getElementById('layer-dropdown')?.value;
 
     // Switch basemap
     map.setStyle(`mapbox://styles/${style}`);
@@ -3072,7 +3112,7 @@ document.querySelectorAll('#basemap-style-thumbnails button').forEach(button => 
   map.once('idle', () => {
     // run afer everything has been added back as changing the style wipes the sources as well??
 
-    // Hide all layers by default 
+    // Hide all layers by default
     dataLayers.forEach(id => {
       if (map.getLayer(id)) {
         map.setLayoutProperty(id, 'visibility', 'none');
@@ -3095,6 +3135,10 @@ document.querySelectorAll('#basemap-style-thumbnails button').forEach(button => 
     visibleOverlays.forEach(id => {
       if (map.getLayer(id)) {
         map.setLayoutProperty(id, 'visibility', 'visible');
+        // Also restore the outline layer for transit-diversity
+        if (id === 'transit-diversity-layer' && map.getLayer('transit-diversity-outline')) {
+          map.setLayoutProperty('transit-diversity-outline', 'visibility', 'visible');
+        }
       }
     });
 
@@ -3108,8 +3152,56 @@ document.querySelectorAll('#basemap-style-thumbnails button').forEach(button => 
 
     updateLayerOpacity();
 
-    const selected = document.getElementById('layer-dropdown')?.value;
-    if (selected) renderLegendFromStops(selected);
+    // Move overlay layers to the top (just below labels) first
+    const layers = map.getStyle().layers;
+    let labelLayerId;
+    for (const layer of layers) {
+      if (layer.type === 'symbol' && layer.layout && layer.layout['text-field']) {
+        labelLayerId = layer.id;
+        break;
+      }
+    }
+
+    if (labelLayerId) {
+      // Move town-layer (community boundaries) to top
+      if (map.getLayer('town-layer')) {
+        map.moveLayer('town-layer', labelLayerId);
+      }
+      // Move transit-diversity layers to top
+      if (map.getLayer('transit-diversity-layer')) {
+        map.moveLayer('transit-diversity-layer', labelLayerId);
+      }
+      if (map.getLayer('transit-diversity-outline')) {
+        map.moveLayer('transit-diversity-outline', labelLayerId);
+      }
+    }
+
+    // Restore the selected data layer from dropdown - do this LAST
+    if (selectedDropdownLayer && selectedDropdownLayer !== 'placeholder') {
+      // Update the dropdown to maintain selection first
+      const dropdown = document.getElementById('layer-dropdown');
+      if (dropdown) {
+        dropdown.value = selectedDropdownLayer;
+
+        // Update legend title
+        const selectedOption = dropdown.options[dropdown.selectedIndex];
+        if (selectedOption) {
+          document.getElementById('legend-title').textContent = selectedOption.text;
+        }
+      }
+
+      renderLegendFromStops(selectedDropdownLayer);
+
+      // Force visibility to be set on the selected layer
+      if (map.getLayer(selectedDropdownLayer)) {
+        map.setLayoutProperty(selectedDropdownLayer, 'visibility', 'visible');
+
+        // Move the selected layer above basemap but below labels
+        if (labelLayerId) {
+          map.moveLayer(selectedDropdownLayer, labelLayerId);
+        }
+      }
+    }
   });
     });
   });
