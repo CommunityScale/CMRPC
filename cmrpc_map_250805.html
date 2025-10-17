@@ -469,7 +469,7 @@
         "towns-layer",
         "bus-stops-layer",
         //"train"-stops-layer
-        //"transit-diversity-layer",
+        "transit-diversity-layer",
         //"transit-quality-layer",
         "subregion-southeast",
         "subregion-northeast",
@@ -742,13 +742,13 @@ function batchSetFeatureStates({ //batching experiment
 
         map.addSource("transit-diversity", {
             type: 'geojson',
-            data: 'https://raw.githubusercontent.com/CommunityScale/CMRPC/e1f70fdb0d8f63d60fef2b96eaacfee5879ca632/parcels_transportation_diversity_marg_onlytrue.geojson',
+            data: 'https://raw.githubusercontent.com/CommunityScale/CMRPC/refs/heads/main/parcels_transportation_diversity_marg_onlytrue_diss.geojson',
             promoteId: 'loc_id'
         })
 
         map.addSource("transit-quality", { //replace!!
             type: 'geojson',
-            data: 'https://raw.githubusercontent.com/CommunityScale/CMRPC/e1f70fdb0d8f63d60fef2b96eaacfee5879ca632/transit_quality_dissolved.geojson',
+            data: 'https://raw.githubusercontent.com/CommunityScale/CMRPC/e1f70fdb0d8f63d60fef2b96eaacfee5879ca632/transit_quality_diss.geojson',
             promoteId: 'fid'
         })
 
@@ -776,7 +776,7 @@ function batchSetFeatureStates({ //batching experiment
 
         map.addSource("buildable", {
             type: "geojson",
-            data: 'buildable.geojson'
+            data: 'buildable2.geojson'
         })
 
         map.addSource("excess-capacity", {
@@ -1950,11 +1950,12 @@ map.addLayer({
             type: 'fill',
             source: 'transit-diversity',
             paint: {
-              'fill-color': '#003da5' //mbta blue lol
+              'fill-color': 'transparent',
+              'fill-outline-color': '#000000'
             },
           layout: {
             visibility: 'none'
-          }}, 
+          }},
         labelLayerId
   )
 
