@@ -239,14 +239,14 @@
           </div>
         <span class="leading-snug ms-2">Bus stops</span>
     </label>
-    <!--<label class="flex items-start text-sm text-gray-700">
+    <label class="flex items-start text-sm text-gray-700">
       <div class="relative">
           <input type="checkbox" class="sr-only overlay-toggle peer" value="train-stops-layer" />
           <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
           <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
         </div>
       <span class="leading-snug ms-2">Rail stops</span>
-  </label>-->
+  </label>
   <label class="flex items-start text-sm text-gray-700">
     <div class="relative">
         <input type="checkbox" class="sr-only overlay-toggle peer" value="mf-byright-layer" />
@@ -754,6 +754,11 @@ function batchSetFeatureStates({ //batching experiment
         map.addSource("bus-stops", {
             type: "geojson",
             data: 'https://raw.githubusercontent.com/CommunityScale/CMRPC/refs/heads/main/bus_stops.geojson' //replace with re-projected version??
+        })
+
+        map.addSource("train-stops", {
+            type: "geojson",
+            data: "CMRPC_RailStations_251017.geojson"
         })
 
         map.addSource("transit-diversity", {
@@ -2184,11 +2189,25 @@ map.addLayer({
             source: "bus-stops",
             paint: {
                 "circle-color": "#ff0000",
-                "circle-radius": 1
+                "circle-radius": 1.5
             },
             layout: {
                 visibility: "none"
             }
+        })
+
+        map.addLayer({
+            id: "train-stops-layer",
+            type: "circle",
+            source: "train-stops",
+            paint: {
+                "circle-color": "#ED8B00", //mbta orange
+                "circle-radius": 3
+            },
+            layout: {
+                visibility: "none"
+            },
+            filter: ["==", ["get", "C_RAILSTAT"], "Y"]
         })
 
         map.addLayer({
