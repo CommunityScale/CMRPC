@@ -957,7 +957,7 @@ function batchSetFeatureStates({ //batching experiment
                     console.log('Valid tracts for displacement risk:', validTractsRD.size);
 
                     // Now load displacement risk data and filter to valid tracts only
-                    return fetch('https://raw.githubusercontent.com/CommunityScale/CMRPC/main/rd_tracts_250731.json');
+                    return fetch('https://raw.githubusercontent.com/CommunityScale/CMRPC/refs/heads/main/rd_tracts_250731.json');
                 })
                 .then(response => response.json())
                 .then(data => {
