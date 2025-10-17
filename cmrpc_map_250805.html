@@ -285,7 +285,9 @@
           <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
           <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
         </div>
-      <span class="leading-snug ms-2">Transportation diversity</span>
+      <span class="leading-snug ms-2">Transportation diversity
+        <button id="transit-diversity-info-btn" class="ml-1 text-gray-500 hover:text-gray-700" style="font-size: 10px;">ⓘ</button>
+      </span>
   </label>
  <!-- <label class="flex items-start text-sm text-gray-700">
     <div class="relative">
@@ -792,7 +794,7 @@ function batchSetFeatureStates({ //batching experiment
 
         map.addSource("buildable", {
             type: "geojson",
-            data: 'buildable3.geojson'
+            data: 'https://raw.githubusercontent.com/CommunityScale/CMRPC/refs/heads/main/buildable3.geojson'
         })
 
         map.addSource("excess-capacity", {
@@ -2262,8 +2264,8 @@ map.on('load', () => {
     addSources();
 
     map.once('idle', async () => {
-        const opacity = 0.66; 
-        const visibleLayerId = "tracts-medIncome"; // set visible layer id to layer wanted for initial load!!
+        const opacity = 0.66;
+        const visibleLayerId = null; // Don't show any layer by default - let user select from dropdown
 
         await addInterpolatedLayers(opacity, visibleLayerId); //add interpolated layers FIRST
 
@@ -3127,11 +3129,8 @@ document.querySelectorAll('#basemap-style-thumbnails button').forEach(button => 
     button.addEventListener('click', () => {
     const style = button.getAttribute('data-style');
 
-    // Capture visible data layers before switching
-    const visibleLayers = dataLayers.filter(id => {
-      const layer = map.getLayer(id);
-      return layer && map.getLayoutProperty(id, 'visibility') === 'visible';
-    });
+    // Don't capture visible data layers - we'll restore from dropdown value only
+    // This prevents the flash of wrong layers during basemap switching
 
     // Capture visible overlays prior to switch
     const visibleOverlays = overlayLayers.filter(id => {
@@ -3154,26 +3153,21 @@ document.querySelectorAll('#basemap-style-thumbnails button').forEach(button => 
   map.once('idle', () => {
     // run afer everything has been added back as changing the style wipes the sources as well??
 
-    // Hide all layers by default
+    // Hide all data layers by default (don't restore them yet to avoid flashing)
     dataLayers.forEach(id => {
       if (map.getLayer(id)) {
         map.setLayoutProperty(id, 'visibility', 'none');
       }
     });
 
+    // Hide all overlay layers by default
     overlayLayers.forEach(id => {
       if (map.getLayer(id)) {
         map.setLayoutProperty(id, 'visibility', 'none');
       }
     });
 
-    // Restore peviously visible layers once the style loads
-    visibleLayers.forEach(id => {
-      if (map.getLayer(id)) {
-        map.setLayoutProperty(id, 'visibility', 'visible');
-      }
-    });
-
+    // Restore only the overlay layers (not data layers - they're handled separately below)
     visibleOverlays.forEach(id => {
       if (map.getLayer(id)) {
         map.setLayoutProperty(id, 'visibility', 'visible');
@@ -3232,11 +3226,26 @@ document.querySelectorAll('#basemap-style-thumbnails button').forEach(button => 
         }
       }
 
+      // Don't hide all layers again - they're already hidden above
+      // Just show the selected layer
+
       renderLegendFromStops(selectedDropdownLayer);
 
-      // Force visibility to be set on the selected layer
+      // Force visibility to be set ONLY on the selected layer
       if (map.getLayer(selectedDropdownLayer)) {
         map.setLayoutProperty(selectedDropdownLayer, 'visibility', 'visible');
+
+        // Show CMRPC region fill layer when buildable land is selected
+        if (selectedDropdownLayer === 'buildable-land' && map.getLayer('cmrpc-region-fill')) {
+          map.setLayoutProperty('cmrpc-region-fill', 'visibility', 'visible');
+          // Move the region fill layer to correct position
+          if (labelLayerId) {
+            map.moveLayer('cmrpc-region-fill', labelLayerId);
+          }
+        } else if (map.getLayer('cmrpc-region-fill')) {
+          // Hide region fill for other layers
+          map.setLayoutProperty('cmrpc-region-fill', 'visibility', 'none');
+        }
 
         // Move the selected layer above basemap but below labels
         if (labelLayerId) {
