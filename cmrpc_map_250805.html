@@ -112,7 +112,7 @@
         <optgroup label="Transportation">
 <<<<<<< HEAD
 =======
-        <!--<option value="bg-transit-diversity-layer">Transportation diversity</option> -->
+        <!--<option value="bg-transport-diversity-layer">Transportation diversity</option> -->
 >>>>>>> e00fd6365de46ccc9d6454c9b35693d2be6484e0
         </optgroup>
 
@@ -239,13 +239,37 @@
           </div>
         <span class="leading-snug ms-2">Bus stops</span>
     </label>
+    <!--<label class="flex items-start text-sm text-gray-700">
+      <div class="relative">
+          <input type="checkbox" class="sr-only overlay-toggle peer" value="train-stops-layer" />
+          <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
+          <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
+        </div>
+      <span class="leading-snug ms-2">Rail stops</span>
+  </label>-->
+  <label class="flex items-start text-sm text-gray-700">
+    <div class="relative">
+        <input type="checkbox" class="sr-only overlay-toggle peer" value="mf-byright-layer" />
+        <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
+        <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
+      </div>
+    <span class="leading-snug ms-2">Multifamily allowed by-right</span>
+  </label>
+  <label class="flex items-start text-sm text-gray-700">
+    <div class="relative">
+        <input type="checkbox" class="sr-only overlay-toggle peer" value="mf-specialpermit-layer" />
+        <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
+        <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
+      </div>
+    <span class="leading-snug ms-2">Multifamily allowed by special permit or special review</span>
+  </label>
     <label class="flex items-start text-sm text-gray-700">
       <div class="relative">
           <input type="checkbox" class="sr-only overlay-toggle peer" value="transit-diversity-layer" />
           <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
           <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
         </div>
-      <span class="leading-snug ms-2">Transit diversity</span>
+      <span class="leading-snug ms-2">Transportation diversity</span>
   </label>
  <!-- <label class="flex items-start text-sm text-gray-700">
     <div class="relative">
@@ -362,7 +386,7 @@
 
 <script>
     const INITIAL_LOC = [-71.81, 42.21] 
-    const INITIAL_ZOOM = 11.5 //set initial zoom (zoom levels 9-12 best for cities depending on size)(this is set to 13 to accomodate the tileset that will need to be uploaded via CLI)
+    const INITIAL_ZOOM = 10 //set initial zoom (zoom levels 9-12 best for cities depending on size)(this is set to 13 to accomodate the tileset that will need to be uploaded via CLI)
     const communityScaleGray = "#425A70" //could replace with different accent color, I personally like this branding 
 
     //Place specific constants!!
@@ -430,7 +454,6 @@
         'buildable-land',
         //'parcels-pctLV',
         //'parcels-value',
-        //'parcels-ownership',
         'parcels-density'
         //'admin-layer' //not sure if admin layer should be included here
     ];
@@ -438,14 +461,17 @@
     const overlayLayers = [ // all overlay layers need to be listed here
         "towns-layer",
         "bus-stops-layer",
-        "transit-diversity-layer",
-        "transit-quality-layer"
-        //"subregion-southeast",
-        //"subregion-northeast",
-        //"subregion-central",
-        //"subregion-west",
-        //"subregion-north",
-        //"subregion-southeast"
+        //"train"-stops-layer
+        //"transit-diversity-layer",
+        //"transit-quality-layer",
+        "subregion-southeast",
+        "subregion-northeast",
+        "subregion-central",
+        "subregion-west",
+        "subregion-north",
+        "subregion-southeast",
+        "mf-byright-layer",
+        "mf-specialpermit-layer"
         ];
 
     //all palettes here!!
@@ -456,20 +482,6 @@
                 '#4956C5',
                 '#071A43'
             ]
-    // const cbRentersPalette = [ //Sequential colorBrewer GrnBlu ramp
-    //             '#f6eff7',
-    //             '#bdc9e1',
-    //             '#67a9cf',
-    //             '#1c9099',
-    //             '#016c59'
-    //         ]
-    // const cbOwnersPalette = [ //Sequential colorBrewer BluPur ramp
-    //             '#edf8fb',
-    //             '#b3cde3',
-    //             '#8c96c6',
-    //             '#8856a7',
-    //             '#810f7c'
-    //         ]
 
     const pricePalette = [
                 '#f1eef6',
@@ -707,10 +719,26 @@ function batchSetFeatureStates({ //batching experiment
             promoteId: 'fid'
         })
 
+        map.addSource("mf-byright", {
+            type: 'geojson',
+            data: 'CMRPC_MFByRight_251009.geojson'
+        })
+
+        map.addSource("mf-specialpermit", {
+            type: 'geojson',
+            data: 'CMRPC_MFBySpecialPermit_SpecialReview_251009.geojson'
+        })
+
         map.addSource("bg-costs", {
             type: "geojson",
             data: 'CMRPC_bg_costs.geojson',
             promoteId: 'GEO_ID_clean'
+        })
+
+        map.addSource("bg-tranport-diversity", {
+            type: 'geojson',
+            data: "CMRPC_bg_transportation_diverse_marg.geojson",
+            promoteId: ''
         })
 
         map.addSource("buildable", {
@@ -1126,14 +1154,15 @@ const interpolateLayers = [
             useQuintiles: true
         },
         // {
-        //     id: "parcels-density",
-        //     property: "density",
-        //     data_source: "parcels",
-        //     source_layer: "tracts",
-        //     source_url: "https://raw.githubusercontent.com/CommunityScale/CMRPC/main/CMRPC_2025_Residensity_Parcel_250801.json",
+        //     id: "bg-transport-diversity-layer",
+        //     property: "density", <-- replace!!
+        //     data_source: "bg-transport-diversity",
+        //     source_layer: null,
+        //     source_url: "CMRPC_bg_transportation_diverse_marg.geojson",
         //     colors: medIncomePalette, //replaced with medIncomePalette for color consistency 
         //     defaultViz: "none",
-        //     useFeatureState: true
+        //     useFeatureState: false,
+        //     useQuintiles: false
         // },
         // {
         //     id: "parcels-pctLV",
@@ -1820,7 +1849,7 @@ map.addLayer({
             type: 'fill',
             source: 'transit-diversity',
             paint: {
-              'fill-color': '#9e1583' //mbta purple lol
+              'fill-color': '#003da5' //mbta blue lol
             },
           layout: {
             visibility: 'none'
@@ -1840,6 +1869,33 @@ map.addLayer({
           }}, 
         labelLayerId
   )
+
+  map.addLayer({
+            id: 'mf-byright-layer',
+            type: 'fill',
+            source: 'mf-byright',
+            paint: {
+              'fill-color': '#028b57' //mbta green lol
+            },
+          layout: {
+            visibility: 'none'
+          }}, 
+        labelLayerId
+  )
+
+  map.addLayer({
+            id: 'mf-specialpermit-layer',
+            type: 'fill',
+            source: 'mf-specialpermit',
+            paint: {
+              'fill-color': '#9e1583' //mbta purple lol
+            },
+          layout: {
+            visibility: 'none'
+          }}, 
+        labelLayerId
+  )
+  
 
     map.addLayer({
             id: "town-layer",
@@ -3130,6 +3186,9 @@ overlayToggle.addEventListener('click', () => {
   overlayArrow.classList.toggle('rotate-180')});
 
     initializeMap();
+
+    console.log(Object.keys(layerDescriptions));
+
 
         </script>
     </body>
