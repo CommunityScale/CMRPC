@@ -799,7 +799,7 @@ function batchSetFeatureStates({ //batching experiment
 
         map.addSource("buildable", {
             type: "geojson",
-            data: 'https://raw.githubusercontent.com/CommunityScale/CMRPC/refs/heads/main/buildable3.geojson'
+            data: 'buildable4.geojson'
         })
 
         map.addSource("excess-capacity", {
@@ -1154,7 +1154,7 @@ const interpolateLayers = [
             source_layer: "tracts",
             source_url: "https://raw.githubusercontent.com/emtzot/mapSources/main/mass_basicHNA_2023acs_250620.json",
             colors: medIncomePalette,
-            defaultViz: "visible",
+            defaultViz: "none",
             useFeatureState: true
         },
         {
@@ -1974,13 +1974,13 @@ map.addLayer({
             type: 'fill',
             source: 'transit-diversity',
             paint: {
-              'fill-color': '#ecd731', // yellow
+              'fill-color': 'black', // yellow
               'fill-opacity': [
                 'interpolate',
                 ['linear'],
                 ['zoom'],
                 0, 0.95,   // 95% opacity before zoom 15
-                15, 0.3    // 30% opacity at zoom 15 and beyond
+                15, 0.0    // 30% opacity at zoom 15 and beyond
               ]
             },
           layout: {
@@ -1995,7 +1995,7 @@ map.addLayer({
             type: 'line',
             source: 'transit-diversity',
             paint: {
-              'line-color': '#ecd731', // yellow
+              'line-color': 'black', // yellow
               'line-width': 2,
               'line-opacity': [
                 'interpolate',
@@ -2292,18 +2292,31 @@ map.on('load', () => {
 
         const initialLayer = layerSelect.value;
 
-        allFillLayers.forEach(id => {
-            if (map.getLayer(id)) {
-                map.setLayoutProperty(id, "visibility", id === initialLayer ? "visible" : "none");
-            }
-        });
+        // Only show a layer if one is actually selected (not empty/placeholder)
+        if (initialLayer && initialLayer !== 'placeholder' && initialLayer !== '') {
+          allFillLayers.forEach(id => {
+              if (map.getLayer(id)) {
+                  map.setLayoutProperty(id, "visibility", id === initialLayer ? "visible" : "none");
+              }
+          });
 
-        // Show CMRPC region fill layer if buildable land is the initial layer
-        if (map.getLayer('cmrpc-region-fill')) {
-            map.setLayoutProperty('cmrpc-region-fill', 'visibility', initialLayer === 'buildable-land' ? 'visible' : 'none');
+          // Show CMRPC region fill layer if buildable land is the initial layer
+          if (map.getLayer('cmrpc-region-fill')) {
+              map.setLayoutProperty('cmrpc-region-fill', 'visibility', initialLayer === 'buildable-land' ? 'visible' : 'none');
+          }
+
+          renderLegendFromStops(initialLayer);
+        } else {
+          // No layer selected - make sure all are hidden
+          allFillLayers.forEach(id => {
+              if (map.getLayer(id)) {
+                  map.setLayoutProperty(id, "visibility", "none");
+              }
+          });
+          if (map.getLayer('cmrpc-region-fill')) {
+              map.setLayoutProperty('cmrpc-region-fill', 'visibility', 'none');
+          }
         }
-
-        renderLegendFromStops(initialLayer)
     });
 });
 
@@ -2312,6 +2325,9 @@ map.on('load', () => {
 
 const layerSelect = document.getElementById('layer-select');
 const legendContent = document.getElementById('legend-content');
+
+// Track the currently selected data layer (since dropdown resets after selection)
+let currentlySelectedDataLayer = null;
 
 const allFillLayers = [
     'tracts-medIncome',
@@ -2709,6 +2725,9 @@ layerSelect.addEventListener('change', (e) => {
   const selected = e.target.value;
 
   if (!selected) return;
+
+  // Store the selected layer globally so we can restore it after basemap changes
+  currentlySelectedDataLayer = selected;
 
   allFillLayers.forEach(id => {
     if (map.getLayer(id)) {
@@ -3157,8 +3176,9 @@ document.querySelectorAll('#basemap-style-thumbnails button').forEach(button => 
       return layer && map.getLayoutProperty(id, 'visibility') === 'visible';
     });
 
-    // Capture the selected layer from dropdown
-    const selectedDropdownLayer = document.getElementById('layer-dropdown')?.value;
+    // Use the globally tracked selected layer (not dropdown value, since it resets)
+    const selectedDropdownLayer = currentlySelectedDataLayer;
+    console.log('Captured selected layer before basemap switch:', selectedDropdownLayer);
 
     // Switch basemap
     map.setStyle(`mapbox://styles/${style}`);
@@ -3173,7 +3193,7 @@ document.querySelectorAll('#basemap-style-thumbnails button').forEach(button => 
     // run afer everything has been added back as changing the style wipes the sources as well??
 
     // Hide all data layers by default (don't restore them yet to avoid flashing)
-    dataLayers.forEach(id => {
+    allFillLayers.forEach(id => {
       if (map.getLayer(id)) {
         map.setLayoutProperty(id, 'visibility', 'none');
       }
@@ -3207,7 +3227,7 @@ document.querySelectorAll('#basemap-style-thumbnails button').forEach(button => 
 
     updateLayerOpacity();
 
-    // Move overlay layers to the top (just below labels) first
+    // Find the label layer ID first (we'll use this for z-ordering)
     const layers = map.getStyle().layers;
     let labelLayerId;
     for (const layer of layers) {
@@ -3217,26 +3237,20 @@ document.querySelectorAll('#basemap-style-thumbnails button').forEach(button => 
       }
     }
 
-    if (labelLayerId) {
-      // Move town-layer (community boundaries) to top
-      if (map.getLayer('town-layer')) {
-        map.moveLayer('town-layer', labelLayerId);
-      }
-      // Move transit-diversity layers to top
-      if (map.getLayer('transit-diversity-layer')) {
-        map.moveLayer('transit-diversity-layer', labelLayerId);
-      }
-      if (map.getLayer('transit-diversity-outline')) {
-        map.moveLayer('transit-diversity-outline', labelLayerId);
-      }
-    }
+    // Restore the selected data layer from dropdown - do this FIRST (before overlays)
+    console.log('Attempting to restore layer:', selectedDropdownLayer);
+    console.log('Checks - not null?', selectedDropdownLayer ? 'YES' : 'NO');
+    console.log('Checks - not placeholder?', selectedDropdownLayer !== 'placeholder' ? 'YES' : 'NO');
+    console.log('Checks - not empty?', selectedDropdownLayer !== '' ? 'YES' : 'NO');
 
-    // Restore the selected data layer from dropdown - do this LAST
-    if (selectedDropdownLayer && selectedDropdownLayer !== 'placeholder') {
+    if (selectedDropdownLayer && selectedDropdownLayer !== 'placeholder' && selectedDropdownLayer !== '') {
+      console.log('✓ Layer value is valid, proceeding with restoration');
+
       // Update the dropdown to maintain selection first
-      const dropdown = document.getElementById('layer-dropdown');
+      const dropdown = document.getElementById('layer-select');
       if (dropdown) {
         dropdown.value = selectedDropdownLayer;
+        console.log('Dropdown value set to:', dropdown.value);
 
         // Update legend title
         const selectedOption = dropdown.options[dropdown.selectedIndex];
@@ -3251,8 +3265,11 @@ document.querySelectorAll('#basemap-style-thumbnails button').forEach(button => 
       renderLegendFromStops(selectedDropdownLayer);
 
       // Force visibility to be set ONLY on the selected layer
-      if (map.getLayer(selectedDropdownLayer)) {
+      const layerExists = map.getLayer(selectedDropdownLayer);
+      console.log('Layer exists?', layerExists ? 'YES' : 'NO');
+      if (layerExists) {
         map.setLayoutProperty(selectedDropdownLayer, 'visibility', 'visible');
+        console.log('Set visibility to visible for:', selectedDropdownLayer);
 
         // Show CMRPC region fill layer when buildable land is selected
         if (selectedDropdownLayer === 'buildable-land' && map.getLayer('cmrpc-region-fill')) {
@@ -3267,9 +3284,56 @@ document.querySelectorAll('#basemap-style-thumbnails button').forEach(button => 
         }
 
         // Move the selected layer above basemap but below labels
+        console.log('labelLayerId value:', labelLayerId);
         if (labelLayerId) {
-          map.moveLayer(selectedDropdownLayer, labelLayerId);
+          console.log('Moving layer', selectedDropdownLayer, 'before', labelLayerId);
+          try {
+            map.moveLayer(selectedDropdownLayer, labelLayerId);
+            console.log('✓ Layer moved successfully');
+
+            // Verify the layer is still visible after moving
+            const visibility = map.getLayoutProperty(selectedDropdownLayer, 'visibility');
+            console.log('Visibility after move:', visibility);
+          } catch (error) {
+            console.error('ERROR moving layer:', error);
+          }
+        } else {
+          console.log('ERROR: labelLayerId not set, cannot move layer to correct z-position');
         }
+      }
+    }
+
+    // Move overlay layers to the top (just below labels) AFTER data layer restoration
+    // This ensures overlays are always above data layers
+    if (labelLayerId) {
+      console.log('Positioning overlay layers at top...');
+
+      // Move all overlay layers to top
+      overlayLayers.forEach(overlayId => {
+        if (map.getLayer(overlayId)) {
+          try {
+            map.moveLayer(overlayId, labelLayerId);
+            console.log('Moved overlay', overlayId, 'to top');
+          } catch (error) {
+            console.error('Error moving overlay', overlayId, ':', error);
+          }
+        }
+      });
+
+      // Move town-layer (community boundaries) to very top (above all other overlays)
+      if (map.getLayer('town-layer')) {
+        map.moveLayer('town-layer', labelLayerId);
+        console.log('Moved town-layer to very top');
+      }
+
+      // Move transit-diversity layers to top (but below town boundaries)
+      if (map.getLayer('transit-diversity-layer')) {
+        map.moveLayer('transit-diversity-layer', labelLayerId);
+        console.log('Moved transit-diversity-layer to top');
+      }
+      if (map.getLayer('transit-diversity-outline')) {
+        map.moveLayer('transit-diversity-outline', labelLayerId);
+        console.log('Moved transit-diversity-outline to top');
       }
     }
   });
