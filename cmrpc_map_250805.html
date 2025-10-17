@@ -105,7 +105,7 @@
           <option value="tracts-rdAge">Displacement risk of seniors</option>
           <option value="tracts-rdRace">Displacement risk of non-white populations</option>
           <option value="parcels-landuse">Land use (property class)</option>
-          <option value="parcels-density">Actual residential density</option>
+          <option value="parcels-density">Actual residential density (units per acre)</option>
           <option value="tracts-mva">Neighborhood conditions</option>
         </optgroup>
 
@@ -1977,11 +1977,12 @@ map.addLayer({
             type: 'fill',
             source: 'mf-byright',
             paint: {
-              'fill-color': '#028b57' //mbta green lol
+              'fill-color': '#028b57', //mbta green lol
+              'fill-opacity': 0.6
             },
           layout: {
             visibility: 'none'
-          }}, 
+          }},
         labelLayerId
   )
 
@@ -1990,11 +1991,12 @@ map.addLayer({
             type: 'fill',
             source: 'mf-specialpermit',
             paint: {
-              'fill-color': '#9e1583' //mbta purple lol
+              'fill-color': '#9e1583', //mbta purple lol
+              'fill-opacity': 0.6
             },
           layout: {
             visibility: 'none'
-          }}, 
+          }},
         labelLayerId
   )
   
