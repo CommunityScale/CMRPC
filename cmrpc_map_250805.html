@@ -779,6 +779,16 @@ function batchSetFeatureStates({ //batching experiment
             data: 'buildable.geojson'
         })
 
+        map.addSource("excess-capacity", {
+            type: "geojson",
+            data: "" //replace
+        })
+
+        map.addSource("exceeds-capacity", {
+            type: "geojson",
+            data: "" //replace
+        })
+
         map.addSource("ctysds", {
             type: "vector",
             url: "mapbox://emtzot01.7fsgy5ln",
@@ -1218,7 +1228,7 @@ const interpolateLayers = [
             data_source: "bg-transport-diversity",
             source_layer: null,
             source_url: "CMRPC_bg_transportation_diverse_marg.geojson",
-            colors: medIncomePalette, //replaced with medIncomePalette for color consistency 
+            colors: medIncomePalette,  
             defaultViz: "none",
             useFeatureState: false,
             useQuintiles: false
