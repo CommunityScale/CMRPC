@@ -255,6 +255,38 @@
     </label>
     <label class="flex items-start text-sm text-gray-700">
       <div class="relative">
+          <input type="checkbox" class="sr-only overlay-toggle peer" value="fair-ped-layer" />
+          <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
+          <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
+        </div>
+      <span class="leading-snug ms-2">Pedestrian quality: fair</span>
+    </label>
+    <label class="flex items-start text-sm text-gray-700">
+      <div class="relative">
+          <input type="checkbox" class="sr-only overlay-toggle peer" value="good-ped-layer" />
+          <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
+          <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
+        </div>
+      <span class="leading-snug ms-2">Pedestrian quality: good</span>
+    </label>
+    <label class="flex items-start text-sm text-gray-700">
+      <div class="relative">
+          <input type="checkbox" class="sr-only overlay-toggle peer" value="fair-transit-layer" />
+          <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
+          <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
+        </div>
+      <span class="leading-snug ms-2">Transportation access: fair</span>
+    </label>
+    <label class="flex items-start text-sm text-gray-700">
+      <div class="relative">
+          <input type="checkbox" class="sr-only overlay-toggle peer" value="good-transit-layer" />
+          <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
+          <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
+        </div>
+      <span class="leading-snug ms-2">Transportation access: good</span>
+    </label>
+    <label class="flex items-start text-sm text-gray-700">
+      <div class="relative">
           <input type="checkbox" class="sr-only overlay-toggle peer" value="transit-diversity-layer" />
           <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
           <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
@@ -303,103 +335,6 @@
       </span>
     </label>
   </label>
-  <label class="flex items-start text-sm text-gray-700">
-    <div class="relative">
-        <input type="checkbox" class="sr-only overlay-toggle peer" value="mf-byright-layer" />
-        <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
-        <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
-      </div>
-    <span class="leading-snug ms-2">Multifamily allowed by-right</span>
-  </label>
-  <label class="flex items-start text-sm text-gray-700">
-    <div class="relative">
-        <input type="checkbox" class="sr-only overlay-toggle peer" value="mf-specialpermit-layer" />
-        <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
-        <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
-      </div>
-    <span class="leading-snug ms-2">Multifamily allowed by special permit/review</span>
-  </label>
-  <label class="flex items-start text-sm text-gray-700">
-    <div class="relative">
-        <input type="checkbox" class="sr-only overlay-toggle peer" value="exceeds-capacity-layer" />
-        <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
-        <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
-      </div>
-    <span class="leading-snug ms-2">Exceeds zoned density</span>
-</label>
-<label class="flex items-start text-sm text-gray-700">
-  <div class="relative">
-      <input type="checkbox" class="sr-only overlay-toggle peer" value="excess-capacity-layer" />
-      <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
-      <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
-    </div>
-  <span class="leading-snug ms-2">Excess capacity by zoning</span>
-</label>
-<label class="flex items-start text-sm text-gray-700">
-  <div class="relative">
-      <input type="checkbox" class="sr-only overlay-toggle peer" value="fair-ped-layer" />
-      <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
-      <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
-    </div>
-  <span class="leading-snug ms-2">Pedestrian quality: fair</span>
-</label>
-<label class="flex items-start text-sm text-gray-700">
-  <div class="relative">
-      <input type="checkbox" class="sr-only overlay-toggle peer" value="good-ped-layer" />
-      <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
-      <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
-    </div>
-  <span class="leading-snug ms-2">Pedestrian quality: good</span>
-</label>
-<label class="flex items-start text-sm text-gray-700">
-  <div class="relative">
-      <input type="checkbox" class="sr-only overlay-toggle peer" value="fair-transit-layer" />
-      <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
-      <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
-    </div>
-  <span class="leading-snug ms-2">Transportation access: fair</span>
-</label>
-<label class="flex items-start text-sm text-gray-700">
-  <div class="relative">
-      <input type="checkbox" class="sr-only overlay-toggle peer" value="good-transit-layer" />
-      <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
-      <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
-    </div>
-  <span class="leading-snug ms-2">Transportation access: good</span>
-</label>
-    <label class="flex items-start text-sm text-gray-700">
-      <div class="relative">
-          <input type="checkbox" class="sr-only overlay-toggle peer" value="transit-diversity-layer" />
-          <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
-          <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
-        </div>
-      <span class="leading-snug ms-2">Transportation diversity</span>
-  </label>
- <!-- <label class="flex items-start text-sm text-gray-700">
-    <div class="relative">
-        <input type="checkbox" class="sr-only overlay-toggle peer" value="transit-quality-layer" />
-        <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
-        <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
-      </div>
-    <span class="leading-snug ms-2">Transit quality</span>
-</label> -->
-    <!--<label class="flex items-center justify-between w-full text-sm text-gray-700">
-        <div class="relative">
-            <input type="checkbox" class="sr-only overlay-toggle peer" value="transit-diversity-layer"/>
-            <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
-            <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
-          </div>
-        <span class="ms-2 leading-snug">Transit diversity</span>
-    </label>
-   <label class="flex items-center justify-between w-full text-sm text-gray-700">
-        <div class="relative">
-            <input type="checkbox" id="toggleCounty" class="sr-only overlay-toggle peer" />
-            <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
-            <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
-          </div>
-        <span class="ms-2 leading-snug">Hide surrounding counties</span>
-    </label> -->
-    <!-- add in colors/to legend via js?? -->
 
     <!-- Transportation diversity info text -->
     <div id="transit-diversity-info" class="hidden mt-3 pt-3 border-t border-gray-200">
