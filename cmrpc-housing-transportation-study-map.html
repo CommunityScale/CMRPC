@@ -3521,9 +3521,24 @@ document.getElementById('clear-map').addEventListener('click', () => {
   }
 });
 
+//layer description logic -- updated 10/20/2025
+    const layerInfoBtn = document.getElementById('layer-info');
+    const descriptionEl = document.getElementById('layer-description');
+    const layerSelect = document.getElementById('layer-select');
 
-const layerInfoBtn = document.getElementById('layer-info');
-const descriptionEl = document.getElementById('layer-description');
+    let descriptionVisible = false;
+    let currentLayer = null;
+
+    // Track current selection globally
+    layerSelect.addEventListener('change', (e) => {
+    currentLayer = e.target.value;
+    console.log('Layer changed to:', currentLayer);
+
+    if (descriptionVisible) {
+        const description = layerDescriptions[currentLayer] || '<p>No description available for this layer.</p>';
+        descriptionEl.innerHTML = description;
+    }
+    });
 
 const layerDescriptions = { //edit as needed; some base text should be re-useable!! add zips, etc
   'tracts-medIncome': `
@@ -3617,12 +3632,15 @@ const layerDescriptions = { //edit as needed; some base text should be re-useabl
   `
 };
 
-let descriptionVisible = false;
 
 layerInfoBtn.addEventListener('click', () => {
-  const selectedLayer = document.getElementById('layer-select').value;
+  const layerSelect = document.getElementById('layer-select');
+  const selectedLayer = layerSelect.value || currentLayer;
+  
+  console.log('Selected layer on click:', selectedLayer);
+  
   const description = layerDescriptions[selectedLayer] || '<p>No description available for this layer.</p>';
-
+  
   if (descriptionVisible) {
     descriptionEl.classList.add('hidden');
     descriptionVisible = false;
@@ -3633,14 +3651,18 @@ layerInfoBtn.addEventListener('click', () => {
   }
 });
 
-document.getElementById('layer-select').addEventListener('change', () => {
-  if (descriptionVisible) {
-    const selectedLayer = document.getElementById('layer-select').value;
-    const description = layerDescriptions[selectedLayer] || '<p>No description available for this layer.</p>';
+
+// Update text automatically on layer switch 
+layerSelect.addEventListener('change', () => {
+  const selectedLayer = layerSelect.value;
+  const description = layerDescriptions[selectedLayer] || '<p>No description available for this layer.</p>';
+  descriptionEl.innerHTML = description;
+
+  // Refresh the text if already visble
+  if (!descriptionEl.classList.contains('hidden')) {
     descriptionEl.innerHTML = description;
   }
 });
-
 
 const overlayToggle = document.getElementById('overlay-toggle');
 const overlayContent = document.getElementById('overlay-content');
