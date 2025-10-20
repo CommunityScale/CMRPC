@@ -279,6 +279,38 @@
     </div>
   <span class="leading-snug ms-2">Excess capacity by zoning</span>
 </label>
+<label class="flex items-start text-sm text-gray-700">
+  <div class="relative">
+      <input type="checkbox" class="sr-only overlay-toggle peer" value="fair-ped-layer" />
+      <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
+      <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
+    </div>
+  <span class="leading-snug ms-2">Pedestrian quality: fair</span>
+</label>
+<label class="flex items-start text-sm text-gray-700">
+  <div class="relative">
+      <input type="checkbox" class="sr-only overlay-toggle peer" value="good-ped-layer" />
+      <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
+      <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
+    </div>
+  <span class="leading-snug ms-2">Pedestrian quality: good</span>
+</label>
+<label class="flex items-start text-sm text-gray-700">
+  <div class="relative">
+      <input type="checkbox" class="sr-only overlay-toggle peer" value="fair-transit-layer" />
+      <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
+      <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
+    </div>
+  <span class="leading-snug ms-2">Transportation access: fair</span>
+</label>
+<label class="flex items-start text-sm text-gray-700">
+  <div class="relative">
+      <input type="checkbox" class="sr-only overlay-toggle peer" value="good-transit-layer" />
+      <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
+      <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
+    </div>
+  <span class="leading-snug ms-2">Transportation access: good</span>
+</label>
     <label class="flex items-start text-sm text-gray-700">
       <div class="relative">
           <input type="checkbox" class="sr-only overlay-toggle peer" value="transit-diversity-layer" />
@@ -764,6 +796,18 @@ function batchSetFeatureStates({ //batching experiment
         map.addSource("transit-diversity", {
             type: 'geojson',
             data: 'https://raw.githubusercontent.com/CommunityScale/CMRPC/refs/heads/main/parcels_transportation_diversity_marg_onlytrue_diss.geojson',
+            promoteId: 'loc_id'
+        })
+
+        map.addSource("ped-quality", {
+            type: 'geojson',
+            data: 'CMRPC_ped_quality_dissolved_select_qualities_251020.geojson',
+            promoteId: 'loc_id'
+        })
+
+        map.addSource("transit-quality-2", {
+            type: 'geojson',
+            data: 'CMRPC_transit_quality_dissolved_selected_qualities_251020.geojson',
             promoteId: 'loc_id'
         })
 
@@ -2075,6 +2119,63 @@ map.addLayer({
           }}, 
         labelLayerId
   )
+
+  map.addLayer({
+            id: "fair-transit-layer",
+            type: "fill",
+            source: "transit-quality-2",
+            paint: {
+                "fill-color": "#ecd731"
+                },
+            layout: {
+                visibility: "none"
+                },
+            filter: ["==", "transit_quality", "fair"]},
+            labelLayerId
+        )
+
+        map.addLayer({
+            id: "good-transit-layer",
+            type: "fill",
+            source: "transit-quality-2",
+            paint: {
+                "fill-color": "#89aa42"
+                },
+            layout: {
+                visibility: "none"
+                },
+            filter: ["==", "transit_quality", "high"]},
+            labelLayerId
+        )
+
+        map.addLayer({
+            id: "fair-ped-layer",
+            type: "fill",
+            source: "ped-quality",
+            paint: {
+                "fill-color": "#ecd731"
+                },
+            layout: {
+                visibility: "none"
+                },
+            filter: ["==", "ped_quality", "fair"]},
+            labelLayerId
+        )
+          
+
+        map.addLayer({
+            id: "good-ped-layer",
+            type: "fill",
+            source: "ped-quality",
+            paint: {
+                "fill-color": "#89aa42"
+                },
+            layout: {
+                visibility: "none"
+                },
+            filter: ["==", "ped_quality", "high"]},
+            labelLayerId
+        )
   
 
     map.addLayer({
