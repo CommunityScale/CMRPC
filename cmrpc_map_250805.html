@@ -112,7 +112,7 @@
         <optgroup label="Transportation">
 <<<<<<< HEAD
 =======
-       <!-- <option value="bg-transport-diversity-layer">Transportation diversity</option> -->
+       <option value="bg-transport-diversity-layer">Transportation diversity</option>
 >>>>>>> e00fd6365de46ccc9d6454c9b35693d2be6484e0
         </optgroup>
 
@@ -136,8 +136,7 @@
           <option value="admin-layer">Massachusetts tracts</option>
         </optgroup>
 
-        <!--<option value="parcels-ownership">Property Tax Credits</option>
-        <option value="parcels-pctLV">Land Value as Percent of Assessed Value</option>
+        <!-- <option value="parcels-pctLV">Land Value as Percent of Assessed Value</option>
         <option value="parcels-value">Parcel Value Per Acre</option>-->
     </select>
     </div>
@@ -160,7 +159,7 @@
   <!-- Header -->
   <button
   id="overlay-toggle"
-  class="w-full px-2 py-2 flex items-center justify-between bg-gray-100 hover:bg-gray-200 text-sm font-medium"
+  class="w-full px-2 py-2 flex items-center justify-between hover:bg-gray-50 text-sm font-medium"
   >
 
   <span class="flex items-center gap-1">
@@ -362,7 +361,7 @@
 <!-- Basemap settings toggle - relocate this in the scrollable part (but still have the panel open towards the top)?? -->
 <div id="basemap-toggle" class="border-t border-gray-300 pt-2">
   <button
-    class="w-full flex items-center justify-between px-2 py-2 hover:bg-gray-100 text-sm font-medium"
+    class="w-full flex items-center justify-between px-2 py-2 hover:bg-gray-50 text-sm font-medium"
     onclick="toggleBasemapSettings()"
   >
   <span class="flex items-center gap-1">
@@ -412,7 +411,7 @@
 
 </div>
 
-<footer class="border-t border-gray-300 bg-gray-50 px-4 py-3 text-sm text-gray-700 flex items-center gap-3">
+<footer class="border-t border-gray-300 px-4 py-3 text-sm text-gray-700 flex items-center gap-3">
   <a href="https://communityscale.io" target="_blank" rel="noopener noreferrer">
       <img
         src="https://communityscale.io/wp-content/uploads/2024/01/white-on-black-with-edges-150x150.png"
@@ -514,16 +513,20 @@
         'buildable-land',
         //'parcels-pctLV',
         //'parcels-value',
-        'parcels-density'
+        'parcels-density',
+        "bg-transport-diversity-layer"
         //'admin-layer' //not sure if admin layer should be included here
     ];
 
     const overlayLayers = [ // all overlay layers need to be listed here
         "towns-layer",
         "bus-stops-layer",
-        //"train"-stops-layer
+        "train-stops-layer",
         "transit-diversity-layer",
-        //"transit-quality-layer",
+        "fair-transit-layer",
+        "fair-ped-layer",
+        "good-transit-layer",
+        "good-ped-layer",
         "subregion-southeast",
         "subregion-northeast",
         "subregion-central",
@@ -598,31 +601,6 @@
                 '#810f7c'
             ]
 
-    // const landValuePalette = [ //Sequential colorBrewer Blu ramp
-    //             '#f1eef6',
-    //             '#bdc9e1',
-    //             '#74a9cf',
-    //             '#2b8cbe',
-    //             '#045a8d'
-    //         ]
-    // const parcelValuePalette = [ //colorBrewer purples 
-    //             '#f2f0f7',
-    //             '#cbc9e2',
-    //             '#9e9ac8',
-    //             '#756bb1',
-    //             '#54278f'
-    //         ]
-
-    // const taxCreditPalette = [ //categorical palette for tax credits -- update!!
-    //             { key: "HMST", color: '#f2e22c', label: "Homestead" },
-    //             { key: "MIL", color: '#fa2a73', label: "Military" },
-    //             { key: "AG", color: '#559428', label: "Agriculture" },
-    //             { key: "S42", color: '#79a8f2', label: "" },
-    //             { key: "HMST,MIL", color: '#e4ac28', label: "Homestead, Military" },
-    //             { key: "HMST,AG", color: '#a7d96d', label: "Homestead, Agriculture" },
-    //             { key: "HMST,AG,MI", color: '#8b63ba', label: "Homestead, Agriculture, Military" },
-    //             { key: "NONE", color: '#bdc9e1', label: "None"}
-    //         ]
     const landUsePalette = [ //only set this up for custom legends unless there is a way to set inner html of breaks/stops dynamically??
                 { key: "R-L", color: "#fffbd7", label: "Low density residential" },
                 { key: "R-M", color: "#fff8bf", label: "Medium density residential" },
@@ -886,65 +864,6 @@ function batchSetFeatureStates({ //batching experiment
                     });
                 });
 
-                // fetch('https://raw.githubusercontent.com/CommunityScale/CMRPC/main/CMRPC_2025_Residensity_Parcel_250801.json')
-                // .then(response => response.json())
-                // .then(data => {
-                //     data.forEach(f => {
-                //     const id = f.LOC_ID.toString(); // Ensure ID is a string
-                //     const duaVal = Number(f["DUA"]);
-                //     map.setFeatureState(
-                //         {
-                //         source: 'parcels',
-                //         sourceLayer: 'tracts',
-                //         id: id
-                //         },
-                //         {
-                //         density: duaVal, //change to number??
-                //         useCode: f["StandardizedUseCodes"],
-                //         SiteAddress: f["SiteAddress"],
-                //         description: f["UseDesc"]
-                //         }
-                //     )
-                //     });
-                // });
-
-                // fetch('https://raw.githubusercontent.com/CommunityScale/CMRPC/main/CMRPC_2025_Residensity_Parcel_250801.json')
-                //     .then(response => response.json())
-                //     .then(data => {
-                //         let skipped = 0;
-                //         let updated = 0;
-
-                //         data.forEach(f => {
-                //         const id = f.LOC_ID?.toString(); // Ensure valid and stringified
-                //         const duaVal = Number(f["DUA"]);
-
-                //         if (!id || isNaN(duaVal)) {
-                //             skipped++;
-                //             return; // Skip if ID missing or DUA not a number
-                //         }
-
-                //         map.setFeatureState(
-                //             {
-                //             source: 'parcels',
-                //             sourceLayer: 'tracts', // Must match tileset layer name
-                //             id: id
-                //             },
-                //             {
-                //             density: duaVal,
-                //             useCode: f["StandardizedUseCodes"],
-                //             SiteAddress: f["SiteAddress"],
-                //             description: f["UseDesc"]
-                //             }
-                //         );
-
-                //         updated++;
-                //         });
-
-                //     console.log(`Set feature state for ${updated} features. Skipped ${skipped} invalid entries.`);
-                // })
-                // .catch(err => console.error("Failed to load parcel data:", err));
-
-
                 fetch('https://raw.githubusercontent.com/CommunityScale/CMRPC/main/CMRPC_Parcels_Use_Residensity_251008.json') //batching experiment!
                     .then(response => response.json())
                     .then(data => {
@@ -1028,36 +947,6 @@ function batchSetFeatureStates({ //batching experiment
     }
 
 
-// async function computeStatsFromGeoJSON(source_url, property) {
-//   const response = await fetch(source_url);
-//   const geojson = await response.json();
-
-//   const values = geojson.features
-//     .map(f => Number(f.properties[property]))
-//     .filter(v => !isNaN(v))
-//     .sort((a, b) => a - b);
-
-//   if (values.length < 5) {
-//     console.warn("Not enough valid values to compute breaks.");
-//     return null;
-//   }
-
-//   function quantile(arr, q) {
-//     const pos = (arr.length - 1) * q;
-//     const base = Math.floor(pos);
-//     const rest = pos - base;
-//     return arr[base + 1] !== undefined
-//       ? arr[base] + rest * (arr[base + 1] - arr[base])
-//       : arr[base];
-//   }
-
-//   const Q1 = quantile(values, 0.25);
-//   const median = quantile(values, 0.5);
-//   const Q3 = quantile(values, 0.75);
-//   const IQR = Q3 - Q1;
-
-//   return [median - 1.5 * IQR, Q1, median, Q3, median + 1.5 * IQR];
-// }
 
 async function computeStatsFromSource(source_url, property) {
   try {
@@ -1153,11 +1042,16 @@ async function computeQuintileBreaks(source, property) {
     // Return quintile breaks: 20th, 40th, 60th, 80th, 100th percentiles
     // Round each break to the nearest 10
     return [
-      Math.round(quantile(values, 0.2) / 10) * 10,
-      Math.round(quantile(values, 0.4) / 10) * 10,
-      Math.round(quantile(values, 0.6) / 10) * 10,
-      Math.round(quantile(values, 0.8) / 10) * 10,
-      Math.round(quantile(values, 1.0) / 10) * 10
+        (quantile(values, 0.2)), 
+        (quantile(values, 0.4)), 
+        (quantile(values, 0.6)), 
+        (quantile(values, 0.8)), 
+        (quantile(values, 1.0)) 
+      // Math.round(quantile(values, 0.2)), // / 10) * 10,
+      // Math.round(quantile(values, 0.4)), // / 10) * 10,
+      // Math.round(quantile(values, 0.6)), // / 10) * 10,
+      // Math.round(quantile(values, 0.8)), // / 10) * 10,
+      // Math.round(quantile(values, 1.0)) // / 10) * 10
     ];
   } catch (err) {
     console.error("Failed to compute quintile breaks:", err);
@@ -1166,21 +1060,7 @@ async function computeQuintileBreaks(source, property) {
 }
 
 
-// function generateColorStopsFromStats(breaks, colors, property) {
-//   if (!breaks || breaks.length !== colors.length) return null;
 
-//   const interpolateExpr = ["step", //["linear"], 
-//         ["get", property], 
-//         communityScaleGray]; //try step vs interpolate
-//   for (let i = 0; i < breaks.length; i++) {
-//     interpolateExpr.push(breaks[i], colors[i]);
-//   }
-
-//   return ["case",
-//     ["==", ["get", property], null], communityScaleGray,
-//     interpolateExpr
-//   ];
-// }
 
 function generateColorStopsFromStats(breaks, colors) {
   if (!breaks || breaks.length !== colors.length) return null;
@@ -1192,8 +1072,6 @@ function generateColorStopsFromStats(breaks, colors) {
 
   return stops; // just the flat array of input/output pairs
 }
-
-
 
 const interpolateLayers = [
         {
@@ -1303,7 +1181,7 @@ const interpolateLayers = [
             colors: medIncomePalette,  
             defaultViz: "none",
             useFeatureState: false,
-            useQuintiles: false
+            useQuintiles: true
         },
         // {
         //     id: "parcels-pctLV",
@@ -1387,53 +1265,6 @@ const interpolateLayers = [
     ]
 
 
-    // async function addInterpolatedLayers(opacity, visibleLayerId) {
-    // for (const { id, property, data_source, source_url, colors, defaultViz, useFeatureState } of interpolateLayers) {
-    //     console.log(`Processing layer: ${id}`); //debugging/check 
-    //     const stats = await computeStatsFromGeoJSON(source_url, property);
-    //     console.log(`Stats for ${id}:`, stats);
-    //     // if (!stats) {
-    //     // console.warn(`Skipping ${id} – insufficient data.`);
-    //     // continue;
-    //     // }
-
-    //     const colorStops = generateColorStopsFromStats(stats, colors, property);
-    //     // if (!colorStops) { //debugging, can cut??
-    //     // console.warn(`Invalid color stops for ${id}`);
-    //     // continue;
-    //     // }
-
-    //     // if (!map.getSource(data_source)) { //debugging, can cut?
-    //     // console.error(`Source ${data_source} not found for layer ${id}`);
-    //     // continue;
-    //     // }
-
-    //     // if (map.getLayer(id)) { //debugging/can cut!!
-    //     // console.warn(`Layer ${id} already exists, skipping addLayer.`);
-    //     // continue;
-    //     // }
-
-    //     map.addLayer({
-    //     id,
-    //     type: "fill",
-    //     source: data_source,
-    //     layout: {
-    //         visibility: id === visibleLayerId ? "visible" : "none" //or use default viz parameter??
-    //         },
-    //     paint: {
-    //         "fill-color": colorStops,
-    //         "fill-outline-color": "white",
-    //         "fill-opacity": [
-    //         "case",
-    //         ["==", ["get", property], null], 0.3,
-    //         ["case", ["boolean", ["feature-state", "hover"], false], 0.95, opacity]
-    //         ]
-    //     }
-    //     }, labelLayerId);
-    //     console.log(`Layer ${id} added.`); //debugging/check
-    // }
-    // }
-
     async function addInterpolatedLayers(opacity, visibleLayerId) {
   for (const { id, property, data_source, source_layer, source_url, colors, defaultViz, useFeatureState, useQuintiles, useCustomBreaks, customBreaks, useFilter, filterProperty } of interpolateLayers) {
     console.log(`Processing layer: ${id}`);
@@ -1472,6 +1303,8 @@ const interpolateLayers = [
         console.warn(`Skipping ${id} – insufficient data.`);
         continue;
       }
+
+      console.log(id, stats.length, colors.length, stats, colors);
 
       const stops = generateColorStopsFromStats(stats, colors);
       if (!stops) {
@@ -1538,64 +1371,6 @@ const interpolateLayers = [
     console.log(`Layer ${id} added.`);
   }
 }
-
-
-  //   async function addInterpolatedLayers(opacity, visibleLayerId) {
-  //   for (const { id, property, data_source, source_url, colors, defaultViz, useFeatureState } of interpolateLayers) {
-  //     console.log(`Processing layer: ${id}`);
-
-  //     const stats = await computeStatsFromSource(source_url, property);
-  //     if (!stats) {
-  //       console.warn(`Skipping ${id} – insufficient data.`);
-  //       continue;
-  //     }
-
-  //     const colorStops = generateColorStopsFromStats(stats, colors);
-
-  //     const expressionInput = useFeatureState
-  //       ? ["feature-state", property]
-  //       : ["get", property];
-
-  //     const fillColorExpression = [
-  //       "interpolate",
-  //       ["linear"],
-  //       expressionInput,
-  //       ...colorStops.flat()
-  //     ];
-
-  //     if (!map.getSource(data_source)) {
-  //       console.error(`Source ${data_source} not found for layer ${id}`);
-  //       continue;
-  //     }
-
-  //     if (map.getLayer(id)) {
-  //       console.warn(`Layer ${id} already exists, skipping addLayer.`);
-  //       continue;
-  //     }
-
-  //     map.addLayer({
-  //       id,
-  //       type: "fill",
-  //       source: data_source,
-  //       "source-layer": data_source, // Optional but included if using vector tiles
-  //       layout: {
-  //         visibility: id === visibleLayerId ? "visible" : defaultViz || "none"
-  //       },
-  //       paint: {
-  //         "fill-color": fillColorExpression,
-  //         "fill-outline-color": "white",
-  //         "fill-opacity": [
-  //           "case",
-  //           ["==", ["get", property], null], 0.3,
-  //           ["case", ["boolean", ["feature-state", "hover"], false], 0.95, opacity]
-  //         ]
-  //       }
-  //     }, labelLayerId);
-
-  //     console.log(`Layer ${id} added.`);
-  //   }
-  // }
-
 
 
     function addAllOtherLayers() { //all categorical, overlay, base geo layers 
@@ -2187,12 +1962,14 @@ map.addLayer({
         labelLayerId
   )
 
+
+//transit quality fill and outline overlays 
   map.addLayer({
             id: "fair-transit-layer",
             type: "fill",
             source: "transit-quality-2",
             paint: {
-                "fill-color": "#ecd731"
+                "fill-color": "#6e79dd"
                 },
             layout: {
                 visibility: "none"
@@ -2206,7 +1983,7 @@ map.addLayer({
             type: "fill",
             source: "transit-quality-2",
             paint: {
-                "fill-color": "#89aa42"
+                "fill-color": "#091a3f"
                 },
             layout: {
                 visibility: "none"
@@ -2220,7 +1997,7 @@ map.addLayer({
             type: "fill",
             source: "ped-quality",
             paint: {
-                "fill-color": "#ecd731"
+                "fill-color": "#c9c744"
                 },
             layout: {
                 visibility: "none"
@@ -2235,7 +2012,7 @@ map.addLayer({
             type: "fill",
             source: "ped-quality",
             paint: {
-                "fill-color": "#89aa42"
+                "fill-color": "#89aa42" //green
                 },
             layout: {
                 visibility: "none"
@@ -2433,33 +2210,6 @@ map.addLayer({
     // Add the diagonal pattern to the map
     const diagonalPattern = createDiagonalLinePattern();
     map.addImage('diagonal-lines-black', diagonalPattern);
-
-    // map.loadImage(
-    //         'https://mits003.github.io/studio_null/img/mapbox_texture/dot_xs.png',
-    //         (err, image) => {
-    //             // Throw an error if something goes wrong.
-        //         if (err) throw err;
-
-        //         // Add the image to the map style.
-        //         map.addImage('pattern', image);
-
-        //         // Create a new layer and style it using `fill-pattern`.
-        //         map.addLayer({
-        //             id: "targetedGrowth-layer",
-        //             type: "fill",
-        //             source: "growthAreas",
-        //             paint: {
-        //                 "fill-pattern": "pattern"
-        //             },
-        //             layout: {
-        //                 visibility: "visible"
-        //         },
-        //         });
-
-        //     }
-        // );
-
-//point overlays!!  not needed yet!!
     };
     
 
@@ -2548,7 +2298,8 @@ const allFillLayers = [
     //'parcels-pctLV',
     //'parcels-value',
     //'parcels-ownership',
-    'admin-layer'
+    'admin-layer',
+    "bg-transport-diversity-layer"
 ];
 
 
@@ -3734,22 +3485,18 @@ const layerDescriptions = { //edit as needed; some base text should be re-useabl
     <p><strong>Cost-burdened owners</strong>: % of homeowners, with and without mortgages, spending more than 30% of income on housing.</p><br>
     <p><em>Source(s):</em> Table B25140, 2023 ACS 5-year estimates; CommunityScale.</p>
   `,
-  'parcels-pctLV': `
-    <p><strong>Land value as a percent of total parcel value</strong>. Higher percentages may indicate urban blight, vacant land, or aging housing stock in urban areas. In rural contexts, higher values may simply indicate agricultural land use.</p><br>
-    <p><em>Source(s):</em> 2025 parcels, Massachusetts GIS assessor database; CommunityScale.</p>
-  `,
+  // 'parcels-pctLV': `
+  //   <p><strong>Land value as a percent of total parcel value</strong>. Higher percentages may indicate urban blight, vacant land, or aging housing stock in urban areas. In rural contexts, higher values may simply indicate agricultural land use.</p><br>
+  //   <p><em>Source(s):</em> 2025 parcels, Massachusetts GIS assessor database; CommunityScale.</p>
+  // `,
   'parcels-landuse': `
     <p><strong>Land use classifications</strong> from local parcel data.</p><br>
     <p><em>Source(s):</em> 2025 parcels, Massachusetts GIS assessor database; CommunityScale.</p>
   `,
-  'parcels-ownership': `
-    <p><strong>Property tax credit</strong> data reveals where ......</p><br>
-    <p><em>Source(s):</em> 2025 parcels, Massachusetts GIS assessor database; CommunityScale.</p>
-  `,
-  'parcels-value': `
-    <p><strong>Parcel value per acre</strong> normalizes parcel value over the acre and may provide insight into development value, potential tax revenue, and land prices.</p><br>
-    <p><em>Source(s):</em> 2025 parcels, Massachusetts GIS assessor database; CommunityScale.</p>
-  `,
+  // 'parcels-value': `
+  //   <p><strong>Parcel value per acre</strong> normalizes parcel value over the acre and may provide insight into development value, potential tax revenue, and land prices.</p><br>
+  //   <p><em>Source(s):</em> 2025 parcels, Massachusetts GIS assessor database; CommunityScale.</p>
+  // `,
   'tracts-mva': `
     <p>This <strong>market value analysis</strong> measures both the relative change in and the current conditions of market value and desirability across CMRPC communities from 2020-2025. Working at the Census tract geography, the analysis assigns two composite scores to inform where each geography falls along a bivariate spectrum of investment and improvement.</p><br> 
     <p><em>Source(s):</em> Tables B01001, B08303, B25004, B25016, B25074, B25095, 2020 & 2023 ACS 5-year estimates; Zillow ZHVI, March 2020 & March 2025; Realtor.com, 2020 & 2025; Mortgage actions, FFIEC, 2020 & 2024; TIGER/line road network shapefiles;  CommunityScale.</p>
@@ -3763,8 +3510,8 @@ const layerDescriptions = { //edit as needed; some base text should be re-useabl
     <p><em>Source(s):</em> Zillow Home Value Index (ZHVI), March 2020, March 2025; CommunityScale.</p>
   `,
   'ctysds-pctHH': `
-    <p><strong>Parcel value per acre</strong> normalizes parcel value over the acre and may provide insight into development value, potential tax revenue, and land prices.</p><br>
-    <p><em>Source(s):</em> Table BXXXXXX, 2023 ACS 5-year estimates, 2020 ACS 5-year estimates; CommunityScale.</p>
+    <p><strong>Change in the number of households</strong> over the last five years captures growth (decline) as reported at the county subdivison geography.</p><br>
+    <p><em>Source(s):</em> Table B11016, 2023 ACS 5-year estimates, 2020 ACS 5-year estimates; CommunityScale.</p>
   `,
   'bg-costs-ownership': `
     <p><strong>Monthly ownership costs</strong> by Census block group, including mortgage payments, property taxes, insurance, and utilities for homeowners.</p><br>
@@ -3781,6 +3528,34 @@ const layerDescriptions = { //edit as needed; some base text should be re-useabl
   'bg-costs-2veh-owner': `
     <p><strong>Housing and transportation cost share</strong> for a 2-vehicle homeowner household with 2-3 bedrooms at 100% AMI (Area Median Income) with 3+ persons, by Census block group. Values represent the proportion of household income spent on combined housing and transportation costs.</p><br>
     <p><em>Source(s):</em> CMRPC housing and transportation cost analysis; CommunityScale.</p>
+  `,
+  'bg-costs-HT': `
+    <p><strong>Combined housing and transportation costs</strong> per renting household, as reported at the block group geography across the CMRPC region.</p><br>
+    <p><em>Source(s):</em> CMRPC housing and transportation cost analysis; CommunityScale.</p>
+  `,
+  'bg-costs-HT-owner': `
+    <p><strong>Combined housing and transportation costs</strong> per homeowning household, as reported at the block group geography across the CMRPC region.</p><br>
+    <p><em>Source(s):</em> CMRPC housing and transportation cost analysis; CommunityScale.</p>
+  `,
+  'buildable-land': `
+    <p><strong>A basic suitability analysis</strong> for development. This analysis considers unbuilt land where sewer/water access may be readily available as well as environmental constraints, including steep slopes, conservation areas, and wetlands.</p><br>
+    <p><em>Source(s):</em> CMRPC site suitability methods; MassGIS Protected and Recreational Open Space; MassGIS Areas of Critical Environmental Concern; MassDEP Estimated Sewer System Service Area Boundaries; CommunityScale.</p>
+  `,
+  'admin-layer': `
+    <p><strong>Census tracts of Massachusetts.</p><br>
+    <p><em>Source(s):</em> US Census Bureau's TIGER/Line shapefile database</p>
+  `,
+  'tracts-rdAge': `
+    <p>Where might communities be more sensitive to market forces, such as gentrification? This <strong>risk of displacement</strong> analysis assigns a 0-1 composite score to each parcel based on indexed Census tract data. The higher the score, the greater the potential risk of displacement is within the Census tract. The scores here consider the proportion of senior householders, length of time in unit, change in cost burdened households over time, and difference in area median home values.</p><br>
+    <p><em>Source(s):</em> Tables B01001, B25039, B25074, B25077, B25095, 2020 and 2023 ACS 5-year estimates; CommunityScale.</p>
+  `,
+  'tracts-rdRace': `
+    <p>Where might communities be more sensitive to market forces, such as gentrification? This <strong>risk of displacement</strong> analysis assigns a 0-1 composite score to each parcel based on indexed Census tract data. The higher the score, the greater the potential risk of displacement is within the Census tract. The scores here consider the proportion of Black householders, the proportion of Latino householders, length of time in unit, change in percent cost burdened over time, and difference in area median home values.</p><br>
+    <p><em>Source(s):</em> Tables B25039, B25074, B25077, B25095, 2020 and 2023 ACS 5-year estimates; CommunityScale.</p>
+  `,
+  'bg-transport-diversity-layer': `
+    <p>This layer examines <strong>transportation diversity</strong> at the block group. Marginal transporation diversity measures the percentage of parcels within each block group that are considered "transportation diverse."</p><br>
+    <p><em>Source(s):</em> CMRPC transportation quality analysis; CommunityScale.</p>
   `
 };
 
