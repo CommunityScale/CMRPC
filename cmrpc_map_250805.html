@@ -175,6 +175,9 @@
 
   <!-- Hidden content -->
   <div id="overlay-content" class="hidden px-2 py-2 space-y-2 bg-white">
+
+    <!-- Boundaries Section -->
+    <div class="text-xs font-semibold text-gray-600 uppercase tracking-wide mt-2 mb-1">Boundaries</div>
     <label class="flex items-start text-sm text-gray-700"> <!--for single line overlay labels, please use this label class. Preserves spacing and is slightly different than multi-line labels-->
         <div class="relative">
             <input type="checkbox" class="sr-only overlay-toggle peer" value="town-layer" checked/>
@@ -199,7 +202,7 @@
           </div>
         <span class="leading-snug ms-2">North subregion</span>
     </label>
-    <label class="flex items-start text-sm text-gray-700"> 
+    <label class="flex items-start text-sm text-gray-700">
         <div class="relative">
             <input type="checkbox" class="sr-only overlay-toggle peer" value="subregion-northeast" />
             <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
@@ -207,7 +210,7 @@
           </div>
         <span class="leading-snug ms-2">Northeast subregion</span>
     </label>
-    <label class="flex items-start text-sm text-gray-700"> 
+    <label class="flex items-start text-sm text-gray-700">
         <div class="relative">
             <input type="checkbox" class="sr-only overlay-toggle peer" value="subregion-west" />
             <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
@@ -231,6 +234,9 @@
           </div>
         <span class="leading-snug ms-2">Southeast subregion</span>
     </label>
+
+    <!-- Transportation Section -->
+    <div class="text-xs font-semibold text-gray-600 uppercase tracking-wide mt-3 mb-1">Transportation</div>
     <label class="flex items-start text-sm text-gray-700">
         <div class="relative">
             <input type="checkbox" class="sr-only overlay-toggle peer" value="bus-stops-layer" />
@@ -246,6 +252,56 @@
           <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
         </div>
       <span class="leading-snug ms-2">Rail stops</span>
+    </label>
+    <label class="flex items-start text-sm text-gray-700">
+      <div class="relative">
+          <input type="checkbox" class="sr-only overlay-toggle peer" value="transit-diversity-layer" />
+          <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
+          <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
+        </div>
+      <span class="leading-snug ms-2">Transportation diversity
+        <button id="transit-diversity-info-btn" class="ml-1 text-gray-500 hover:text-gray-700" style="font-size: 10px;">ⓘ</button>
+      </span>
+    </label>
+
+    <!-- Zoning Section -->
+    <div class="text-xs font-semibold text-gray-600 uppercase tracking-wide mt-3 mb-1">Zoning</div>
+    <label class="flex items-start text-sm text-gray-700">
+      <div class="relative">
+          <input type="checkbox" class="sr-only overlay-toggle peer" value="mf-byright-layer" />
+          <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
+          <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
+        </div>
+      <span class="leading-snug ms-2">Multifamily allowed by-right</span>
+    </label>
+    <label class="flex items-start text-sm text-gray-700">
+      <div class="relative">
+          <input type="checkbox" class="sr-only overlay-toggle peer" value="mf-specialpermit-layer" />
+          <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
+          <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
+        </div>
+      <span class="leading-snug ms-2">Multifamily allowed by special permit/review</span>
+    </label>
+    <label class="flex items-start text-sm text-gray-700">
+      <div class="relative">
+          <input type="checkbox" class="sr-only overlay-toggle peer" value="exceeds-capacity-layer" />
+          <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
+          <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
+        </div>
+      <span class="leading-snug ms-2">Exceeds zoned density
+        <button id="exceeds-capacity-info-btn" class="ml-1 text-gray-500 hover:text-gray-700" style="font-size: 10px;">ⓘ</button>
+      </span>
+    </label>
+    <label class="flex items-start text-sm text-gray-700">
+      <div class="relative">
+          <input type="checkbox" class="sr-only overlay-toggle peer" value="excess-capacity-layer" />
+          <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
+          <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
+        </div>
+      <span class="leading-snug ms-2">Excess capacity by zoning
+        <button id="excess-capacity-info-btn" class="ml-1 text-gray-500 hover:text-gray-700" style="font-size: 10px;">ⓘ</button>
+      </span>
+    </label>
   </label>
   <label class="flex items-start text-sm text-gray-700">
     <div class="relative">
@@ -349,6 +405,20 @@
     <div id="transit-diversity-info" class="hidden mt-3 pt-3 border-t border-gray-200">
       <p class="text-xs text-gray-700" style="font-family: Roboto, sans-serif;">
         Areas with stronger transportation diversity, shown here, are areas where some everyday trips don't require a car and can be completed on foot, on a bike, or by using transit.
+      </p>
+    </div>
+
+    <!-- Excess capacity info text -->
+    <div id="excess-capacity-info" class="hidden mt-3 pt-3 border-t border-gray-200">
+      <p class="text-xs text-gray-700" style="font-family: Roboto, sans-serif;">
+        This area either allows multi-family development by-right or by special permit/special review. Current development does not exceed three units per acre. There may be excess capacity for additional units should there be interest in further development or redevelopment.
+      </p>
+    </div>
+
+    <!-- Exceeds capacity info text -->
+    <div id="exceeds-capacity-info" class="hidden mt-3 pt-3 border-t border-gray-200">
+      <p class="text-xs text-gray-700" style="font-family: Roboto, sans-serif;">
+        This area does not allow multi-family development. Current development patterns, however, exceed a three unit/acre density. It may be worth up-zoning this area should relatively dense development trends continue.
       </p>
     </div>
   </div>
@@ -526,7 +596,9 @@
         "subregion-north",
         "subregion-southeast",
         "mf-byright-layer",
-        "mf-specialpermit-layer"
+        "mf-specialpermit-layer",
+        "excess-capacity-layer",
+        "exceeds-capacity-layer"
         ];
 
     //all palettes here!!
@@ -774,12 +846,12 @@ function batchSetFeatureStates({ //batching experiment
 
         map.addSource("communityboundaries", {
             type: "geojson",
-            data: 'communityboundaries.geojson'
+            data: 'https://raw.githubusercontent.com/CommunityScale/CMRPC/refs/heads/main/communityboundaries.geojson'
         })
 
         map.addSource("subregions", {
             type: "geojson",
-            data: '/CMRPC_Tigerlines_Regions_FromCytsds_250820.geojson',
+            data: 'https://raw.githubusercontent.com/CommunityScale/CMRPC/refs/heads/main/CMRPC_Tigerlines_Regions_FromCytsds_250820.geojson',
             promoteId: "TOWN_ID"
         })
 
@@ -790,7 +862,7 @@ function batchSetFeatureStates({ //batching experiment
 
         map.addSource("train-stops", {
             type: "geojson",
-            data: "CMRPC_RailStations_251017.geojson"
+            data: 'https://raw.githubusercontent.com/CommunityScale/CMRPC/refs/heads/main/CMRPC_RailStations_251017.geojson'
         })
 
         map.addSource("transit-diversity", {
@@ -819,39 +891,39 @@ function batchSetFeatureStates({ //batching experiment
 
         map.addSource("mf-byright", {
             type: 'geojson',
-            data: 'CMRPC_MFByRight_251009.geojson'
+            data: 'https://raw.githubusercontent.com/CommunityScale/CMRPC/refs/heads/main/CMRPC_MFByRight_251009.geojson'
         })
 
         map.addSource("mf-specialpermit", {
             type: 'geojson',
-            data: 'CMRPC_MFBySpecialPermit_SpecialReview_251009.geojson'
+            data: 'https://raw.githubusercontent.com/CommunityScale/CMRPC/refs/heads/main/CMRPC_MFBySpecialPermit_SpecialReview_251009.geojson'
         })
 
         map.addSource("bg-costs", {
             type: "geojson",
-            data: 'CMRPC_bg_costs.geojson',
+            data: 'https://raw.githubusercontent.com/CommunityScale/CMRPC/refs/heads/main/CMRPC_bg_costs.geojson',
             promoteId: 'GEO_ID_clean'
         })
 
         map.addSource("bg-transport-diversity", {
             type: 'geojson',
-            data: "CMRPC_bg_transportation_diverse_marg.geojson",
+            data: 'https://raw.githubusercontent.com/CommunityScale/CMRPC/refs/heads/main/CMRPC_bg_transportation_diverse_marg.geojson',
             promoteId: 'geoid'
         })
 
         map.addSource("buildable", {
             type: "geojson",
-            data: 'buildable3.geojson'
+            data: 'https://raw.githubusercontent.com/CommunityScale/CMRPC/refs/heads/main/buildable4.geojson'
         })
 
         map.addSource("excess-capacity", {
             type: "geojson",
-            data: "CMRPC_DissolvedParcels_ExcessCapacity_251017.geojson" 
+            data: 'https://raw.githubusercontent.com/CommunityScale/CMRPC/refs/heads/main/CMRPC_DissolvedParcels_ExcessCapacity_251017.geojson'
         })
 
         map.addSource("exceeds-capacity", {
             type: "geojson",
-            data: "CMRPC_DissolvedParcels_ExceedsCapacity_251017.geojson"
+            data: 'https://raw.githubusercontent.com/CommunityScale/CMRPC/refs/heads/main/CMRPC_DissolvedParcels_ExceedsCapacity_251017.geojson'
         })
 
         map.addSource("ctysds", {
@@ -954,7 +1026,7 @@ function batchSetFeatureStates({ //batching experiment
 
                 // Load CTfilter2 to get valid tract GEOIDs for filtering displacement risk data
                 let validTractsRD = new Set();
-                fetch('/CTfilter2.geojson')
+                fetch('https://raw.githubusercontent.com/CommunityScale/CMRPC/refs/heads/main/CTfilter2.geojson')
                 .then(response => response.json())
                 .then(filterData => {
                     console.log('CTfilter2 loaded for displacement risk filtering');
@@ -970,7 +1042,7 @@ function batchSetFeatureStates({ //batching experiment
                     console.log('Valid tracts for displacement risk:', validTractsRD.size);
 
                     // Now load displacement risk data and filter to valid tracts only
-                    return fetch('https://raw.githubusercontent.com/CommunityScale/CMRPC/main/rd_tracts_250731.json');
+                    return fetch('https://raw.githubusercontent.com/CommunityScale/CMRPC/refs/heads/main/rd_tracts_250731.json');
                 })
                 .then(response => response.json())
                 .then(data => {
@@ -1196,7 +1268,7 @@ const interpolateLayers = [
             source_layer: "tracts",
             source_url: "https://raw.githubusercontent.com/emtzot/mapSources/main/mass_basicHNA_2023acs_250620.json",
             colors: medIncomePalette,
-            defaultViz: "visible",
+            defaultViz: "none",
             useFeatureState: true
         },
         {
@@ -1224,7 +1296,7 @@ const interpolateLayers = [
             property: "H_T_renters",
             data_source: "bg-costs",
             source_layer: null,
-            source_url: "/CMRPC_bg_costs.geojson",
+            source_url: "https://raw.githubusercontent.com/CommunityScale/CMRPC/refs/heads/main/CMRPC_bg_costs.geojson",
             colors: medIncomePalette,
             defaultViz: "none",
             useFeatureState: false,
@@ -1235,7 +1307,7 @@ const interpolateLayers = [
             property: "H_T_owner",
             data_source: "bg-costs",
             source_layer: null,
-            source_url: "/CMRPC_bg_costs.geojson",
+            source_url: "https://raw.githubusercontent.com/CommunityScale/CMRPC/refs/heads/main/CMRPC_bg_costs.geojson",
             colors: medIncomePalette,
             defaultViz: "none",
             useFeatureState: false,
@@ -1246,7 +1318,7 @@ const interpolateLayers = [
             property: "own_2veh_2_3_bd_AMI100_3p_cost_sh",
             data_source: "bg-costs",
             source_layer: null,
-            source_url: "/CMRPC_bg_costs.geojson",
+            source_url: "https://raw.githubusercontent.com/CommunityScale/CMRPC/refs/heads/main/CMRPC_bg_costs.geojson",
             colors: affordabilityPalette,
             defaultViz: "none",
             useFeatureState: false,
@@ -1259,7 +1331,7 @@ const interpolateLayers = [
             property: "monthly_ownership_costs_overall",
             data_source: "bg-costs",
             source_layer: null,
-            source_url: "/CMRPC_bg_costs.geojson",
+            source_url: "https://raw.githubusercontent.com/CommunityScale/CMRPC/refs/heads/main/CMRPC_bg_costs.geojson",
             colors: medIncomePalette,
             defaultViz: "none",
             useFeatureState: false,
@@ -1270,7 +1342,7 @@ const interpolateLayers = [
             property: "monthly_rental_costs_overall",
             data_source: "bg-costs",
             source_layer: null,
-            source_url: "/CMRPC_bg_costs.geojson",
+            source_url: "https://raw.githubusercontent.com/CommunityScale/CMRPC/refs/heads/main/CMRPC_bg_costs.geojson",
             colors: medIncomePalette,
             defaultViz: "none",
             useFeatureState: false,
@@ -1281,7 +1353,7 @@ const interpolateLayers = [
             property: "monthly_t_costs_avg_hh",
             data_source: "bg-costs",
             source_layer: null,
-            source_url: "/CMRPC_bg_costs.geojson",
+            source_url: "https://raw.githubusercontent.com/CommunityScale/CMRPC/refs/heads/main/CMRPC_bg_costs.geojson",
             colors: medIncomePalette,
             defaultViz: "none",
             useFeatureState: false,
@@ -2016,13 +2088,13 @@ map.addLayer({
             type: 'fill',
             source: 'transit-diversity',
             paint: {
-              'fill-color': '#ecd731', // yellow
+              'fill-color': 'black', // yellow
               'fill-opacity': [
                 'interpolate',
                 ['linear'],
                 ['zoom'],
                 0, 0.95,   // 95% opacity before zoom 15
-                15, 0.3    // 30% opacity at zoom 15 and beyond
+                15, 0.0    // 30% opacity at zoom 15 and beyond
               ]
             },
           layout: {
@@ -2037,7 +2109,7 @@ map.addLayer({
             type: 'line',
             source: 'transit-diversity',
             paint: {
-              'line-color': '#ecd731', // yellow
+              'line-color': 'black', // yellow
               'line-width': 2,
               'line-opacity': [
                 'interpolate',
@@ -2094,29 +2166,89 @@ map.addLayer({
         labelLayerId
   )
 
+  // Excess capacity fill layer (polygon fill)
   map.addLayer({
             id: 'excess-capacity-layer',
             type: 'fill',
             source: 'excess-capacity',
             paint: {
-              'fill-color': '#008eaa' //mbta teal lol
+              'fill-color': '#ecd731', // yellow
+              'fill-opacity': [
+                'interpolate',
+                ['linear'],
+                ['zoom'],
+                0, 0.95,   // 95% opacity before zoom 15
+                15, 0.3    // 30% opacity at zoom 15 and beyond
+              ]
             },
           layout: {
             visibility: 'none'
-          }}, 
+          }},
         labelLayerId
   )
 
+  // Excess capacity outline layer (appears at zoom 15+)
+  map.addLayer({
+            id: 'excess-capacity-outline',
+            type: 'line',
+            source: 'excess-capacity',
+            paint: {
+              'line-color': '#ecd731', // yellow
+              'line-width': 2.5,
+              'line-opacity': [
+                'interpolate',
+                ['linear'],
+                ['zoom'],
+                14, 0,      // invisible before zoom 15
+                15, 1       // fully visible at zoom 15+
+              ]
+            },
+          layout: {
+            visibility: 'none'
+          }},
+        labelLayerId
+  )
+
+  // Exceeds capacity fill layer (polygon fill)
   map.addLayer({
             id: 'exceeds-capacity-layer',
             type: 'fill',
             source: 'exceeds-capacity',
             paint: {
-              'fill-color': '#ffc72c' //mbta yellow lol
+              'fill-color': '#ecd731', // yellow
+              'fill-opacity': [
+                'interpolate',
+                ['linear'],
+                ['zoom'],
+                0, 0.95,   // 95% opacity before zoom 15
+                15, 0.3    // 30% opacity at zoom 15 and beyond
+              ]
             },
           layout: {
             visibility: 'none'
-          }}, 
+          }},
+        labelLayerId
+  )
+
+  // Exceeds capacity outline layer (appears at zoom 15+)
+  map.addLayer({
+            id: 'exceeds-capacity-outline',
+            type: 'line',
+            source: 'exceeds-capacity',
+            paint: {
+              'line-color': '#ecd731', // yellow
+              'line-width': 2.5,
+              'line-opacity': [
+                'interpolate',
+                ['linear'],
+                ['zoom'],
+                14, 0,      // invisible before zoom 15
+                15, 1       // fully visible at zoom 15+
+              ]
+            },
+          layout: {
+            visibility: 'none'
+          }},
         labelLayerId
   )
 
@@ -2336,6 +2468,37 @@ map.addLayer({
         })
 
 
+    // Create diagonal line pattern for buildable-land layer
+    const createDiagonalLinePattern = () => {
+      const size = 16; // Size of the pattern tile
+      const canvas = document.createElement('canvas');
+      canvas.width = size;
+      canvas.height = size;
+      const ctx = canvas.getContext('2d');
+
+      // Clear canvas
+      ctx.clearRect(0, 0, size, size);
+
+      // Draw diagonal lines at 45 degrees
+      ctx.strokeStyle = '#000000'; // Black lines
+      ctx.lineWidth = 1; // 1pt width
+      ctx.beginPath();
+
+      // Draw multiple diagonal lines to fill the pattern
+      // We need to draw lines offset to create the pattern
+      for (let i = -size; i < size * 2; i += 6) { // spacing of 6 pixels (moderately close)
+        ctx.moveTo(i, 0);
+        ctx.lineTo(i + size, size);
+      }
+
+      ctx.stroke();
+      return canvas;
+    };
+
+    // Add the diagonal pattern to the map
+    const diagonalPattern = createDiagonalLinePattern();
+    map.addImage('diagonal-lines-black', diagonalPattern);
+
     // map.loadImage(
     //         'https://mits003.github.io/studio_null/img/mapbox_texture/dot_xs.png',
     //         (err, image) => {
@@ -2357,12 +2520,12 @@ map.addLayer({
         //                 visibility: "visible"
         //         },
         //         });
-                
+
         //     }
         // );
 
 //point overlays!!  not needed yet!!
-    };
+
     
 
 
@@ -2382,8 +2545,8 @@ map.on('load', () => {
     addSources();
 
     map.once('idle', async () => {
-        const opacity = 0.66; 
-        const visibleLayerId = "tracts-medIncome"; // set visible layer id to layer wanted for initial load!!
+        const opacity = 0.66;
+        const visibleLayerId = null; // Don't show any layer by default - let user select from dropdown
 
         await addInterpolatedLayers(opacity, visibleLayerId); //add interpolated layers FIRST
 
@@ -2391,18 +2554,31 @@ map.on('load', () => {
 
         const initialLayer = layerSelect.value;
 
-        allFillLayers.forEach(id => {
-            if (map.getLayer(id)) {
-                map.setLayoutProperty(id, "visibility", id === initialLayer ? "visible" : "none");
-            }
-        });
+        // Only show a layer if one is actually selected (not empty/placeholder)
+        if (initialLayer && initialLayer !== 'placeholder' && initialLayer !== '') {
+          allFillLayers.forEach(id => {
+              if (map.getLayer(id)) {
+                  map.setLayoutProperty(id, "visibility", id === initialLayer ? "visible" : "none");
+              }
+          });
 
-        // Show CMRPC region fill layer if buildable land is the initial layer
-        if (map.getLayer('cmrpc-region-fill')) {
-            map.setLayoutProperty('cmrpc-region-fill', 'visibility', initialLayer === 'buildable-land' ? 'visible' : 'none');
+          // Show CMRPC region fill layer if buildable land is the initial layer
+          if (map.getLayer('cmrpc-region-fill')) {
+              map.setLayoutProperty('cmrpc-region-fill', 'visibility', initialLayer === 'buildable-land' ? 'visible' : 'none');
+          }
+
+          renderLegendFromStops(initialLayer);
+        } else {
+          // No layer selected - make sure all are hidden
+          allFillLayers.forEach(id => {
+              if (map.getLayer(id)) {
+                  map.setLayoutProperty(id, "visibility", "none");
+              }
+          });
+          if (map.getLayer('cmrpc-region-fill')) {
+              map.setLayoutProperty('cmrpc-region-fill', 'visibility', 'none');
+          }
         }
-
-        renderLegendFromStops(initialLayer)
     });
 });
 
@@ -2411,6 +2587,9 @@ map.on('load', () => {
 
 const layerSelect = document.getElementById('layer-select');
 const legendContent = document.getElementById('legend-content');
+
+// Track the currently selected data layer (since dropdown resets after selection)
+let currentlySelectedDataLayer = null;
 
 const allFillLayers = [
     'tracts-medIncome',
@@ -2655,12 +2834,28 @@ document.querySelectorAll('.overlay-toggle').forEach(input => {
       if (layerId === 'transit-diversity-layer' && map.getLayer('transit-diversity-outline')) {
         map.setLayoutProperty('transit-diversity-outline', 'visibility', 'visible');
       }
+      // Also toggle the outline layer for excess-capacity
+      if (layerId === 'excess-capacity-layer' && map.getLayer('excess-capacity-outline')) {
+        map.setLayoutProperty('excess-capacity-outline', 'visibility', 'visible');
+      }
+      // Also toggle the outline layer for exceeds-capacity
+      if (layerId === 'exceeds-capacity-layer' && map.getLayer('exceeds-capacity-outline')) {
+        map.setLayoutProperty('exceeds-capacity-outline', 'visibility', 'visible');
+      }
       renderOverlayLegend(layerId); // append overlay to legend
     } else {
       map.setLayoutProperty(layerId, 'visibility', 'none');
       // Also hide the outline layer for transit-diversity
       if (layerId === 'transit-diversity-layer' && map.getLayer('transit-diversity-outline')) {
         map.setLayoutProperty('transit-diversity-outline', 'visibility', 'none');
+      }
+      // Also hide the outline layer for excess-capacity
+      if (layerId === 'excess-capacity-layer' && map.getLayer('excess-capacity-outline')) {
+        map.setLayoutProperty('excess-capacity-outline', 'visibility', 'none');
+      }
+      // Also hide the outline layer for exceeds-capacity
+      if (layerId === 'exceeds-capacity-layer' && map.getLayer('exceeds-capacity-outline')) {
+        map.setLayoutProperty('exceeds-capacity-outline', 'visibility', 'none');
       }
       // optionally remove overlay entry from legend
     }
@@ -2681,9 +2876,17 @@ function getOverlayDisplayName(layerId) {
 
   // Clone the span and remove any info icon elements
   const clone = labelSpan.cloneNode(true);
-  const infoIcon = clone.querySelector('#transit-diversity-info-btn');
-  if (infoIcon) {
-    infoIcon.parentElement?.remove(); // Remove the parent span that contains the icon
+  const transitInfoIcon = clone.querySelector('#transit-diversity-info-btn');
+  if (transitInfoIcon) {
+    transitInfoIcon.remove();
+  }
+  const excessInfoIcon = clone.querySelector('#excess-capacity-info-btn');
+  if (excessInfoIcon) {
+    excessInfoIcon.remove();
+  }
+  const exceedsInfoIcon = clone.querySelector('#exceeds-capacity-info-btn');
+  if (exceedsInfoIcon) {
+    exceedsInfoIcon.remove();
   }
 
   return clone.textContent?.trim() || layerId;
@@ -2808,6 +3011,9 @@ layerSelect.addEventListener('change', (e) => {
   const selected = e.target.value;
 
   if (!selected) return;
+
+  // Store the selected layer globally so we can restore it after basemap changes
+  currentlySelectedDataLayer = selected;
 
   allFillLayers.forEach(id => {
     if (map.getLayer(id)) {
@@ -3247,11 +3453,8 @@ document.querySelectorAll('#basemap-style-thumbnails button').forEach(button => 
     button.addEventListener('click', () => {
     const style = button.getAttribute('data-style');
 
-    // Capture visible data layers before switching
-    const visibleLayers = dataLayers.filter(id => {
-      const layer = map.getLayer(id);
-      return layer && map.getLayoutProperty(id, 'visibility') === 'visible';
-    });
+    // Don't capture visible data layers - we'll restore from dropdown value only
+    // This prevents the flash of wrong layers during basemap switching
 
     // Capture visible overlays prior to switch
     const visibleOverlays = overlayLayers.filter(id => {
@@ -3259,8 +3462,9 @@ document.querySelectorAll('#basemap-style-thumbnails button').forEach(button => 
       return layer && map.getLayoutProperty(id, 'visibility') === 'visible';
     });
 
-    // Capture the selected layer from dropdown
-    const selectedDropdownLayer = document.getElementById('layer-dropdown')?.value;
+    // Use the globally tracked selected layer (not dropdown value, since it resets)
+    const selectedDropdownLayer = currentlySelectedDataLayer;
+    console.log('Captured selected layer before basemap switch:', selectedDropdownLayer);
 
     // Switch basemap
     map.setStyle(`mapbox://styles/${style}`);
@@ -3274,32 +3478,35 @@ document.querySelectorAll('#basemap-style-thumbnails button').forEach(button => 
   map.once('idle', () => {
     // run afer everything has been added back as changing the style wipes the sources as well??
 
-    // Hide all layers by default
-    dataLayers.forEach(id => {
+    // Hide all data layers by default (don't restore them yet to avoid flashing)
+    allFillLayers.forEach(id => {
       if (map.getLayer(id)) {
         map.setLayoutProperty(id, 'visibility', 'none');
       }
     });
 
+    // Hide all overlay layers by default
     overlayLayers.forEach(id => {
       if (map.getLayer(id)) {
         map.setLayoutProperty(id, 'visibility', 'none');
       }
     });
 
-    // Restore peviously visible layers once the style loads
-    visibleLayers.forEach(id => {
-      if (map.getLayer(id)) {
-        map.setLayoutProperty(id, 'visibility', 'visible');
-      }
-    });
-
+    // Restore only the overlay layers (not data layers - they're handled separately below)
     visibleOverlays.forEach(id => {
       if (map.getLayer(id)) {
         map.setLayoutProperty(id, 'visibility', 'visible');
         // Also restore the outline layer for transit-diversity
         if (id === 'transit-diversity-layer' && map.getLayer('transit-diversity-outline')) {
           map.setLayoutProperty('transit-diversity-outline', 'visibility', 'visible');
+        }
+        // Also restore the outline layer for excess-capacity
+        if (id === 'excess-capacity-layer' && map.getLayer('excess-capacity-outline')) {
+          map.setLayoutProperty('excess-capacity-outline', 'visibility', 'visible');
+        }
+        // Also restore the outline layer for exceeds-capacity
+        if (id === 'exceeds-capacity-layer' && map.getLayer('exceeds-capacity-outline')) {
+          map.setLayoutProperty('exceeds-capacity-outline', 'visibility', 'visible');
         }
       }
     });
@@ -3314,7 +3521,7 @@ document.querySelectorAll('#basemap-style-thumbnails button').forEach(button => 
 
     updateLayerOpacity();
 
-    // Move overlay layers to the top (just below labels) first
+    // Find the label layer ID first (we'll use this for z-ordering)
     const layers = map.getStyle().layers;
     let labelLayerId;
     for (const layer of layers) {
@@ -3324,26 +3531,20 @@ document.querySelectorAll('#basemap-style-thumbnails button').forEach(button => 
       }
     }
 
-    if (labelLayerId) {
-      // Move town-layer (community boundaries) to top
-      if (map.getLayer('town-layer')) {
-        map.moveLayer('town-layer', labelLayerId);
-      }
-      // Move transit-diversity layers to top
-      if (map.getLayer('transit-diversity-layer')) {
-        map.moveLayer('transit-diversity-layer', labelLayerId);
-      }
-      if (map.getLayer('transit-diversity-outline')) {
-        map.moveLayer('transit-diversity-outline', labelLayerId);
-      }
-    }
+    // Restore the selected data layer from dropdown - do this FIRST (before overlays)
+    console.log('Attempting to restore layer:', selectedDropdownLayer);
+    console.log('Checks - not null?', selectedDropdownLayer ? 'YES' : 'NO');
+    console.log('Checks - not placeholder?', selectedDropdownLayer !== 'placeholder' ? 'YES' : 'NO');
+    console.log('Checks - not empty?', selectedDropdownLayer !== '' ? 'YES' : 'NO');
 
-    // Restore the selected data layer from dropdown - do this LAST
-    if (selectedDropdownLayer && selectedDropdownLayer !== 'placeholder') {
+    if (selectedDropdownLayer && selectedDropdownLayer !== 'placeholder' && selectedDropdownLayer !== '') {
+      console.log('✓ Layer value is valid, proceeding with restoration');
+
       // Update the dropdown to maintain selection first
-      const dropdown = document.getElementById('layer-dropdown');
+      const dropdown = document.getElementById('layer-select');
       if (dropdown) {
         dropdown.value = selectedDropdownLayer;
+        console.log('Dropdown value set to:', dropdown.value);
 
         // Update legend title
         const selectedOption = dropdown.options[dropdown.selectedIndex];
@@ -3352,16 +3553,81 @@ document.querySelectorAll('#basemap-style-thumbnails button').forEach(button => 
         }
       }
 
+      // Don't hide all layers again - they're already hidden above
+      // Just show the selected layer
+
       renderLegendFromStops(selectedDropdownLayer);
 
-      // Force visibility to be set on the selected layer
-      if (map.getLayer(selectedDropdownLayer)) {
+      // Force visibility to be set ONLY on the selected layer
+      const layerExists = map.getLayer(selectedDropdownLayer);
+      console.log('Layer exists?', layerExists ? 'YES' : 'NO');
+      if (layerExists) {
         map.setLayoutProperty(selectedDropdownLayer, 'visibility', 'visible');
+        console.log('Set visibility to visible for:', selectedDropdownLayer);
+
+        // Show CMRPC region fill layer when buildable land is selected
+        if (selectedDropdownLayer === 'buildable-land' && map.getLayer('cmrpc-region-fill')) {
+          map.setLayoutProperty('cmrpc-region-fill', 'visibility', 'visible');
+          // Move the region fill layer to correct position
+          if (labelLayerId) {
+            map.moveLayer('cmrpc-region-fill', labelLayerId);
+          }
+        } else if (map.getLayer('cmrpc-region-fill')) {
+          // Hide region fill for other layers
+          map.setLayoutProperty('cmrpc-region-fill', 'visibility', 'none');
+        }
 
         // Move the selected layer above basemap but below labels
+        console.log('labelLayerId value:', labelLayerId);
         if (labelLayerId) {
-          map.moveLayer(selectedDropdownLayer, labelLayerId);
+          console.log('Moving layer', selectedDropdownLayer, 'before', labelLayerId);
+          try {
+            map.moveLayer(selectedDropdownLayer, labelLayerId);
+            console.log('✓ Layer moved successfully');
+
+            // Verify the layer is still visible after moving
+            const visibility = map.getLayoutProperty(selectedDropdownLayer, 'visibility');
+            console.log('Visibility after move:', visibility);
+          } catch (error) {
+            console.error('ERROR moving layer:', error);
+          }
+        } else {
+          console.log('ERROR: labelLayerId not set, cannot move layer to correct z-position');
         }
+      }
+    }
+
+    // Move overlay layers to the top (just below labels) AFTER data layer restoration
+    // This ensures overlays are always above data layers
+    if (labelLayerId) {
+      console.log('Positioning overlay layers at top...');
+
+      // Move all overlay layers to top
+      overlayLayers.forEach(overlayId => {
+        if (map.getLayer(overlayId)) {
+          try {
+            map.moveLayer(overlayId, labelLayerId);
+            console.log('Moved overlay', overlayId, 'to top');
+          } catch (error) {
+            console.error('Error moving overlay', overlayId, ':', error);
+          }
+        }
+      });
+
+      // Move town-layer (community boundaries) to very top (above all other overlays)
+      if (map.getLayer('town-layer')) {
+        map.moveLayer('town-layer', labelLayerId);
+        console.log('Moved town-layer to very top');
+      }
+
+      // Move transit-diversity layers to top (but below town boundaries)
+      if (map.getLayer('transit-diversity-layer')) {
+        map.moveLayer('transit-diversity-layer', labelLayerId);
+        console.log('Moved transit-diversity-layer to top');
+      }
+      if (map.getLayer('transit-diversity-outline')) {
+        map.moveLayer('transit-diversity-outline', labelLayerId);
+        console.log('Moved transit-diversity-outline to top');
       }
     }
   });
@@ -3444,8 +3710,9 @@ function zoomToFullRegion() {
         });
 }
 
-//clear map
+//clear map - turn off all layers and overlays
 document.getElementById('clear-map').addEventListener('click', () => {
+  // Turn off all overlay layers
   const overlayInputs = document.querySelectorAll('.overlay-toggle');
 
   overlayInputs.forEach(input => {
@@ -3454,38 +3721,61 @@ document.getElementById('clear-map').addEventListener('click', () => {
 
     if (layer && map.getLayoutProperty(layerId, 'visibility') !== 'none') {
       map.setLayoutProperty(layerId, 'visibility', 'none');
+
+      // Also hide companion outline layers
+      if (layerId === 'transit-diversity-layer' && map.getLayer('transit-diversity-outline')) {
+        map.setLayoutProperty('transit-diversity-outline', 'visibility', 'none');
+      }
+      if (layerId === 'excess-capacity-layer' && map.getLayer('excess-capacity-outline')) {
+        map.setLayoutProperty('excess-capacity-outline', 'visibility', 'none');
+      }
+      if (layerId === 'exceeds-capacity-layer' && map.getLayer('exceeds-capacity-outline')) {
+        map.setLayoutProperty('exceeds-capacity-outline', 'visibility', 'none');
+      }
     }
 
     input.checked = false; // uncheck toggle in UI
   });
 
-// wipe the fills 
-  map.getStyle().layers.forEach(layer => {
-    if (layer.type === 'fill') {
-      try {
-        map.setLayoutProperty(layer.id, 'visibility', 'none');
-      } catch (e) {
-        console.warn(`Could not hide layer ${layer.id}:`, e);
-      }
+  // Turn off all data layers from dropdown
+  console.log('Clearing all data layers...');
+  allFillLayers.forEach(layerId => {
+    if (map.getLayer(layerId)) {
+      map.setLayoutProperty(layerId, 'visibility', 'none');
+      console.log('Hid layer:', layerId);
     }
   });
 
-  // clear the legend panel
+  // Hide companion layer for buildable land
+  if (map.getLayer('cmrpc-region-fill')) {
+    map.setLayoutProperty('cmrpc-region-fill', 'visibility', 'none');
+    console.log('Hid cmrpc-region-fill');
+  }
+
+  // Reset dropdown to placeholder
+  const dropdown = document.getElementById('layer-select');
+  if (dropdown) {
+    dropdown.selectedIndex = 0; // Reset to first option (placeholder)
+    console.log('Reset dropdown to placeholder');
+  }
+
+  // Clear the currently selected data layer tracking variable
+  currentlySelectedDataLayer = null;
+  console.log('Cleared currentlySelectedDataLayer');
+
+  // Clear the legend panel
   const legendContent = document.getElementById('legend-content');
   if (legendContent) {
     legendContent.innerHTML = '';
   }
 
-  // reset legend title to blank
+  // Reset legend title to blank
   const legendTitle = document.getElementById('legend-title');
   if (legendTitle) {
     legendTitle.textContent = '';
   }
 
-  // reset to gray basemap
-  map.setStyle('mapbox://styles/communityscale/cmgicidwh007k01qdauae93b0');
-
-  // remove any popups
+  // Remove any popups
   if (typeof popup !== 'undefined') {
     popup.remove();
   }
@@ -3605,10 +3895,34 @@ if (transitDiversityInfoBtn && transitDiversityInfo) {
   });
 }
 
+// Excess capacity info toggle
+const excessCapacityInfoBtn = document.getElementById('excess-capacity-info-btn');
+const excessCapacityInfo = document.getElementById('excess-capacity-info');
+
+if (excessCapacityInfoBtn && excessCapacityInfo) {
+  excessCapacityInfoBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    excessCapacityInfo.classList.toggle('hidden');
+  });
+}
+
+// Exceeds capacity info toggle
+const exceedsCapacityInfoBtn = document.getElementById('exceeds-capacity-info-btn');
+const exceedsCapacityInfo = document.getElementById('exceeds-capacity-info');
+
+if (exceedsCapacityInfoBtn && exceedsCapacityInfo) {
+  exceedsCapacityInfoBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    exceedsCapacityInfo.classList.toggle('hidden');
+  });
+}
+
     initializeMap();
 
     console.log(Object.keys(layerDescriptions));
-
+  }
 
         </script>
     </body>
