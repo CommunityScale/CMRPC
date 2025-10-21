@@ -3099,7 +3099,7 @@ layerSelect.addEventListener('change', (e) => {
             }
 
             case "parcels-density": {
-                const DUA = attributes.density;
+                const DUA = Math.round(attributes.density * 10) /10;
                 html = `
                 <div class="popup-header">${parcelDisplayName}</div>
                 <div class="popup-content">${DUA != null ? `This parcel is built out at a residential density of ${DUA} units per acre.` : 'No available data.'}
