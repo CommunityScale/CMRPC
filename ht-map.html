@@ -792,9 +792,9 @@ function batchSetFeatureStates({ //batching experiment
             promoteId: 'loc_id'
         })
 
-        map.addSource("transit-quality", { //replace!!
+        map.addSource("transit-quality", {
             type: 'geojson',
-            data: 'https://raw.githubusercontent.com/CommunityScale/CMRPC/e1f70fdb0d8f63d60fef2b96eaacfee5879ca632/transit_quality_diss.geojson',
+            data: 'https://raw.githubusercontent.com/CommunityScale/CMRPC/refs/heads/main/CMRPC_transit_quality_dissolved_selected_qualities_251020.geojson',
             promoteId: 'fid'
         })
 
