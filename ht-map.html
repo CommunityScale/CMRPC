@@ -3200,9 +3200,17 @@ document.querySelectorAll('#basemap-style-thumbnails button').forEach(button => 
     console.log('Captured selected layer before basemap switch:', selectedDropdownLayer);
 
     // Switch basemap
+    console.log('About to switch basemap style...');
     map.setStyle(`mapbox://styles/${style}`);
+    console.log('Style set, waiting for styledata event...');
 
-    map.once('style.load', () => {
+    // Wait for the style to be fully loaded using styledata event
+    const onStyleData = (e) => {
+      if (e.dataType === 'style') {
+        console.log('===== STYLEDATA EVENT - checking if loaded =====');
+        if (map.isStyleLoaded()) {
+          console.log('===== STYLE IS FULLY LOADED =====');
+          map.off('styledata', onStyleData);
       // Find the label layer ID FIRST before adding any layers
       const layers = map.getStyle().layers;
       labelLayerId = null;
@@ -3378,6 +3386,11 @@ document.querySelectorAll('#basemap-style-thumbnails button').forEach(button => 
       }
     }
   });
+        }
+      }
+    };
+
+    map.on('styledata', onStyleData);
     });
   });
 });
