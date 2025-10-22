@@ -3129,14 +3129,6 @@ layerSelect.addEventListener('change', (e) => {
             .addTo(map);
     });
 
-    //KEEP LAYERS WHEN BASEMAP CHANGES
-    function toggleBasemapSettings() { //correct for the basemap toggle situation
-        const panel = document.getElementById('basemap-settings');
-        const arrow = document.getElementById('basemap-arrow');
-        panel.classList.toggle('hidden');
-        arrow.classList.toggle('rotate-180'); // Flip the arrow
-        }
-
 document.querySelectorAll('#basemap-style-thumbnails button').forEach(button => {
     button.addEventListener('click', () => {
     const style = button.getAttribute('data-style');
@@ -3401,6 +3393,14 @@ function zoomToFullRegion() {
                 duration: 1000
             });
         });
+}
+
+//BASEMAP SETTINGS TOGGLE
+function toggleBasemapSettings() {
+    const panel = document.getElementById('basemap-settings');
+    const arrow = document.getElementById('basemap-arrow');
+    panel.classList.toggle('hidden');
+    arrow.classList.toggle('rotate-180');
 }
 
 //clear map - turn off all layers and overlays
