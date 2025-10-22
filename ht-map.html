@@ -2721,7 +2721,7 @@ layerSelect.addEventListener('change', (e) => {
 });
        
     function layerLegendVisibility() {
-        const dropdown = document.getElementById('layer-dropdown');
+        const dropdown = document.getElementById('layer-select');
         const selectedLayerId = dropdown.value;
 
         dataLayers.forEach(layerId => {
@@ -3392,8 +3392,8 @@ function toggleBasemapSettings() {
 
     document.getElementById('basemap-toggle').addEventListener('click', toggleBasemapSettings);
 
-    
-    const dropdown = document.getElementById('layer-dropdown');
+
+    const dropdown = document.getElementById('layer-select');
 
     document.getElementById("opacity").addEventListener("input", function (e) {
         const newOpacity = parseFloat(e.target.value);
