@@ -3179,9 +3179,9 @@ document.querySelectorAll('#basemap-style-thumbnails button').forEach(button => 
       addAllOtherLayers();
       console.log('All layers added.');
 
-  map.once('idle', () => {
-    console.log('===== MAP IDLE EVENT FIRED =====');
-    // run afer everything has been added back as changing the style wipes the sources as well??
+    // Use setTimeout instead of nested idle event since we're already idle
+    setTimeout(() => {
+      console.log('===== RUNNING RESTORATION AFTER LAYER ADD =====');
 
     // Hide all data layers by default (don't restore them yet to avoid flashing)
     allFillLayers.forEach(id => {
@@ -3347,8 +3347,8 @@ document.querySelectorAll('#basemap-style-thumbnails button').forEach(button => 
       }
     }
   });
+    }, 100); // Small delay to ensure layers are fully rendered
     });
-  });
 });
 
 //BASEMAP SETTINGS TOGGLE
