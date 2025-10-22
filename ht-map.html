@@ -3400,6 +3400,13 @@ document.querySelectorAll('#basemap-style-thumbnails button').forEach(button => 
   });
 });
 
+//BASEMAP SETTINGS TOGGLE
+function toggleBasemapSettings() {
+    const panel = document.getElementById('basemap-settings');
+    const arrow = document.getElementById('basemap-arrow');
+    panel.classList.toggle('hidden');
+    arrow.classList.toggle('rotate-180');
+}
 
     document.getElementById('basemap-toggle').addEventListener('click', toggleBasemapSettings);
 
@@ -3473,14 +3480,6 @@ function zoomToFullRegion() {
                 duration: 1000
             });
         });
-}
-
-//BASEMAP SETTINGS TOGGLE
-function toggleBasemapSettings() {
-    const panel = document.getElementById('basemap-settings');
-    const arrow = document.getElementById('basemap-arrow');
-    panel.classList.toggle('hidden');
-    arrow.classList.toggle('rotate-180');
 }
 
 //clear map - turn off all layers and overlays
