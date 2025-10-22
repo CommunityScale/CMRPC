@@ -2701,6 +2701,7 @@ layerSelect.addEventListener('change', (e) => {
 
   // Store the selected layer globally so we can restore it after basemap changes
   currentlySelectedDataLayer = selected;
+  console.log('✓ Selected layer stored:', currentlySelectedDataLayer);
 
   allFillLayers.forEach(id => {
     if (map.getLayer(id)) {
