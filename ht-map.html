@@ -3336,30 +3336,12 @@ document.querySelectorAll('#basemap-style-thumbnails button').forEach(button => 
         }
       };
 
-      // For buildable-land, wait for the source data to load (it's a large 94MB file)
-      if (selectedDropdownLayer === 'buildable-land') {
-        console.log('Waiting for buildable source data to load...');
-
-        // Check if source is already loaded
-        const source = map.getSource('buildable');
-        if (source && source._data) {
-          console.log('✓ Buildable source already loaded');
-          showAndPositionLayer();
-        } else {
-          // Wait for sourcedata event
-          const onSourceData = (e) => {
-            if (e.sourceId === 'buildable' && e.isSourceLoaded) {
-              console.log('✓ Buildable source finished loading');
-              map.off('sourcedata', onSourceData);
-              showAndPositionLayer();
-            }
-          };
-          map.on('sourcedata', onSourceData);
-        }
-      } else {
-        // For other layers, show immediately
+      // Use setTimeout to ensure sources are fully loaded before showing layer
+      // This is especially important for large files like buildable6.geojson (94MB)
+      setTimeout(() => {
+        console.log('Attempting to show and position layer after delay...');
         showAndPositionLayer();
-      }
+      }, 500);
     }
 
     // Move overlay layers to the top (just below labels) AFTER data layer restoration
