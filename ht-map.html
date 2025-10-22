@@ -615,10 +615,10 @@
             ]
 
     const buildablePalette = [
-                { key: "NZN", color: "#6e79dd", label: "Buildable, no sewer" },
-                { key: "SZN", color: "#ecd731", label: "Buildable, sewer" },
-                { key: "NBN", color: "#000000", label: "Developed or exempt" },
-                { key: "SBN", color: "#000000", label: "Developed or exempt" }
+                { key: "Sew unBuilt noExempt", color: "#6e79dd", label: "Buildable, sewer" },
+                { key: "noSew noBuilt noExempt", color: "#ecd731", label: "Buildable, no sewer" },
+                { key: "noSew Built noExempt", color: "#000000", label: "Developed" },
+                { key: "Sew Built noExempt", color: "#000000", label: "Developed" }
             ]
 
    const palettesByLayer = { //leave empty if not needed
@@ -823,7 +823,7 @@ function batchSetFeatureStates({ //batching experiment
 
         map.addSource("buildable", {
             type: "geojson",
-            data: 'https://raw.githubusercontent.com/CommunityScale/CMRPC/refs/heads/main/buildable4.geojson'
+            data: 'https://raw.githubusercontent.com/CommunityScale/CMRPC/refs/heads/main/buildable5.geojson'
         })
 
         map.addSource("excess-capacity", {
@@ -1731,16 +1731,18 @@ map.addLayer({
                 paint: {
                     "fill-color": [
                         "match",
-                        ["get", "CLASSTYP"],
-                        "NZN", "#6e79dd",
-                        "SZN", "#ecd731",
-                        "NBN", "#000000",
-                        "SBN", "#000000",
+                        ["get", "clss"],
+                        "noSew Built noExempt", "#000000",
+                        "noSew noBuilt Exempt", "transparent",
+                        "noSew noBuilt noExempt", "#ecd731",
+                        "Sew Built noExempt", "#000000",
+                        "Sew noBuilt Exempt", "transparent",
+                        "Sew unBuilt noExempt", "#6e79dd",
                         "transparent"
                     ],
                     "fill-opacity": [
                         "case",
-                        ["in", ["get", "CLASSTYP"], ["literal", ["NZN", "SZN", "NBN", "SBN"]]],
+                        ["in", ["get", "clss"], ["literal", ["noSew Built noExempt", "noSew noBuilt noExempt", "Sew Built noExempt", "Sew unBuilt noExempt"]]],
                         1,
                         0
                     ]
@@ -3305,16 +3307,13 @@ document.querySelectorAll('#basemap-style-thumbnails button').forEach(button => 
         map.setLayoutProperty(selectedDropdownLayer, 'visibility', 'visible');
         console.log('Set visibility to visible for:', selectedDropdownLayer);
 
-        // Show CMRPC region fill layer when buildable land is selected
+        // Handle CMRPC region fill layer for buildable land
         if (selectedDropdownLayer === 'buildable-land' && map.getLayer('cmrpc-region-fill')) {
           map.setLayoutProperty('cmrpc-region-fill', 'visibility', 'visible');
-          // Move the region fill layer to correct position
-          if (labelLayerId) {
-            map.moveLayer('cmrpc-region-fill', labelLayerId);
-          }
+          console.log('Showing cmrpc-region-fill for buildable-land');
         } else if (map.getLayer('cmrpc-region-fill')) {
-          // Hide region fill for other layers
           map.setLayoutProperty('cmrpc-region-fill', 'visibility', 'none');
+          console.log('Hiding cmrpc-region-fill');
         }
 
         // Move the selected layer above basemap but below labels
@@ -3322,6 +3321,13 @@ document.querySelectorAll('#basemap-style-thumbnails button').forEach(button => 
         if (labelLayerId) {
           console.log('Moving layer', selectedDropdownLayer, 'before', labelLayerId);
           try {
+            // First, position cmrpc-region-fill if buildable land is selected
+            if (selectedDropdownLayer === 'buildable-land' && map.getLayer('cmrpc-region-fill')) {
+              map.moveLayer('cmrpc-region-fill', labelLayerId);
+              console.log('✓ Region fill positioned below labels');
+            }
+
+            // Then position the selected layer above cmrpc-region-fill
             map.moveLayer(selectedDropdownLayer, labelLayerId);
             console.log('✓ Layer moved successfully');
 
