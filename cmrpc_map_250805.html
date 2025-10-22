@@ -2442,11 +2442,11 @@ function formatLegendLabel(value, layerId) {
 
 // Render legend from stops
 function renderLegendFromStops(layerId) {
-  const stops = getStopsFromLayer(layerId);
+  const stops = getStopsFromLayer(layerId).filter(stop => stop.color.toLowerCase() !== 'transparent');
   const palette = palettesByLayer[layerId] || [];
 
   function getLabel(stop) {
-    const match = palette.find(p => 
+    const match = palette.find(p =>
       (p.value === stop.value) || (p.color.toLowerCase() === stop.color.toLowerCase())
     );
     return match?.label || formatLegendLabel(stop.value, layerId); // fallback to data value if no label
