@@ -3211,6 +3211,17 @@ document.querySelectorAll('#basemap-style-thumbnails button').forEach(button => 
     map.setStyle(`mapbox://styles/${style}`);
 
     map.once('style.load', () => {
+      // Find the label layer ID FIRST before adding any layers
+      const layers = map.getStyle().layers;
+      labelLayerId = null;
+      for (const layer of layers) {
+        if (layer.type === 'symbol' && layer.layout && layer.layout['text-field']) {
+          labelLayerId = layer.id;
+          break;
+        }
+      }
+      console.log('Found labelLayerId for new basemap:', labelLayerId);
+
       addSources();
       const currentOpacity = parseFloat(document.getElementById("opacity").value);
       addInterpolatedLayers(currentOpacity);
@@ -3261,16 +3272,6 @@ document.querySelectorAll('#basemap-style-thumbnails button').forEach(button => 
     // }
 
     updateLayerOpacity();
-
-    // Find the label layer ID first (we'll use this for z-ordering)
-    const layers = map.getStyle().layers;
-    let labelLayerId;
-    for (const layer of layers) {
-      if (layer.type === 'symbol' && layer.layout && layer.layout['text-field']) {
-        labelLayerId = layer.id;
-        break;
-      }
-    }
 
     // Restore the selected data layer from dropdown - do this FIRST (before overlays)
     console.log('Attempting to restore layer:', selectedDropdownLayer);
