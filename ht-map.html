@@ -3292,46 +3292,73 @@ document.querySelectorAll('#basemap-style-thumbnails button').forEach(button => 
 
       renderLegendFromStops(selectedDropdownLayer);
 
-      // Force visibility to be set ONLY on the selected layer
-      const layerExists = map.getLayer(selectedDropdownLayer);
-      console.log('Layer exists?', layerExists ? 'YES' : 'NO');
-      if (layerExists) {
-        map.setLayoutProperty(selectedDropdownLayer, 'visibility', 'visible');
-        console.log('Set visibility to visible for:', selectedDropdownLayer);
+      // Helper function to show and position a layer
+      const showAndPositionLayer = () => {
+        const layerExists = map.getLayer(selectedDropdownLayer);
+        console.log('Layer exists?', layerExists ? 'YES' : 'NO');
+        if (layerExists) {
+          map.setLayoutProperty(selectedDropdownLayer, 'visibility', 'visible');
+          console.log('Set visibility to visible for:', selectedDropdownLayer);
 
-        // Handle CMRPC region fill layer for buildable land
-        if (selectedDropdownLayer === 'buildable-land' && map.getLayer('cmrpc-region-fill')) {
-          map.setLayoutProperty('cmrpc-region-fill', 'visibility', 'visible');
-          console.log('Showing cmrpc-region-fill for buildable-land');
-        } else if (map.getLayer('cmrpc-region-fill')) {
-          map.setLayoutProperty('cmrpc-region-fill', 'visibility', 'none');
-          console.log('Hiding cmrpc-region-fill');
-        }
-
-        // Move the selected layer above basemap but below labels
-        console.log('labelLayerId value:', labelLayerId);
-        if (labelLayerId) {
-          console.log('Moving layer', selectedDropdownLayer, 'before', labelLayerId);
-          try {
-            // First, position cmrpc-region-fill if buildable land is selected
-            if (selectedDropdownLayer === 'buildable-land' && map.getLayer('cmrpc-region-fill')) {
-              map.moveLayer('cmrpc-region-fill', labelLayerId);
-              console.log('✓ Region fill positioned below labels');
-            }
-
-            // Then position the selected layer above cmrpc-region-fill
-            map.moveLayer(selectedDropdownLayer, labelLayerId);
-            console.log('✓ Layer moved successfully');
-
-            // Verify the layer is still visible after moving
-            const visibility = map.getLayoutProperty(selectedDropdownLayer, 'visibility');
-            console.log('Visibility after move:', visibility);
-          } catch (error) {
-            console.error('ERROR moving layer:', error);
+          // Handle CMRPC region fill layer for buildable land
+          if (selectedDropdownLayer === 'buildable-land' && map.getLayer('cmrpc-region-fill')) {
+            map.setLayoutProperty('cmrpc-region-fill', 'visibility', 'visible');
+            console.log('Showing cmrpc-region-fill for buildable-land');
+          } else if (map.getLayer('cmrpc-region-fill')) {
+            map.setLayoutProperty('cmrpc-region-fill', 'visibility', 'none');
+            console.log('Hiding cmrpc-region-fill');
           }
-        } else {
-          console.log('ERROR: labelLayerId not set, cannot move layer to correct z-position');
+
+          // Move the selected layer above basemap but below labels
+          console.log('labelLayerId value:', labelLayerId);
+          if (labelLayerId) {
+            console.log('Moving layer', selectedDropdownLayer, 'before', labelLayerId);
+            try {
+              // First, position cmrpc-region-fill if buildable land is selected
+              if (selectedDropdownLayer === 'buildable-land' && map.getLayer('cmrpc-region-fill')) {
+                map.moveLayer('cmrpc-region-fill', labelLayerId);
+                console.log('✓ Region fill positioned below labels');
+              }
+
+              // Then position the selected layer above cmrpc-region-fill
+              map.moveLayer(selectedDropdownLayer, labelLayerId);
+              console.log('✓ Layer moved successfully');
+
+              // Verify the layer is still visible after moving
+              const visibility = map.getLayoutProperty(selectedDropdownLayer, 'visibility');
+              console.log('Visibility after move:', visibility);
+            } catch (error) {
+              console.error('ERROR moving layer:', error);
+            }
+          } else {
+            console.log('ERROR: labelLayerId not set, cannot move layer to correct z-position');
+          }
         }
+      };
+
+      // For buildable-land, wait for the source data to load (it's a large 94MB file)
+      if (selectedDropdownLayer === 'buildable-land') {
+        console.log('Waiting for buildable source data to load...');
+
+        // Check if source is already loaded
+        const source = map.getSource('buildable');
+        if (source && source._data) {
+          console.log('✓ Buildable source already loaded');
+          showAndPositionLayer();
+        } else {
+          // Wait for sourcedata event
+          const onSourceData = (e) => {
+            if (e.sourceId === 'buildable' && e.isSourceLoaded) {
+              console.log('✓ Buildable source finished loading');
+              map.off('sourcedata', onSourceData);
+              showAndPositionLayer();
+            }
+          };
+          map.on('sourcedata', onSourceData);
+        }
+      } else {
+        // For other layers, show immediately
+        showAndPositionLayer();
       }
     }
 
