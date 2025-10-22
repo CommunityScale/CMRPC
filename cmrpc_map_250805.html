@@ -3131,7 +3131,9 @@ layerSelect.addEventListener('change', (e) => {
 
 document.querySelectorAll('#basemap-style-thumbnails button').forEach(button => {
     button.addEventListener('click', () => {
+    console.log('===== BASEMAP BUTTON CLICKED =====');
     const style = button.getAttribute('data-style');
+    console.log('Style selected:', style);
 
     // Don't capture visible data layers - we'll restore from dropdown value only
     // This prevents the flash of wrong layers during basemap switching
@@ -3141,15 +3143,19 @@ document.querySelectorAll('#basemap-style-thumbnails button').forEach(button => 
       const layer = map.getLayer(id);
       return layer && map.getLayoutProperty(id, 'visibility') === 'visible';
     });
+    console.log('Visible overlays captured:', visibleOverlays);
 
     // Use the globally tracked selected layer (not dropdown value, since it resets)
     const selectedDropdownLayer = currentlySelectedDataLayer;
+    console.log('currentlySelectedDataLayer value:', currentlySelectedDataLayer);
+    console.log('selectedDropdownLayer value:', selectedDropdownLayer);
     console.log('Captured selected layer before basemap switch:', selectedDropdownLayer);
 
     // Switch basemap
     map.setStyle(`mapbox://styles/${style}`);
 
     map.once('style.load', () => {
+      console.log('===== STYLE.LOAD EVENT FIRED =====');
       // Find the label layer ID FIRST before adding any layers
       const layers = map.getStyle().layers;
       labelLayerId = null;
@@ -3161,12 +3167,17 @@ document.querySelectorAll('#basemap-style-thumbnails button').forEach(button => 
       }
       console.log('Found labelLayerId for new basemap:', labelLayerId);
 
+      console.log('Calling addSources()...');
       addSources();
       const currentOpacity = parseFloat(document.getElementById("opacity").value);
+      console.log('Calling addInterpolatedLayers()...');
       addInterpolatedLayers(currentOpacity);
+      console.log('Calling addAllOtherLayers()...');
       addAllOtherLayers();
+      console.log('All layers added.');
 
   map.once('idle', () => {
+    console.log('===== MAP IDLE EVENT FIRED =====');
     // run afer everything has been added back as changing the style wipes the sources as well??
 
     // Hide all data layers by default (don't restore them yet to avoid flashing)
@@ -3241,8 +3252,13 @@ document.querySelectorAll('#basemap-style-thumbnails button').forEach(button => 
 
       // Helper function to show and position a layer
       const showAndPositionLayer = () => {
+        console.log('===== showAndPositionLayer CALLED =====');
+        console.log('Checking for layer:', selectedDropdownLayer);
         const layerExists = map.getLayer(selectedDropdownLayer);
         console.log('Layer exists?', layerExists ? 'YES' : 'NO');
+        if (layerExists) {
+          console.log('Layer object:', layerExists);
+        }
         if (layerExists) {
           map.setLayoutProperty(selectedDropdownLayer, 'visibility', 'visible');
           console.log('Set visibility to visible for:', selectedDropdownLayer);
@@ -3285,10 +3301,13 @@ document.querySelectorAll('#basemap-style-thumbnails button').forEach(button => 
 
       // Use setTimeout to ensure sources are fully loaded before showing layer
       // This is especially important for large files like buildable6.geojson (94MB)
+      // Using 2000ms to give enough time for large file to download
+      console.log('Setting timeout for layer restoration...');
       setTimeout(() => {
-        console.log('Attempting to show and position layer after delay...');
+        console.log('===== TIMEOUT FIRED (after 2000ms) =====');
+        console.log('About to call showAndPositionLayer for:', selectedDropdownLayer);
         showAndPositionLayer();
-      }, 500);
+      }, 2000);
     }
 
     // Move overlay layers to the top (just below labels) AFTER data layer restoration
