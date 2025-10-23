@@ -110,10 +110,7 @@
         </optgroup>
 
         <optgroup label="Transportation">
-<<<<<<< HEAD
-=======
-       <option value="bg-transport-diversity-layer">Transportation diversity</option>
->>>>>>> e00fd6365de46ccc9d6454c9b35693d2be6484e0
+            <option value="bg-transport-diversity-layer">Transportation diversity</option>
         </optgroup>
 
         <optgroup label="Cost Analysis">
@@ -170,7 +167,7 @@
       viewBox="0 0 24 24" stroke="currentColor">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
     </svg>
-  </button>
+  </button> 
 
   <!-- Hidden content -->
   <div id="overlay-content" class="hidden px-2 py-2 space-y-2 bg-white">
@@ -687,6 +684,7 @@ function batchSetFeatureStates({ //batching experiment
   processNextBatch();
 }
 
+//let layerSelect; //global definition
 
     
     mapboxgl.accessToken = 'pk.eyJ1IjoiY29tbXVuaXR5c2NhbGUiLCJhIjoiY21hZ3Y4azlmMDU5YTJqb2NqbzRsa3psbSJ9.eJlBVHcMSB88Czl3ti2i5g';
@@ -2272,6 +2270,10 @@ map.on('load', () => {
 
 
 const layerSelect = document.getElementById('layer-select');
+  // if (!layerSelect) {
+  //   console.error("⚠️ layer-select element not found in DOM");
+  //   return;
+  // }
 const legendContent = document.getElementById('legend-content');
 
 // Track the currently selected data layer (since dropdown resets after selection)
@@ -2701,7 +2703,6 @@ layerSelect.addEventListener('change', (e) => {
 
   // Store the selected layer globally so we can restore it after basemap changes
   currentlySelectedDataLayer = selected;
-  console.log('✓ Selected layer stored:', currentlySelectedDataLayer);
 
   allFillLayers.forEach(id => {
     if (map.getLayer(id)) {
@@ -2720,8 +2721,8 @@ layerSelect.addEventListener('change', (e) => {
   const selectedOption = e.target.options[e.target.selectedIndex];
   document.getElementById('legend-title').textContent = selectedOption.text;
 
-  // Don't reset dropdown - keep it showing the selected layer
-  // This ensures the selection persists when changing basemaps
+  // Reset dropdown to placeholder
+  e.target.selectedIndex = 0;
 });
        
     function layerLegendVisibility() {
@@ -2875,10 +2876,8 @@ layerSelect.addEventListener('change', (e) => {
 
     map.on('click', (e) => { //pop-up logic!! just add additional layers to the array and case logic below to create new pop-up!!
         const popUpLayers = [
-            //"parcels-pctLV",
             //"parcels-value",
             "parcels-landuse",
-            //"parcels-ownership",
             "parcels-density",
             "tracts-medIncome",
             "tracts-pctCostBurdenedRenters",
@@ -2889,11 +2888,16 @@ layerSelect.addEventListener('change', (e) => {
             "tracts-rdAge",
             "tracts-rdRace",
             "tracts-mva",
+            "bg-costs-ownership",
+            "bg-costs-rental",
             "zip-currentZHVI",
             "zip-chZHVI",
             "ctysds-pctHH",
             "admin-layer",
-            "town-layer",
+            "buildable-land",
+            "bg-transport-diversity-layer",
+           // "town-layer",
+            "bg-costs-transport"
         ]
 
         const visiblePopupLayers = popUpLayers.filter(id => {
@@ -2976,6 +2980,42 @@ layerSelect.addEventListener('change', (e) => {
             break;
             }
 
+            case "bg-costs-ownership": {
+                const cost_ownership = attributes.monthly_ownership_costs_overall;
+                html = `
+                <div class="popup-header">Block Group ${attributes.GEO_ID_clean}</div>
+                <div class="popup-content">${cost_ownership != null ? `Monthly housing costs for homeowners: $${Math.round(cost_ownership).toLocaleString()}` : 'No available data.'}
+                </div>`;
+            break;
+            }
+
+            case "bg-costs-rental": {
+                const cost_rental = attributes.monthly_rental_costs_overall;
+                html = `
+                <div class="popup-header">Block Group ${attributes.GEO_ID_clean}</div>
+                <div class="popup-content">${cost_rental != null ? `Monthly housing costs for renters: $${Math.round(cost_rental).toLocaleString()}` : 'No available data.'}
+                </div>`;
+            break;
+            }
+
+            case "bg-costs-transport": {
+                const avg_transport_cost = attributes.monthly_t_costs_avg_hh;
+                html = `
+                <div class="popup-header">Block Group ${attributes.GEO_ID_clean}</div>
+                <div class="popup-content">${avg_transport_cost != null ? `Average monthly transportation costs across household type: $${Math.round(avg_transport_cost).toLocaleString()}` : 'No available data.'}
+                </div>`;
+            break;
+            }
+
+            case "bg-transport-diversity-layer": {
+                const transport_diversity = attributes.transpo_diverse_perc_marginal ;
+                html = `
+                <div class="popup-header">Block Group ${attributes.geoid}</div>
+                <div class="popup-content">${transport_diversity != null? `${Math.round(transport_diversity * 1000) / 10}% of parcels in this block group are considered "transportation diverse."` : 'No available data.'}
+                </div>`;
+            break;
+            }
+
             case "bg-costs-2veh-owner": {
                 const affordabilityShare = attributes.own_2veh_2_3_bd_AMI100_3p_cost_sh;
                 const affordabilityPct = affordabilityShare != null ? Math.round(affordabilityShare * 100) : null;
@@ -3032,26 +3072,26 @@ layerSelect.addEventListener('change', (e) => {
             break;
             }
 
-            case "parcels-pctLV": {
-                const pctLandValue = attributes.pctLandVal;
-                html = `
-                <div class="popup-header">${parcelDisplayName}</div>
-                <div class="popup-content">${pctLandValue != null ? `Land value accounts for ${Math.round(pctLandValue * 1000) / 10}% of Parcel #${selectedGeo.properties.PPN}'s total assessed value.` : 'No available data.'}
-                </div>`;
-            break;
-            }
+            // case "parcels-pctLV": {
+            //     const pctLandValue = attributes.pctLandVal;
+            //     html = `
+            //     <div class="popup-header">${parcelDisplayName}</div>
+            //     <div class="popup-content">${pctLandValue != null ? `Land value accounts for ${Math.round(pctLandValue * 1000) / 10}% of Parcel #${selectedGeo.properties.PPN}'s total assessed value.` : 'No available data.'}
+            //     </div>`;
+            // break;
+            // }
 
-            case "parcels-value": {
-                const normVal = attributes.acreVal != null ? Math.round(attributes.acreVal) : null;
-                const av = attributes.TotalValue;
-                const displayVal = normVal === null || normVal === undefined ? 'No available data.' : `Assessed value per acre: $${normVal.toLocaleString('en-US')}.`;
-                const displayAV = av === null || av === undefined ? `No available data.` : `Total assessed value: $${av.toLocaleString('en-US')}.`;
-                html = `
-                <div class="popup-header">${parcelDisplayName}</div>
-                <div class="popup-content">${displayVal}<br>${displayAV}
-                </div>`;
-            break;
-            }
+            // case "parcels-value": {
+            //     const normVal = attributes.acreVal != null ? Math.round(attributes.acreVal) : null;
+            //     const av = attributes.TotalValue;
+            //     const displayVal = normVal === null || normVal === undefined ? 'No available data.' : `Assessed value per acre: $${normVal.toLocaleString('en-US')}.`;
+            //     const displayAV = av === null || av === undefined ? `No available data.` : `Total assessed value: $${av.toLocaleString('en-US')}.`;
+            //     html = `
+            //     <div class="popup-header">${parcelDisplayName}</div>
+            //     <div class="popup-content">${displayVal}<br>${displayAV}
+            //     </div>`;
+            // break;
+            // }
 
             case "parcels-landuse": {
                 const propClassVal = attributes.useCode;
@@ -3063,6 +3103,24 @@ layerSelect.addEventListener('change', (e) => {
                 </div>`;
             break;
             }
+
+            case "parcels-density": {
+                const DUA = Math.round(attributes.density * 10) /10;
+                html = `
+                <div class="popup-header">${parcelDisplayName}</div>
+                <div class="popup-content">${DUA != null ? `This parcel is built out at a residential density of ${DUA} units per acre.` : 'No available data.'}
+                </div>`;
+            break;
+            }
+
+            // case "buildable-land": {
+            //     const build_class = attributes.density;
+            //     html = `
+            //     <div class="popup-header">${parcelDisplayName}</div>
+            //     <div class="popup-content">${DUA != null ? `This parcel is built out at a residential density of ${DUA} units per acre.` : 'No available data.'}
+            //     </div>`;
+            // break;
+            // }
 
             case "tracts-mva": { 
               const condition = attributes.mva;
@@ -3131,9 +3189,7 @@ layerSelect.addEventListener('change', (e) => {
 
 document.querySelectorAll('#basemap-style-thumbnails button').forEach(button => {
     button.addEventListener('click', () => {
-    console.log('===== BASEMAP BUTTON CLICKED =====');
     const style = button.getAttribute('data-style');
-    console.log('Style selected:', style);
 
     // Don't capture visible data layers - we'll restore from dropdown value only
     // This prevents the flash of wrong layers during basemap switching
@@ -3143,12 +3199,9 @@ document.querySelectorAll('#basemap-style-thumbnails button').forEach(button => 
       const layer = map.getLayer(id);
       return layer && map.getLayoutProperty(id, 'visibility') === 'visible';
     });
-    console.log('Visible overlays captured:', visibleOverlays);
 
     // Use the globally tracked selected layer (not dropdown value, since it resets)
     const selectedDropdownLayer = currentlySelectedDataLayer;
-    console.log('currentlySelectedDataLayer value:', currentlySelectedDataLayer);
-    console.log('selectedDropdownLayer value:', selectedDropdownLayer);
     console.log('Captured selected layer before basemap switch:', selectedDropdownLayer);
 
     // Switch basemap
@@ -3170,14 +3223,10 @@ document.querySelectorAll('#basemap-style-thumbnails button').forEach(button => 
       }
       console.log('Found labelLayerId for new basemap:', labelLayerId);
 
-      console.log('Calling addSources()...');
       addSources();
       const currentOpacity = parseFloat(document.getElementById("opacity").value);
-      console.log('Calling addInterpolatedLayers()...');
       addInterpolatedLayers(currentOpacity);
-      console.log('Calling addAllOtherLayers()...');
       addAllOtherLayers();
-      console.log('All layers added.');
 
     // Use setTimeout instead of nested idle event since we're already idle
     setTimeout(() => {
@@ -3255,13 +3304,8 @@ document.querySelectorAll('#basemap-style-thumbnails button').forEach(button => 
 
       // Helper function to show and position a layer
       const showAndPositionLayer = () => {
-        console.log('===== showAndPositionLayer CALLED =====');
-        console.log('Checking for layer:', selectedDropdownLayer);
         const layerExists = map.getLayer(selectedDropdownLayer);
         console.log('Layer exists?', layerExists ? 'YES' : 'NO');
-        if (layerExists) {
-          console.log('Layer object:', layerExists);
-        }
         if (layerExists) {
           map.setLayoutProperty(selectedDropdownLayer, 'visibility', 'visible');
           console.log('Set visibility to visible for:', selectedDropdownLayer);
@@ -3304,13 +3348,10 @@ document.querySelectorAll('#basemap-style-thumbnails button').forEach(button => 
 
       // Use setTimeout to ensure sources are fully loaded before showing layer
       // This is especially important for large files like buildable6.geojson (94MB)
-      // Using 2000ms to give enough time for large file to download
-      console.log('Setting timeout for layer restoration...');
       setTimeout(() => {
-        console.log('===== TIMEOUT FIRED (after 2000ms) =====');
-        console.log('About to call showAndPositionLayer for:', selectedDropdownLayer);
+        console.log('Attempting to show and position layer after delay...');
         showAndPositionLayer();
-      }, 2000);
+      }, 500);
     }
 
     // Move overlay layers to the top (just below labels) AFTER data layer restoration
@@ -3503,9 +3544,24 @@ document.getElementById('clear-map').addEventListener('click', () => {
   }
 });
 
+//layer description logic -- updated 10/20/2025
+    const layerInfoBtn = document.getElementById('layer-info');
+    const descriptionEl = document.getElementById('layer-description');
+    //const layerSelect = document.getElementById('layer-select');
 
-const layerInfoBtn = document.getElementById('layer-info');
-const descriptionEl = document.getElementById('layer-description');
+    let descriptionVisible = false;
+    let currentLayer = null;
+
+    // Track current selection globally
+    layerSelect.addEventListener('change', (e) => {
+    currentLayer = e.target.value;
+    console.log('Layer changed to:', currentLayer);
+
+    if (descriptionVisible) {
+        const description = layerDescriptions[currentLayer] || '<p>No description available for this layer.</p>';
+        descriptionEl.innerHTML = description;
+    }
+    });
 
 const layerDescriptions = { //edit as needed; some base text should be re-useable!! add zips, etc
   'tracts-medIncome': `
@@ -3592,15 +3648,22 @@ const layerDescriptions = { //edit as needed; some base text should be re-useabl
   'bg-transport-diversity-layer': `
     <p>This layer examines <strong>transportation diversity</strong> at the block group. Marginal transporation diversity measures the percentage of parcels within each block group that are considered "transportation diverse."</p><br>
     <p><em>Source(s):</em> CMRPC transportation quality analysis; CommunityScale.</p>
+  `,
+  'parcels-density':`
+    <p><strong>Units per acre</strong> by parcel.</p><br>
+    <p><em>Source(s):</em> 2025 parcels, MassGIS; 2025 Massachusetts Residensity data; CommunityScale.</p>
   `
 };
 
-let descriptionVisible = false;
 
 layerInfoBtn.addEventListener('click', () => {
-  const selectedLayer = document.getElementById('layer-select').value;
+  const layerSelect = document.getElementById('layer-select');
+  const selectedLayer = layerSelect.value || currentLayer;
+  
+  console.log('Selected layer on click:', selectedLayer);
+  
   const description = layerDescriptions[selectedLayer] || '<p>No description available for this layer.</p>';
-
+  
   if (descriptionVisible) {
     descriptionEl.classList.add('hidden');
     descriptionVisible = false;
@@ -3611,14 +3674,18 @@ layerInfoBtn.addEventListener('click', () => {
   }
 });
 
-document.getElementById('layer-select').addEventListener('change', () => {
-  if (descriptionVisible) {
-    const selectedLayer = document.getElementById('layer-select').value;
-    const description = layerDescriptions[selectedLayer] || '<p>No description available for this layer.</p>';
+
+// Update text automatically on layer switch 
+layerSelect.addEventListener('change', () => {
+  const selectedLayer = layerSelect.value;
+  const description = layerDescriptions[selectedLayer] || '<p>No description available for this layer.</p>';
+  descriptionEl.innerHTML = description;
+
+  // Refresh the text if already visble
+  if (!descriptionEl.classList.contains('hidden')) {
     descriptionEl.innerHTML = description;
   }
 });
-
 
 const overlayToggle = document.getElementById('overlay-toggle');
 const overlayContent = document.getElementById('overlay-content');
