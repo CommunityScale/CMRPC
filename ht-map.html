@@ -2875,26 +2875,32 @@ layerSelect.addEventListener('change', (e) => {
 
     map.on('click', (e) => { //pop-up logic!! just add additional layers to the array and case logic below to create new pop-up!!
         const popUpLayers = [
-            //"parcels-pctLV",
-            //"parcels-value",
-            "parcels-landuse",
-            //"parcels-ownership",
-            "parcels-density",
-            "tracts-medIncome",
-            "tracts-pctCostBurdenedRenters",
-            "tracts-pctCostBurdenedOwners",
-            "bg-costs-HT",
-            "bg-costs-HT-owner",
-            "bg-costs-2veh-owner",
-            "tracts-rdAge",
-            "tracts-rdRace",
-            "tracts-mva",
-            "zip-currentZHVI",
-            "zip-chZHVI",
-            "ctysds-pctHH",
-            "admin-layer",
-            "town-layer",
-        ]
+        'tracts-medIncome',
+        'tracts-pctCostBurdenedRenters',
+        'tracts-pctCostBurdenedOwners',
+        'bg-costs-HT',
+        'bg-costs-HT-owner',
+        'bg-costs-2veh-owner',
+        'bg-costs-ownership',
+        'bg-costs-rental',
+        'bg-costs-transport',
+        'tracts-rdAge',
+        'tracts-rdRace',
+        'ctysds-pctHH',
+        'zip-currentZHVI',
+        'tracts-mva',
+        'zip-chZHVI',
+        'parcels-density',
+        'parcels-landuse',
+        'buildable-land',
+        //'parcels-pctLV',
+        //'parcels-value',
+        //'parcels-ownership',
+        'admin-layer',
+        "bg-transport-diversity-layer"
+];
+           
+    
 
         const visiblePopupLayers = popUpLayers.filter(id => {
         const layer = map.getLayer(id);
@@ -3003,7 +3009,7 @@ layerSelect.addEventListener('change', (e) => {
             break;
             }
 
-            case "transit-diversity-layer": {
+            case "bg-transport-diversity-layer": {
                 const transport_diversity = attributes.transpo_diverse_perc_marginal ;
                 html = `
                 <div class="popup-header">Block Group ${attributes.geoid}</div>
