@@ -684,6 +684,7 @@ function batchSetFeatureStates({ //batching experiment
   processNextBatch();
 }
 
+//let layerSelect; //global definition
 
     
     mapboxgl.accessToken = 'pk.eyJ1IjoiY29tbXVuaXR5c2NhbGUiLCJhIjoiY21hZ3Y4azlmMDU5YTJqb2NqbzRsa3psbSJ9.eJlBVHcMSB88Czl3ti2i5g';
@@ -2269,6 +2270,10 @@ map.on('load', () => {
 
 
 const layerSelect = document.getElementById('layer-select');
+  // if (!layerSelect) {
+  //   console.error("⚠️ layer-select element not found in DOM");
+  //   return;
+  // }
 const legendContent = document.getElementById('legend-content');
 
 // Track the currently selected data layer (since dropdown resets after selection)
@@ -3542,7 +3547,7 @@ document.getElementById('clear-map').addEventListener('click', () => {
 //layer description logic -- updated 10/20/2025
     const layerInfoBtn = document.getElementById('layer-info');
     const descriptionEl = document.getElementById('layer-description');
-    const layerSelect = document.getElementById('layer-select');
+    //const layerSelect = document.getElementById('layer-select');
 
     let descriptionVisible = false;
     let currentLayer = null;
