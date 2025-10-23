@@ -2976,6 +2976,42 @@ layerSelect.addEventListener('change', (e) => {
             break;
             }
 
+            case "bg-costs-ownership": {
+                const cost_ownership = attributes.monthly_ownership_costs_overall;
+                html = `
+                <div class="popup-header">Block Group ${attributes.GEO_ID_clean}</div>
+                <div class="popup-content">${cost_ownership != null ? `Monthly housing costs for homeowners: $${Math.round(cost_ownership).toLocaleString()}` : 'No available data.'}
+                </div>`;
+            break;
+            }
+
+            case "bg-costs-rental": {
+                const cost_rental = attributes.monthly_rental_costs_overall;
+                html = `
+                <div class="popup-header">Block Group ${attributes.GEO_ID_clean}</div>
+                <div class="popup-content">${cost_rental != null ? `Monthly housing costs for renters: $${Math.round(cost_rental).toLocaleString()}` : 'No available data.'}
+                </div>`;
+            break;
+            }
+
+            case "bg-costs-transport": {
+                const avg_transport_cost = attributes.monthly_t_costs_avg_hh;
+                html = `
+                <div class="popup-header">Block Group ${attributes.GEO_ID_clean}</div>
+                <div class="popup-content">${avg_transport_cost != null ? `Average monthly transportation costs across household type: $${Math.round(avg_transport_cost).toLocaleString()}` : 'No available data.'}
+                </div>`;
+            break;
+            }
+
+            case "bg-transport-diversity-layer": {
+                const transport_diversity = attributes.transpo_diverse_perc_marginal ;
+                html = `
+                <div class="popup-header">Block Group ${attributes.geoid}</div>
+                <div class="popup-content">${transport_diversity != null? `${Math.round(transport_diversity * 1000) / 10}% of parcels in this block group are considered "transportation diverse."` : 'No available data.'}
+                </div>`;
+            break;
+            }
+
             case "bg-costs-2veh-owner": {
                 const affordabilityShare = attributes.own_2veh_2_3_bd_AMI100_3p_cost_sh;
                 const affordabilityPct = affordabilityShare != null ? Math.round(affordabilityShare * 100) : null;
@@ -3032,26 +3068,26 @@ layerSelect.addEventListener('change', (e) => {
             break;
             }
 
-            case "parcels-pctLV": {
-                const pctLandValue = attributes.pctLandVal;
-                html = `
-                <div class="popup-header">${parcelDisplayName}</div>
-                <div class="popup-content">${pctLandValue != null ? `Land value accounts for ${Math.round(pctLandValue * 1000) / 10}% of Parcel #${selectedGeo.properties.PPN}'s total assessed value.` : 'No available data.'}
-                </div>`;
-            break;
-            }
+            // case "parcels-pctLV": {
+            //     const pctLandValue = attributes.pctLandVal;
+            //     html = `
+            //     <div class="popup-header">${parcelDisplayName}</div>
+            //     <div class="popup-content">${pctLandValue != null ? `Land value accounts for ${Math.round(pctLandValue * 1000) / 10}% of Parcel #${selectedGeo.properties.PPN}'s total assessed value.` : 'No available data.'}
+            //     </div>`;
+            // break;
+            // }
 
-            case "parcels-value": {
-                const normVal = attributes.acreVal != null ? Math.round(attributes.acreVal) : null;
-                const av = attributes.TotalValue;
-                const displayVal = normVal === null || normVal === undefined ? 'No available data.' : `Assessed value per acre: $${normVal.toLocaleString('en-US')}.`;
-                const displayAV = av === null || av === undefined ? `No available data.` : `Total assessed value: $${av.toLocaleString('en-US')}.`;
-                html = `
-                <div class="popup-header">${parcelDisplayName}</div>
-                <div class="popup-content">${displayVal}<br>${displayAV}
-                </div>`;
-            break;
-            }
+            // case "parcels-value": {
+            //     const normVal = attributes.acreVal != null ? Math.round(attributes.acreVal) : null;
+            //     const av = attributes.TotalValue;
+            //     const displayVal = normVal === null || normVal === undefined ? 'No available data.' : `Assessed value per acre: $${normVal.toLocaleString('en-US')}.`;
+            //     const displayAV = av === null || av === undefined ? `No available data.` : `Total assessed value: $${av.toLocaleString('en-US')}.`;
+            //     html = `
+            //     <div class="popup-header">${parcelDisplayName}</div>
+            //     <div class="popup-content">${displayVal}<br>${displayAV}
+            //     </div>`;
+            // break;
+            // }
 
             case "parcels-landuse": {
                 const propClassVal = attributes.useCode;
@@ -3063,6 +3099,24 @@ layerSelect.addEventListener('change', (e) => {
                 </div>`;
             break;
             }
+
+            case "parcels-density": {
+                const DUA = Math.round(attributes.density * 10) /10;
+                html = `
+                <div class="popup-header">${parcelDisplayName}</div>
+                <div class="popup-content">${DUA != null ? `This parcel is built out at a residential density of ${DUA} units per acre.` : 'No available data.'}
+                </div>`;
+            break;
+            }
+
+            // case "buildable-land": {
+            //     const build_class = attributes.density;
+            //     html = `
+            //     <div class="popup-header">${parcelDisplayName}</div>
+            //     <div class="popup-content">${DUA != null ? `This parcel is built out at a residential density of ${DUA} units per acre.` : 'No available data.'}
+            //     </div>`;
+            // break;
+            // }
 
             case "tracts-mva": { 
               const condition = attributes.mva;
@@ -3592,6 +3646,10 @@ const layerDescriptions = { //edit as needed; some base text should be re-useabl
   'bg-transport-diversity-layer': `
     <p>This layer examines <strong>transportation diversity</strong> at the block group. Marginal transporation diversity measures the percentage of parcels within each block group that are considered "transportation diverse."</p><br>
     <p><em>Source(s):</em> CMRPC transportation quality analysis; CommunityScale.</p>
+  `,
+  'parcels-density':`
+    <p><strong>Units per acre</strong> by parcel.</p><br>
+    <p><em>Source(s):</em> 2025 parcels, MassGIS; 2025 Massachusetts Residensity data; CommunityScale.</p>
   `
 };
 
