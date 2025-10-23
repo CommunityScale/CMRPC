@@ -615,10 +615,9 @@
             ]
 
     const buildablePalette = [
-                { key: "NZN", color: "#6e79dd", label: "Buildable, no sewer" },
-                { key: "SZN", color: "#ecd731", label: "Buildable, sewer" },
-                { key: "NBN", color: "#000000", label: "Developed or exempt" },
-                { key: "SBN", color: "#000000", label: "Developed or exempt" }
+                { key: "noSew Built noExempt", color: "#000000", label: "Existing development" },
+                { key: "noSew noBuilt noExempt", color: "#ecd731", label: "Buildable, no sewer" },
+                { key: "Sew unBuilt noExempt", color: "#6e79dd", label: "Buildable, sewer" }
             ]
 
    const palettesByLayer = { //leave empty if not needed
@@ -793,9 +792,9 @@ function batchSetFeatureStates({ //batching experiment
             promoteId: 'loc_id'
         })
 
-        map.addSource("transit-quality", { //replace!!
+        map.addSource("transit-quality", {
             type: 'geojson',
-            data: 'https://raw.githubusercontent.com/CommunityScale/CMRPC/e1f70fdb0d8f63d60fef2b96eaacfee5879ca632/transit_quality_diss.geojson',
+            data: 'https://raw.githubusercontent.com/CommunityScale/CMRPC/refs/heads/main/CMRPC_transit_quality_dissolved_selected_qualities_251020.geojson',
             promoteId: 'fid'
         })
 
@@ -823,7 +822,7 @@ function batchSetFeatureStates({ //batching experiment
 
         map.addSource("buildable", {
             type: "geojson",
-            data: 'https://raw.githubusercontent.com/CommunityScale/CMRPC/refs/heads/main/buildable4.geojson'
+            data: 'https://raw.githubusercontent.com/CommunityScale/CMRPC/refs/heads/main/buildable6.geojson'
         })
 
         map.addSource("excess-capacity", {
@@ -1731,16 +1730,18 @@ map.addLayer({
                 paint: {
                     "fill-color": [
                         "match",
-                        ["get", "CLASSTYP"],
-                        "NZN", "#6e79dd",
-                        "SZN", "#ecd731",
-                        "NBN", "#000000",
-                        "SBN", "#000000",
+                        ["get", "clss"],
+                        "noSew Built noExempt", "#000000",
+                        "noSew noBuilt Exempt", "transparent",
+                        "noSew noBuilt noExempt", "#ecd731",
+                        "Sew Built noExempt", "#000000",
+                        "Sew noBuilt Exempt", "transparent",
+                        "Sew unBuilt noExempt", "#6e79dd",
                         "transparent"
                     ],
                     "fill-opacity": [
                         "case",
-                        ["in", ["get", "CLASSTYP"], ["literal", ["NZN", "SZN", "NBN", "SBN"]]],
+                        ["in", ["get", "clss"], ["literal", ["noSew Built noExempt", "noSew noBuilt noExempt", "Sew Built noExempt", "Sew unBuilt noExempt"]]],
                         1,
                         0
                     ]
@@ -2438,11 +2439,11 @@ function formatLegendLabel(value, layerId) {
 
 // Render legend from stops
 function renderLegendFromStops(layerId) {
-  const stops = getStopsFromLayer(layerId);
+  const stops = getStopsFromLayer(layerId).filter(stop => stop.color.toLowerCase() !== 'transparent');
   const palette = palettesByLayer[layerId] || [];
 
   function getLabel(stop) {
-    const match = palette.find(p => 
+    const match = palette.find(p =>
       (p.value === stop.value) || (p.color.toLowerCase() === stop.color.toLowerCase())
     );
     return match?.label || formatLegendLabel(stop.value, layerId); // fallback to data value if no label
@@ -2720,7 +2721,7 @@ layerSelect.addEventListener('change', (e) => {
 });
        
     function layerLegendVisibility() {
-        const dropdown = document.getElementById('layer-dropdown');
+        const dropdown = document.getElementById('layer-select');
         const selectedLayerId = dropdown.value;
 
         dataLayers.forEach(layerId => {
@@ -3181,14 +3182,6 @@ layerSelect.addEventListener('change', (e) => {
             .addTo(map);
     });
 
-    //KEEP LAYERS WHEN BASEMAP CHANGES
-    function toggleBasemapSettings() { //correct for the basemap toggle situation
-        const panel = document.getElementById('basemap-settings');
-        const arrow = document.getElementById('basemap-arrow');
-        panel.classList.toggle('hidden');
-        arrow.classList.toggle('rotate-180'); // Flip the arrow
-        }
-
 document.querySelectorAll('#basemap-style-thumbnails button').forEach(button => {
     button.addEventListener('click', () => {
     const style = button.getAttribute('data-style');
@@ -3207,16 +3200,32 @@ document.querySelectorAll('#basemap-style-thumbnails button').forEach(button => 
     console.log('Captured selected layer before basemap switch:', selectedDropdownLayer);
 
     // Switch basemap
+    console.log('About to switch basemap style...');
     map.setStyle(`mapbox://styles/${style}`);
+    console.log('Style set, waiting for idle event...');
 
-    map.once('style.load', () => {
+    // Wait for map to be idle after style change
+    map.once('idle', () => {
+      console.log('===== MAP IDLE AFTER STYLE CHANGE =====');
+      // Find the label layer ID FIRST before adding any layers
+      const layers = map.getStyle().layers;
+      labelLayerId = null;
+      for (const layer of layers) {
+        if (layer.type === 'symbol' && layer.layout && layer.layout['text-field']) {
+          labelLayerId = layer.id;
+          break;
+        }
+      }
+      console.log('Found labelLayerId for new basemap:', labelLayerId);
+
       addSources();
       const currentOpacity = parseFloat(document.getElementById("opacity").value);
       addInterpolatedLayers(currentOpacity);
       addAllOtherLayers();
 
-  map.once('idle', () => {
-    // run afer everything has been added back as changing the style wipes the sources as well??
+    // Use setTimeout instead of nested idle event since we're already idle
+    setTimeout(() => {
+      console.log('===== RUNNING RESTORATION AFTER LAYER ADD =====');
 
     // Hide all data layers by default (don't restore them yet to avoid flashing)
     allFillLayers.forEach(id => {
@@ -3261,16 +3270,6 @@ document.querySelectorAll('#basemap-style-thumbnails button').forEach(button => 
 
     updateLayerOpacity();
 
-    // Find the label layer ID first (we'll use this for z-ordering)
-    const layers = map.getStyle().layers;
-    let labelLayerId;
-    for (const layer of layers) {
-      if (layer.type === 'symbol' && layer.layout && layer.layout['text-field']) {
-        labelLayerId = layer.id;
-        break;
-      }
-    }
-
     // Restore the selected data layer from dropdown - do this FIRST (before overlays)
     console.log('Attempting to restore layer:', selectedDropdownLayer);
     console.log('Checks - not null?', selectedDropdownLayer ? 'YES' : 'NO');
@@ -3298,43 +3297,56 @@ document.querySelectorAll('#basemap-style-thumbnails button').forEach(button => 
 
       renderLegendFromStops(selectedDropdownLayer);
 
-      // Force visibility to be set ONLY on the selected layer
-      const layerExists = map.getLayer(selectedDropdownLayer);
-      console.log('Layer exists?', layerExists ? 'YES' : 'NO');
-      if (layerExists) {
-        map.setLayoutProperty(selectedDropdownLayer, 'visibility', 'visible');
-        console.log('Set visibility to visible for:', selectedDropdownLayer);
+      // Helper function to show and position a layer
+      const showAndPositionLayer = () => {
+        const layerExists = map.getLayer(selectedDropdownLayer);
+        console.log('Layer exists?', layerExists ? 'YES' : 'NO');
+        if (layerExists) {
+          map.setLayoutProperty(selectedDropdownLayer, 'visibility', 'visible');
+          console.log('Set visibility to visible for:', selectedDropdownLayer);
 
-        // Show CMRPC region fill layer when buildable land is selected
-        if (selectedDropdownLayer === 'buildable-land' && map.getLayer('cmrpc-region-fill')) {
-          map.setLayoutProperty('cmrpc-region-fill', 'visibility', 'visible');
-          // Move the region fill layer to correct position
+          // Handle CMRPC region fill layer for buildable land
+          if (selectedDropdownLayer === 'buildable-land' && map.getLayer('cmrpc-region-fill')) {
+            map.setLayoutProperty('cmrpc-region-fill', 'visibility', 'visible');
+            console.log('Showing cmrpc-region-fill for buildable-land');
+          } else if (map.getLayer('cmrpc-region-fill')) {
+            map.setLayoutProperty('cmrpc-region-fill', 'visibility', 'none');
+            console.log('Hiding cmrpc-region-fill');
+          }
+
+          // Move the selected layer above basemap but below labels
+          console.log('labelLayerId value:', labelLayerId);
           if (labelLayerId) {
-            map.moveLayer('cmrpc-region-fill', labelLayerId);
-          }
-        } else if (map.getLayer('cmrpc-region-fill')) {
-          // Hide region fill for other layers
-          map.setLayoutProperty('cmrpc-region-fill', 'visibility', 'none');
-        }
+            console.log('Moving layer', selectedDropdownLayer, 'before', labelLayerId);
+            try {
+              // First, position cmrpc-region-fill if buildable land is selected
+              if (selectedDropdownLayer === 'buildable-land' && map.getLayer('cmrpc-region-fill')) {
+                map.moveLayer('cmrpc-region-fill', labelLayerId);
+                console.log('✓ Region fill positioned below labels');
+              }
 
-        // Move the selected layer above basemap but below labels
-        console.log('labelLayerId value:', labelLayerId);
-        if (labelLayerId) {
-          console.log('Moving layer', selectedDropdownLayer, 'before', labelLayerId);
-          try {
-            map.moveLayer(selectedDropdownLayer, labelLayerId);
-            console.log('✓ Layer moved successfully');
+              // Then position the selected layer above cmrpc-region-fill
+              map.moveLayer(selectedDropdownLayer, labelLayerId);
+              console.log('✓ Layer moved successfully');
 
-            // Verify the layer is still visible after moving
-            const visibility = map.getLayoutProperty(selectedDropdownLayer, 'visibility');
-            console.log('Visibility after move:', visibility);
-          } catch (error) {
-            console.error('ERROR moving layer:', error);
+              // Verify the layer is still visible after moving
+              const visibility = map.getLayoutProperty(selectedDropdownLayer, 'visibility');
+              console.log('Visibility after move:', visibility);
+            } catch (error) {
+              console.error('ERROR moving layer:', error);
+            }
+          } else {
+            console.log('ERROR: labelLayerId not set, cannot move layer to correct z-position');
           }
-        } else {
-          console.log('ERROR: labelLayerId not set, cannot move layer to correct z-position');
         }
-      }
+      };
+
+      // Use setTimeout to ensure sources are fully loaded before showing layer
+      // This is especially important for large files like buildable6.geojson (94MB)
+      setTimeout(() => {
+        console.log('Attempting to show and position layer after delay...');
+        showAndPositionLayer();
+      }, 500);
     }
 
     // Move overlay layers to the top (just below labels) AFTER data layer restoration
@@ -3371,15 +3383,22 @@ document.querySelectorAll('#basemap-style-thumbnails button').forEach(button => 
       }
     }
   });
+    }, 100); // Small delay to ensure layers are fully rendered
     });
-  });
 });
 
+//BASEMAP SETTINGS TOGGLE
+function toggleBasemapSettings() {
+    const panel = document.getElementById('basemap-settings');
+    const arrow = document.getElementById('basemap-arrow');
+    panel.classList.toggle('hidden');
+    arrow.classList.toggle('rotate-180');
+}
 
     document.getElementById('basemap-toggle').addEventListener('click', toggleBasemapSettings);
 
-    
-    const dropdown = document.getElementById('layer-dropdown');
+
+    const dropdown = document.getElementById('layer-select');
 
     document.getElementById("opacity").addEventListener("input", function (e) {
         const newOpacity = parseFloat(e.target.value);
@@ -3396,7 +3415,6 @@ document.querySelectorAll('#basemap-style-thumbnails button').forEach(button => 
         }
     });
     });
-};
 
 
 //zoom in zoom out buttons
@@ -3708,6 +3726,8 @@ if (exceedsCapacityInfoBtn && exceedsCapacityInfo) {
     exceedsCapacityInfo.classList.toggle('hidden');
   });
 }
+
+} // Close initializeMap function
 
     initializeMap();
 
