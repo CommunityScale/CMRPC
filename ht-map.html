@@ -246,11 +246,35 @@
     </label>
     <label class="flex items-start text-sm text-gray-700">
       <div class="relative">
+          <input type="checkbox" class="sr-only overlay-toggle peer" value="wrta-fixed-layer" />
+          <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
+          <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
+        </div>
+      <span class="leading-snug ms-2">WRTA fixed transit lines</span>
+    </label>
+    <label class="flex items-start text-sm text-gray-700">
+      <div class="relative">
           <input type="checkbox" class="sr-only overlay-toggle peer" value="train-stops-layer" />
           <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
           <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
         </div>
       <span class="leading-snug ms-2">Rail stops</span>
+    </label>
+    <label class="flex items-start text-sm text-gray-700">
+      <div class="relative">
+          <input type="checkbox" class="sr-only overlay-toggle peer" value="via-stops-layer" />
+          <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
+          <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
+        </div>
+      <span class="leading-snug ms-2">Via microtransit stops</span>
+    </label>
+    <label class="flex items-start text-sm text-gray-700">
+      <div class="relative">
+          <input type="checkbox" class="sr-only overlay-toggle peer" value="via-service-area-layer" />
+          <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
+          <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
+        </div>
+      <span class="leading-snug ms-2">Via microtransit service areas</span>
     </label>
     <label class="flex items-start text-sm text-gray-700">
       <div class="relative">
@@ -538,7 +562,10 @@
         "mf-byright-layer",
         "mf-specialpermit-layer",
         "excess-capacity-layer",
-        "exceeds-capacity-layer"
+        "exceeds-capacity-layer",
+        "via-service-area-layer",
+        "via-stops-layer",
+        "wrta-fixed-layer"
         ];
 
     //all palettes here!!
@@ -838,6 +865,21 @@ function batchSetFeatureStates({ //batching experiment
         map.addSource("exceeds-capacity", {
             type: "geojson",
             data: 'https://raw.githubusercontent.com/CommunityScale/CMRPC/refs/heads/main/CMRPC_DissolvedParcels_ExceedsCapacity_251017.geojson'
+        })
+
+        map.addSource("via-service-area", {
+            type: "geojson",
+            data: "Via_Microtransit_Service_Areas_251030.geojson"
+        })
+
+        map.addSource("via-stops", {
+            type: "geojson",
+            data: "Via_Microtransit_Origin_Destination_Points_251030.geojson"
+        })
+
+        map.addSource("wrta-fixed", {
+            type: "geojson",
+            data: "Via_WRTA_Fixed_Routes_251030.geojson"
         })
 
         map.addSource("ctysds", {
@@ -2136,8 +2178,16 @@ map.addLayer({
             type: "circle",
             source: "bus-stops",
             paint: {
-                "circle-color": "#ff0000",
-                "circle-radius": 1.5
+                "circle-color": "#ff0000", //change size based on zoom
+                'circle-radius': [
+                  'interpolate',
+                  ['linear'],
+                  ['zoom'],
+                  7, 1,
+                  10, 1.5,
+                  12, 5,
+                  15, 8
+                ]
             },
             layout: {
                 visibility: "none"
@@ -2150,12 +2200,66 @@ map.addLayer({
             source: "train-stops",
             paint: {
                 "circle-color": "#ED8B00", //mbta orange
-                "circle-radius": 3
+                'circle-radius': [
+                  'interpolate',
+                  ['linear'],
+                  ['zoom'],
+                  7, 3,
+                  10, 6,
+                  12, 12
+                ] 
             },
             layout: {
                 visibility: "none"
             },
             filter: ["==", ["get", "C_RAILSTAT"], "Y"]
+        })
+
+        map.addLayer({
+            id: "via-stops-layer",
+            type: "circle",
+            source: "via-stops",
+            paint: {
+                'circle-color': '#3690c0',
+                'circle-radius': [
+                  'interpolate',
+                  ['linear'],
+                  ['zoom'],
+                  7, 2,
+                  10, 4,
+                  12, 12
+                ]
+              },
+            layout: {
+                visibility: "none"
+            }
+        })
+
+        map.addLayer({
+            id: "via-service-area-layer",
+            type: "fill",
+            source: "via-service-area",
+            paint: {
+                "fill-color": "#74a9cf",
+                "fill-outline-color": "#3690c0", //change color?? check that this is variable 
+                "fill-opacity": 0.4
+                },
+            layout: {
+                visibility: "none"
+            }
+        })
+
+        map.addLayer({
+            id: "wrta-fixed-layer",
+            type: "line",
+            source: "wrta-fixed",
+            paint: {
+                "line-color": "#0570b0", //change color!! and maybe line weight
+                "line-width": 1.5
+                },
+            layout: {
+                visibility: "none"
+            }
         })
 
         map.addLayer({
