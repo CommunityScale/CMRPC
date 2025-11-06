@@ -41,6 +41,24 @@
     height: 100%; 
   }
 
+  #info-popup { /* added 11/6 -- need to make sure this works!!*/
+    position: absolute;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 0.25rem;
+    padding: 0.75rem 1rem;
+    max-width: 240px;
+    font-family: 'Roboto', sans-serif;
+    font-size: 0.875rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 100;
+    transition: opacity 0.2s ease;
+  }
+
+.hidden {
+    display: none;
+  }
+
   .mapboxgl-popup {
       max-width: 150px;
       font-family: 'Roboto', sans-serif;
@@ -275,6 +293,9 @@
           <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
         </div>
       <span class="leading-snug ms-2">Via microtransit service areas</span>
+      <button class="ml-1 text-gray-500 hover:text-gray-700 info-btn" style="font-size: 10px;"
+              data-info="Via, an WRTA microtransit partnership, operates its rideshare service in the highlighted areas. Via operates between 7am-7pm."> ⓘ
+      </button>
     </label>
     <label class="flex items-start text-sm text-gray-700">
       <div class="relative">
@@ -283,6 +304,9 @@
           <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
         </div>
       <span class="leading-snug ms-2">Pedestrian quality: fair</span>
+      <button class="ml-1 text-gray-500 hover:text-gray-700 info-btn" style="font-size: 10px;"
+              data-info="Pedestrian access and infrastructure in the highlighted area is considered fair relative to the CMRPC region."> ⓘ
+      </button>
     </label>
     <label class="flex items-start text-sm text-gray-700">
       <div class="relative">
@@ -291,6 +315,9 @@
           <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
         </div>
       <span class="leading-snug ms-2">Pedestrian quality: good</span>
+      <button class="ml-1 text-gray-500 hover:text-gray-700 info-btn" style="font-size: 10px;"
+              data-info="Pedestrian access and infrastructure in the highlighted area is considered good relative to the CMRPC region."> ⓘ
+      </button>
     </label>
     <label class="flex items-start text-sm text-gray-700">
       <div class="relative">
@@ -299,6 +326,9 @@
           <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
         </div>
       <span class="leading-snug ms-2">Transportation access: fair</span>
+      <button class="ml-1 text-gray-500 hover:text-gray-700 info-btn" style="font-size: 10px;"
+              data-info="Transportation access in the highlighted area is considered fair relative to the CMRPC region."> ⓘ
+      </button>
     </label>
     <label class="flex items-start text-sm text-gray-700">
       <div class="relative">
@@ -307,6 +337,9 @@
           <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
         </div>
       <span class="leading-snug ms-2">Transportation access: good</span>
+      <button class="ml-1 text-gray-500 hover:text-gray-700 info-btn" style="font-size: 10px;"
+              data-info="Transportation access in the highlighted area is considered good relative to the CMRPC region."> ⓘ
+      </button>
     </label>
     <label class="flex items-start text-sm text-gray-700">
       <div class="relative">
@@ -314,9 +347,10 @@
           <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
           <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
         </div>
-      <span class="leading-snug ms-2">Transportation diversity
-        <button id="transit-diversity-info-btn" class="ml-1 text-gray-500 hover:text-gray-700" style="font-size: 10px;">ⓘ</button>
-      </span>
+      <span class="leading-snug ms-2">Transportation diversity</span>
+      <button class="ml-1 text-gray-500 hover:text-gray-700 info-btn" style="font-size: 10px;"
+              data-info="Areas with stronger transportation diversity, shown here, are areas where some everyday trips don't require a car and can be completed on foot, on a bike, or by using transit."> ⓘ
+      </button>
     </label>
 
     <!-- Zoning Section -->
@@ -328,6 +362,9 @@
           <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
         </div>
       <span class="leading-snug ms-2">Multifamily allowed by-right</span>
+      <button class="ml-1 text-gray-500 hover:text-gray-700 info-btn" style="font-size: 10px;"
+              data-info="Multifamily housing, if pursued in the highlighted area, is permitted by-right under the respective municipality's zoning."> ⓘ
+      </button>
     </label>
     <label class="flex items-start text-sm text-gray-700">
       <div class="relative">
@@ -336,6 +373,9 @@
           <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
         </div>
       <span class="leading-snug ms-2">Multifamily allowed by special permit/review</span>
+      <button class="ml-1 text-gray-500 hover:text-gray-700 info-btn" style="font-size: 10px;"
+              data-info="Multifamily housing, if pursued in the highlighted area, requires special permitting and/or review under the respective municipality's zoning."> ⓘ
+      </button>
     </label>
     <label class="flex items-start text-sm text-gray-700">
       <div class="relative">
@@ -343,9 +383,10 @@
           <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
           <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
         </div>
-      <span class="leading-snug ms-2">Exceeds zoned density
-        <button id="exceeds-capacity-info-btn" class="ml-1 text-gray-500 hover:text-gray-700" style="font-size: 10px;">ⓘ</button>
-      </span>
+      <span class="leading-snug ms-2">Exceeds zoned density</span>
+      <button class="ml-1 text-gray-500 hover:text-gray-700 info-btn" style="font-size: 10px;"
+              data-info="This area does not allow multi-family development. Current development patterns, however, exceed a three unit/acre density. It may be worth up-zoning this area should relatively dense development trends continue."> ⓘ
+      </button>
     </label>
     <label class="flex items-start text-sm text-gray-700">
       <div class="relative">
@@ -353,34 +394,17 @@
           <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
           <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
         </div>
-      <span class="leading-snug ms-2">Excess capacity by zoning
-        <button id="excess-capacity-info-btn" class="ml-1 text-gray-500 hover:text-gray-700" style="font-size: 10px;">ⓘ</button>
-      </span>
+      <span class="leading-snug ms-2">Excess capacity by zoning</span>
+      <button class="ml-1 text-gray-500 hover:text-gray-700 info-btn" style="font-size: 10px;"
+              data-info="This area either allows multi-family development by-right or by special permit/special review. Current development does not exceed three units per acre. There may be excess capacity for additional units should there be interest in further development or redevelopment."> ⓘ
+      </button>
     </label>
   </label>
 
-    <!-- Transportation diversity info text -->
-    <div id="transit-diversity-info" class="hidden mt-3 pt-3 border-t border-gray-200">
-      <p class="text-xs text-gray-700" style="font-family: Roboto, sans-serif;">
-        Areas with stronger transportation diversity, shown here, are areas where some everyday trips don't require a car and can be completed on foot, on a bike, or by using transit.
-      </p>
-    </div>
-
-    <!-- Excess capacity info text -->
-    <div id="excess-capacity-info" class="hidden mt-3 pt-3 border-t border-gray-200">
-      <p class="text-xs text-gray-700" style="font-family: Roboto, sans-serif;">
-        This area either allows multi-family development by-right or by special permit/special review. Current development does not exceed three units per acre. There may be excess capacity for additional units should there be interest in further development or redevelopment.
-      </p>
-    </div>
-
-    <!-- Exceeds capacity info text -->
-    <div id="exceeds-capacity-info" class="hidden mt-3 pt-3 border-t border-gray-200">
-      <p class="text-xs text-gray-700" style="font-family: Roboto, sans-serif;">
-        This area does not allow multi-family development. Current development patterns, however, exceed a three unit/acre density. It may be worth up-zoning this area should relatively dense development trends continue.
-      </p>
-    </div>
   </div>
 </div>
+
+<div id="info-popup" class="hidden"></div> <!--for the info button pop-ups!!-->
 
 <!-- Basemap settings toggle - relocate this in the scrollable part (but still have the panel open towards the top)?? -->
 <div id="basemap-toggle" class="border-t border-gray-300 pt-2">
@@ -635,9 +659,9 @@
                 { key: "R-M", color: "#ffdd00", label: "Medium density residential" },
                 { key: "R-H", color: "#ffb700", label: "High density residential" },
                 { key: "R-O", color: "#ff8800", label: "Other housing" },
-                { key: "MU-R", color: "#d899dd", label: "Mixed use with residential" },
+                { key: "MU-R", color: "#d899dd", label: "Mixed use: residential/commercial" },
                 { key: "COMM", color: "#df2d83", label: "Commercial" },
-                { key: "GR", color: "#d4f088", label: "Greenspace" },
+                { key: "GR", color: "#d4f088", label: "Forest; Agriculture; Recreation" },
                 { key: "IND", color: "#767676", label: "Industrial" },
                 { key: "IMP", color: "#f0f420", label: "Improved land" },
                 { key: "DEV-R", color: "#f27059", label: "Developable as residential"},
@@ -870,6 +894,11 @@ function batchSetFeatureStates({ //batching experiment
         map.addSource("via-service-area", {
             type: "geojson",
             data: "Via_Microtransit_Service_Areas_251030.geojson"
+        })
+
+        map.addSource("bgs-residensity",{
+            type: "geojson",
+            data: ""
         })
 
         map.addSource("via-stops", {
@@ -1685,7 +1714,7 @@ map.addLayer({
                     ["step",
                     ["feature-state", "density"],
                     'transparent',
-                    0.5,
+                    0.1,
                     medIncomePalette[0],
                     1,
                     medIncomePalette[1],
@@ -1742,14 +1771,17 @@ map.addLayer({
                         "UNK", landUsePalette[12].color,
                         "#fff"
                     ],
-                    "fill-outline-color": "#777777",
-                    "fill-opacity": [
-                    "case", ["==", ["feature-state", "useCode"], null], 0.3,
-                    ["case",
-                    ["boolean", ["feature-state", "hover"], false],
-                    0.95,
-                    0.66
-            ]]},
+                    "fill-outline-color": [
+                      "step",
+                      ["zoom"],
+                      "transparent",
+                      14,
+                      "white"],
+                    "fill-opacity":
+                      ["interpolate", 
+                      ["linear"], 
+                      ["zoom"], 6, 0, 8, 0.1, 10, 0.15, 11, 0.2, 12, 0.3, 12.5, 0.9]
+                  },
                 layout: {
                     visibility: "none"
                 }
@@ -2091,7 +2123,7 @@ map.addLayer({
             source: "subregions",
             paint: {
                 "line-color": "black", 
-                "line-width": 1.5
+                "line-width": 3
                 },
             layout: {
                 visibility: "none"
@@ -2106,7 +2138,7 @@ map.addLayer({
             source: "subregions",
             paint: {
                 "line-color": "black", 
-                "line-width": 1.5
+                "line-width": 3
                 },
             layout: {
                 visibility: "none"
@@ -2121,7 +2153,7 @@ map.addLayer({
             source: "subregions",
             paint: {
                 "line-color": "black", 
-                "line-width": 1.5
+                "line-width": 3
                 },
             layout: {
                 visibility: "none"
@@ -2136,7 +2168,7 @@ map.addLayer({
             source: "subregions",
             paint: {
                 "line-color": "black", 
-                "line-width": 1.5
+                "line-width": 3
                 },
             layout: {
                 visibility: "none"
@@ -2151,7 +2183,7 @@ map.addLayer({
             source: "subregions",
             paint: {
                 "line-color": "black", 
-                "line-width": 1.5
+                "line-width": 3
                 },
             layout: {
                 visibility: "none"
@@ -2166,7 +2198,7 @@ map.addLayer({
             source: "subregions",
             paint: {
                 "line-color": "black",
-                "line-width": 1.5
+                "line-width": 3
                 },
             layout: {
                 visibility: "none"
@@ -3801,41 +3833,51 @@ overlayToggle.addEventListener('click', () => {
   overlayContent.classList.toggle('hidden');
   overlayArrow.classList.toggle('rotate-180')});
 
-// Transportation diversity info toggle
-const transitDiversityInfoBtn = document.getElementById('transit-diversity-info-btn');
-const transitDiversityInfo = document.getElementById('transit-diversity-info');
 
-if (transitDiversityInfoBtn && transitDiversityInfo) {
-  transitDiversityInfoBtn.addEventListener('click', (e) => {
+
+const popup = document.getElementById('info-popup');
+const buttons = document.querySelectorAll('.info-btn');
+let activeButton = null;
+
+buttons.forEach((btn) => {
+  btn.addEventListener('click', (e) => {
     e.preventDefault();
     e.stopPropagation();
-    transitDiversityInfo.classList.toggle('hidden');
+
+    // Close if clicking the same button again
+    if (activeButton === btn) {
+      popup.classList.add('hidden');
+      activeButton = null;
+      return;
+    }
+
+    // Get info text from data attribute
+    const infoText = btn.getAttribute('data-info');
+    popup.textContent = infoText;
+
+    // Position popup near button
+    const rect = btn.getBoundingClientRect();
+    const scrollY = window.scrollY || document.documentElement.scrollTop;
+    const scrollX = window.scrollX || document.documentElement.scrollLeft;
+
+    popup.style.top = `${rect.top - 36 + scrollY}px`;
+    popup.style.left = `${rect.right + 12 + scrollX}px`;
+
+    // Show popup
+    popup.classList.remove('hidden');
+
+    activeButton = btn;
   });
-}
+});
 
-// Excess capacity info toggle
-const excessCapacityInfoBtn = document.getElementById('excess-capacity-info-btn');
-const excessCapacityInfo = document.getElementById('excess-capacity-info');
+// Close popup when clicking outside
+document.addEventListener('click', (e) => {
+  if (activeButton && !popup.contains(e.target) && !activeButton.contains(e.target)) {
+    popup.classList.add('hidden');
+    activeButton = null;
+  }
+});
 
-if (excessCapacityInfoBtn && excessCapacityInfo) {
-  excessCapacityInfoBtn.addEventListener('click', (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    excessCapacityInfo.classList.toggle('hidden');
-  });
-}
-
-// Exceeds capacity info toggle
-const exceedsCapacityInfoBtn = document.getElementById('exceeds-capacity-info-btn');
-const exceedsCapacityInfo = document.getElementById('exceeds-capacity-info');
-
-if (exceedsCapacityInfoBtn && exceedsCapacityInfo) {
-  exceedsCapacityInfoBtn.addEventListener('click', (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    exceedsCapacityInfo.classList.toggle('hidden');
-  });
-}
 
 } // Close initializeMap function
 
