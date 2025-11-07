@@ -655,15 +655,18 @@
             ]
 
     const landUsePalette = [ //only set this up for custom legends unless there is a way to set inner html of breaks/stops dynamically??
+                { key: "R-SF-S", color: "#fff78a", label: "Small-lot single family" }, //change color
+                { key: "R-SF-L", color: "#ffe382", label: "Large-lot single family" }, //change color
                 { key: "R-L", color: "#fff8bf", label: "Low density residential" },
                 { key: "R-M", color: "#ffdd00", label: "Medium density residential" },
                 { key: "R-H", color: "#ffb700", label: "High density residential" },
                 { key: "R-O", color: "#ff8800", label: "Other housing" },
                 { key: "MU-R", color: "#d899dd", label: "Mixed use: residential/commercial" },
                 { key: "COMM", color: "#df2d83", label: "Commercial" },
-                { key: "GR", color: "#d4f088", label: "Forest; Agriculture; Recreation" },
+                { key: "R-GR", color: "#d4f088", label: "Residential with greenspace" }, 
+                { key: "GR", color: "#89aa42", label: "Greenspace: forest; agriculture; recreation" }, 
                 { key: "IND", color: "#767676", label: "Industrial" },
-                { key: "IMP", color: "#f0f420", label: "Improved land" },
+                { key: "IMP", color: "#f0f420", label: "Improved land" }, //change color
                 { key: "DEV-R", color: "#f27059", label: "Developable as residential"},
                 { key: "UND", color: "#d5d5d5", label: "Undevelopable"},
                 { key: "EXE", color: "#425A70", label: "Exempt" },
@@ -896,9 +899,9 @@ function batchSetFeatureStates({ //batching experiment
             data: "Via_Microtransit_Service_Areas_251030.geojson"
         })
 
-        map.addSource("bgs-residensity",{
+        map.addSource("bg-residensity",{
             type: "geojson",
-            data: ""
+            data: "CMRPC_Bgs_ResidentialDensity_251106.geojson"
         })
 
         map.addSource("via-stops", {
@@ -936,7 +939,7 @@ function batchSetFeatureStates({ //batching experiment
                     });
                 });
 
-                fetch('https://raw.githubusercontent.com/CommunityScale/CMRPC/main/CMRPC_Parcels_Use_Residensity_251008.json') //batching experiment!
+                fetch('CMRPC_Parcels_LandUse_Residensity_Pared_251107.json') //batching experiment!
                     .then(response => response.json())
                     .then(data => {
                         batchSetFeatureStates({
@@ -1193,6 +1196,17 @@ const interpolateLayers = [
             data_source: "bg-costs",
             source_layer: null,
             source_url: "https://raw.githubusercontent.com/CommunityScale/CMRPC/refs/heads/main/CMRPC_bg_costs.geojson",
+            colors: medIncomePalette,
+            defaultViz: "none",
+            useFeatureState: false,
+            useQuintiles: true
+        },
+        {
+            id: "bg-residensity-layer",
+            property: "DUA",
+            data_source: "bg-residensity",
+            source_layer: null,
+            source_url: "CMRPC_Bgs_ResidentialDensity_251106.geojson",
             colors: medIncomePalette,
             defaultViz: "none",
             useFeatureState: false,
@@ -1756,19 +1770,22 @@ map.addLayer({
                     "fill-color": [
                         "match",
                         ["feature-state", "useCode"],
-                        "R-L", landUsePalette[0].color,
-                        "R-M", landUsePalette[1].color,
-                        "R-H", landUsePalette[2].color,
-                        "R-0", landUsePalette[3].color,
-                        "MU-R", landUsePalette[4].color,
-                        "COMM", landUsePalette[5].color,
-                        "GR", landUsePalette[6].color,
-                        "IND", landUsePalette[7].color,
-                        "IMP", landUsePalette[8].color,
-                        "DEV-R", landUsePalette[9].color,
-                        "UND", landUsePalette[10].color,
-                        "EXE", landUsePalette[11].color,
-                        "UNK", landUsePalette[12].color,
+                        "R-SF-S", landUsePalette[0].color,
+                        "R-SF-L", landUsePalette[1].color,
+                        "R-L", landUsePalette[2].color,
+                        "R-M", landUsePalette[3].color,
+                        "R-H", landUsePalette[4].color,
+                        "R-0", landUsePalette[5].color,
+                        "MU-R", landUsePalette[6].color,
+                        "COMM", landUsePalette[7].color,
+                        "R-GR", landUsePalette[8].color,
+                        "GR", landUsePalette[9].color,
+                        "IND", landUsePalette[10].color,
+                        "IMP", landUsePalette[11].color,
+                        "DEV-R", landUsePalette[12].color,
+                        "UND", landUsePalette[13].color,
+                        "EXE", landUsePalette[14].color,
+                        "UNK", landUsePalette[15].color,
                         "#fff"
                     ],
                     "fill-outline-color": [
@@ -3037,7 +3054,8 @@ layerSelect.addEventListener('change', (e) => {
         //'parcels-value',
         //'parcels-ownership',
         'admin-layer',
-        "bg-transport-diversity-layer"
+        "bg-transport-diversity-layer",
+        "bg-residensity-layer"
 ];
            
     
