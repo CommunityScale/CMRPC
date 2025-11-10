@@ -564,7 +564,8 @@
         //'parcels-pctLV',
         //'parcels-value',
         'parcels-density',
-        "bg-transport-diversity-layer"
+        "bg-transport-diversity-layer",
+        "bg-residensity-layer"
         //'admin-layer' //not sure if admin layer should be included here
     ];
 
@@ -606,20 +607,6 @@
                 '#fff290', // Orange for 45-60%
                 '#ecd731'  // Red for >60%
             ]
-    // const cbRentersPalette = [ //Sequential colorBrewer GrnBlu ramp
-    //             '#f6eff7',
-    //             '#bdc9e1',
-    //             '#67a9cf',
-    //             '#1c9099',
-    //             '#016c59'
-    //         ]
-    // const cbOwnersPalette = [ //Sequential colorBrewer BluPur ramp
-    //             '#edf8fb',
-    //             '#b3cde3',
-    //             '#8c96c6',
-    //             '#8856a7',
-    //             '#810f7c'
-    //         ]
 
     const pricePalette = [
                 '#f1eef6',
@@ -655,9 +642,9 @@
             ]
 
     const landUsePalette = [ //only set this up for custom legends unless there is a way to set inner html of breaks/stops dynamically??
-                { key: "R-SF-S", color: "#fff78a", label: "Small-lot single family" }, //change color
+                { key: "R-SF-S", color: "#fff2c7", label: "Small-lot single family" }, //change color
                 { key: "R-SF-L", color: "#ffe382", label: "Large-lot single family" }, //change color
-                { key: "R-L", color: "#fff8bf", label: "Low density residential" },
+                { key: "R-L", color: "#fff78a", label: "Low density residential" },
                 { key: "R-M", color: "#ffdd00", label: "Medium density residential" },
                 { key: "R-H", color: "#ffb700", label: "High density residential" },
                 { key: "R-O", color: "#ff8800", label: "Other housing" },
@@ -666,7 +653,7 @@
                 { key: "R-GR", color: "#d4f088", label: "Residential with greenspace" }, 
                 { key: "GR", color: "#89aa42", label: "Greenspace: forest; agriculture; recreation" }, 
                 { key: "IND", color: "#767676", label: "Industrial" },
-                { key: "IMP", color: "#f0f420", label: "Improved land" }, //change color
+                { key: "IMP", color: "#c2ba01", label: "Improved land" }, //change color
                 { key: "DEV-R", color: "#f27059", label: "Developable as residential"},
                 { key: "UND", color: "#d5d5d5", label: "Undevelopable"},
                 { key: "EXE", color: "#425A70", label: "Exempt" },
@@ -714,7 +701,7 @@ function batchSetFeatureStates({ //batching experiment
   propertyParser = (f) => ({
     density: Number(f["DUA"]),
     useCode: f["use"],
-    SiteAddress: f["SiteAddress"],
+    SiteAddress: f["SiteAddres"],
     description: f["UseDesc"]
   })
 }) {
@@ -1196,17 +1183,6 @@ const interpolateLayers = [
             data_source: "bg-costs",
             source_layer: null,
             source_url: "https://raw.githubusercontent.com/CommunityScale/CMRPC/refs/heads/main/CMRPC_bg_costs.geojson",
-            colors: medIncomePalette,
-            defaultViz: "none",
-            useFeatureState: false,
-            useQuintiles: true
-        },
-        {
-            id: "bg-residensity-layer",
-            property: "DUA",
-            data_source: "bg-residensity",
-            source_layer: null,
-            source_url: "CMRPC_Bgs_ResidentialDensity_251106.geojson",
             colors: medIncomePalette,
             defaultViz: "none",
             useFeatureState: false,
@@ -1760,6 +1736,41 @@ map.addLayer({
         labelLayerId
     )
 
+    map.addLayer({      //density test
+            id: "bg-residensity-layer",  
+            type: "fill",
+            source: "bg-residensity",
+            paint: {
+                "fill-color": [
+                    "case", ["==", ["get", "avgDUA"], null], 'transparent',
+                    ["step",
+                    ["get", "avgDUA"],
+                    'transparent',
+                    0.1,
+                    medIncomePalette[0],
+                    1,
+                    medIncomePalette[1],
+                    4,
+                    medIncomePalette[2],
+                    8,
+                    medIncomePalette[3],
+                    16,
+                    "#192f5e"]],
+                "fill-outline-color": "white",
+                "fill-opacity": [
+                    "case", ["==", ["get", "avgDUA"], null], 0,
+                    ["case",
+                    ["boolean", ["feature-state", "hover"], false],
+                    1,
+                    1
+            ]]
+             },
+             layout: {
+                visibility: "none"
+             }
+        },
+        labelLayerId
+    )
 
     map.addLayer({
                 id: "parcels-landuse", //update with parcel types!!
@@ -1797,7 +1808,7 @@ map.addLayer({
                     "fill-opacity":
                       ["interpolate", 
                       ["linear"], 
-                      ["zoom"], 6, 0, 8, 0.1, 10, 0.15, 11, 0.2, 12, 0.3, 12.5, 0.9]
+                      ["zoom"], 6, 0, 8, 0.1, 10, 0.15, 11, 0.2, 12, 0.3, 12.5, 0.8]
                   },
                 layout: {
                     visibility: "none"
@@ -2370,6 +2381,17 @@ map.addLayer({
     map.addImage('diagonal-lines-black', diagonalPattern);
     };
     
+//dual layer logic!! 11/10 added + in testing 
+const dualLayerPairs = { //test!!
+  'parcels-density': {
+    aggregated: 'bg-residensity-layer',
+    detailed: 'parcels-density',
+    threshold: 12.5 // switch point zoom 
+  },
+};
+
+
+
 
 
 let labelLayerId; //pull text fields on top!!
@@ -2457,7 +2479,8 @@ const allFillLayers = [
     //'parcels-value',
     //'parcels-ownership',
     'admin-layer',
-    "bg-transport-diversity-layer"
+    "bg-transport-diversity-layer",
+    "bg-residensity-layer"
 ];
 
 
@@ -3304,27 +3327,14 @@ layerSelect.addEventListener('change', (e) => {
             break;
             }
 
-            // case "parcels-density": { //add density pop-up!!
-            //     const propClassVal = attributes.useCode;
-            //     const propClassMatch = landUsePalette.find(entry => entry.key === propClassVal);
-            //     const displayPropClass = propClassMatch ? propClassMatch.label : "data unavailable";
-            //     html = `
-            //     <div class="popup-header">${parcelDisplayName}</div>
-            //     <div class="popup-content">Current land use designation: ${displayPropClass}.
-            //     </div>`;
-            // break;
-            // }
-
-            // case "parcels-ownership": {
-            //     const propTaxCredits = attributes.credits;
-            //     const taxCreditMatch = taxCreditPalette.find(entry => entry.key === propTaxCredits);
-            //     const displayCredits = taxCreditMatch ? taxCreditMatch.label : "data unavailable";
-            //     html = `
-            //     <div class="popup-header">${parcelDisplayName}</div>
-            //     <div class="popup-content">Tax credits received applied to this parcel: ${displayCredits}.
-            //     </div>`;
-            // break;
-            // }
+            case "bg-residensity-layer": { //add density pop-up!!
+                const density = Math.round(attributes.avgDUA * 10) /10;;
+                html = `
+                <div class="popup-header">Block Group ${attributes.GEOID}</div>
+                <div class="popup-content">Average residential density across this block group is ${density} per acre.
+                </div>`;
+            break;
+            }
 
             case "admin-layer": {
                 html = `
@@ -3589,14 +3599,69 @@ function toggleBasemapSettings() {
         });
     });
 
-    dropdown.addEventListener('change', function() { //keep but change 
-        const selectedLayer = dropdown.value;
-        dataLayers.forEach(layerId => {
-            if (layerId !== selectedLayer && map.getLayer(layerId)) {
-            map.setLayoutProperty(layerId, 'visibility', 'none');
-        }
-    });
-    });
+    // dropdown.addEventListener('change', function() { 
+    //     const selectedLayer = dropdown.value;
+    //     dataLayers.forEach(layerId => {
+    //         if (layerId !== selectedLayer && map.getLayer(layerId)) {
+    //         map.setLayoutProperty(layerId, 'visibility', 'none');
+    //     }
+    // });
+    // });
+
+    dropdown.addEventListener('change', function() { 
+  const selectedLayer = dropdown.value;
+  const zoom = map.getZoom();
+  currentlySelectedDataLayer = selectedLayer;
+
+  // Hide all other layers
+  dataLayers.forEach(layerId => {
+    if (map.getLayer(layerId)) {
+      map.setLayoutProperty(layerId, 'visibility', 'none');
+    }
+  });
+
+  // Handle dual-layer case
+  if (dualLayerPairs[selectedLayer]) {
+    const { aggregated, detailed, threshold } = dualLayerPairs[selectedLayer];
+
+    if (zoom < threshold) {
+      map.setLayoutProperty(aggregated, 'visibility', 'visible');
+      map.setLayoutProperty(detailed, 'visibility', 'none');
+    } else {
+      map.setLayoutProperty(aggregated, 'visibility', 'none');
+      map.setLayoutProperty(detailed, 'visibility', 'visible');
+    }
+  }
+
+  // Handle normal single-layer case
+  else if (map.getLayer(selectedLayer)) {
+    map.setLayoutProperty(selectedLayer, 'visibility', 'visible');
+  }
+
+  // Optional: update legend or description
+  // updateLayerDescription(selectedLayer);
+});
+
+map.on('zoom', () => {
+  const zoom = map.getZoom();
+
+  if (!currentlySelectedDataLayer) return;
+
+  const pair = dualLayerPairs[currentlySelectedDataLayer];
+  if (!pair) return; // not a dual-layer type
+
+  const { aggregated, detailed, threshold } = pair;
+
+  if (zoom < threshold) {
+    map.setLayoutProperty(aggregated, 'visibility', 'visible');
+    map.setLayoutProperty(detailed, 'visibility', 'none');
+  } else {
+    map.setLayoutProperty(aggregated, 'visibility', 'none');
+    map.setLayoutProperty(detailed, 'visibility', 'visible');
+  }
+});
+
+
 
 
 //zoom in zoom out buttons
@@ -3812,7 +3877,7 @@ const layerDescriptions = { //edit as needed; some base text should be re-useabl
     <p><em>Source(s):</em> CMRPC transportation quality analysis; CommunityScale.</p>
   `,
   'parcels-density':`
-    <p><strong>Units per acre</strong> by parcel.</p><br>
+    <p><strong>Units per acre</strong>. To explore parcel level data, please zoom to the neighborhood scale.</p><br>
     <p><em>Source(s):</em> 2025 parcels, MassGIS; 2025 Massachusetts Residensity data; CommunityScale.</p>
   `
 };
