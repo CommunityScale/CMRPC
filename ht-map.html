@@ -661,9 +661,9 @@
             ]
 
     const buildablePalette = [
-                { key: "noSew Built noExempt", color: "#000000", label: "Existing development" },
-                { key: "noSew noBuilt noExempt", color: "#ecd731", label: "Buildable, no sewer" },
-                { key: "Sew unBuilt noExempt", color: "#6e79dd", label: "Buildable, sewer" }
+                { key: "noSew Built noExempt", color: "#c7c7c7", label: "Existing development" },
+                { key: "noSew noBuilt noExempt", color: "#ec8f45", label: "Buildable, no sewer" },
+                { key: "Sew unBuilt noExempt", color: "#3643b8", label: "Buildable, sewer" }
             ]
 
    const palettesByLayer = { //leave empty if not needed
@@ -1840,12 +1840,12 @@ map.addLayer({
                     "fill-color": [
                         "match",
                         ["get", "clss"],
-                        "noSew Built noExempt", "#000000",
+                        "noSew Built noExempt", "#c7c7c7",
                         "noSew noBuilt Exempt", "transparent",
-                        "noSew noBuilt noExempt", "#ecd731",
-                        "Sew Built noExempt", "#000000",
+                        "noSew noBuilt noExempt", "#ec8f45",
+                        "Sew Built noExempt", "#c7c7c7",
                         "Sew noBuilt Exempt", "transparent",
-                        "Sew unBuilt noExempt", "#6e79dd",
+                        "Sew unBuilt noExempt", "#3643b8",
                         "transparent"
                     ],
                     "fill-opacity": [
