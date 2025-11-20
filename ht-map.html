@@ -3287,6 +3287,15 @@ layerSelect.addEventListener('change', (e) => {
             break;
             }
 
+            case "buildable-land": {
+                const buildClass = attributes.clss; 
+                const buildableClassMatch = buildablePalette.find(entry => entry.key === buildClass);
+                const displayBuildClass = buildableClassMatch ? buildableClassMatch.label : "Unavailable";
+                html = `
+                <div class="popup-header">${displayBuildClass}</div>`;
+            break;
+            }
+
             case "parcels-density": {
                 const DUA = Math.round(attributes.density * 10) /10;
                 html = `
