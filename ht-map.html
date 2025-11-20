@@ -806,8 +806,8 @@ function batchSetFeatureStates({ //batching experiment
 
         map.addSource("subregions", {
             type: "geojson",
-            data: 'https://raw.githubusercontent.com/CommunityScale/CMRPC/refs/heads/main/CMRPC_Tigerlines_Regions_FromCytsds_250820.geojson',
-            promoteId: "TOWN_ID"
+            data: 'CMRPC_Subregions_251120.geojson',
+            promoteId: "region"
         })
 
         map.addSource("bus-stops", {
