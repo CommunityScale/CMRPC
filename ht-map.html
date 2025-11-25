@@ -299,6 +299,17 @@
     </label>
     <label class="flex items-start text-sm text-gray-700">
       <div class="relative">
+          <input type="checkbox" class="sr-only overlay-toggle peer" value="bike-trails-layer" />
+          <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
+          <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
+        </div>
+      <span class="leading-snug ms-2">Bike or shared use paths</span>
+      <button class="ml-1 text-gray-500 hover:text-gray-700 info-btn" style="font-size: 10px;"
+              data-info="Path access may increase quality of life and offer an alternative to other modes of transportation. Bike and shared use path usage is, however, primarily recreational."> ⓘ
+      </button>
+    </label>
+    <label class="flex items-start text-sm text-gray-700">
+      <div class="relative">
           <input type="checkbox" class="sr-only overlay-toggle peer" value="fair-ped-layer" />
           <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
           <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
@@ -590,7 +601,8 @@
         "exceeds-capacity-layer",
         "via-service-area-layer",
         "via-stops-layer",
-        "wrta-fixed-layer"
+        "wrta-fixed-layer",
+        "bike-trails-layer"
         ];
 
     //all palettes here!!
@@ -787,6 +799,12 @@ function batchSetFeatureStates({ //batching experiment
             promoteId: "LOC_ID"
         })
    
+        map.addSource("bike-trails", {
+            type: 'geojson',
+            data: 'CMRPC_BikeTrails_251125.geojson',
+            promoteId: 'OBJECTID'
+        })
+
         map.addSource("zips", {
             type: 'vector',
             url: 'mapbox://emtzot01.963cu3b9',
@@ -2255,6 +2273,20 @@ map.addLayer({
                 visibility: "none"
             }
         })
+
+        map.addLayer({
+          id: "bike-trails-layer",
+          type: "line",
+          source: "bike-trails",
+          paint: {
+            "line-color": "purple", //replace
+            "line-width": 1.5,
+          },
+          layout: {
+            visibility: "none"
+          }},
+        labelLayerId
+      )
 
         map.addLayer({
             id: "train-stops-layer",
