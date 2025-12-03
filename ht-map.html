@@ -654,12 +654,11 @@
             ]
 
     const landUsePalette = [ //only set this up for custom legends unless there is a way to set inner html of breaks/stops dynamically??
-                { key: "R-SF-L", color: "#fff2c7", label: "Large-lot single family" }, //change color
-                { key: "R-SF-S", color: "#ffe382", label: "Small-lot single family" }, //change color
-                { key: "R-L", color: "#fff78a", label: "Low density residential (2+ units)" },
-                { key: "R-M", color: "#ffdd00", label: "Medium density residential (2+ units)" },
-                { key: "R-H", color: "#ffb700", label: "High density residential (2+ units)" },
-                { key: "R-O", color: "#ff8800", label: "Other housing" },
+                { key: "SFR", color: "#fff2c7", label: "Single family residential" }, //change color
+                { key: "MR", color: "#ffe382", label: "Middle residential" }, //change color
+                { key: "MFR", color: "#fff78a", label: "Multifamily residential" },
+                { key: "GQ", color: "#ffdd00", label: "Group quarters" },
+                { key: "MHR", color: "#ff8800", label: "Manufactured/mobile home residential" },
                 { key: "MU-R", color: "#d899dd", label: "Mixed use: residential/commercial" },
                 { key: "COMM", color: "#df2d83", label: "Commercial" },
                 { key: "R-GR", color: "#d4f088", label: "Residential with greenspace" }, 
@@ -712,7 +711,7 @@ function batchSetFeatureStates({ //batching experiment
   delay = 50,
   propertyParser = (f) => ({
     density: Number(f["DUA"]),
-    useCode: f["use"],
+    useCode: f["use_2"],
     SiteAddress: f["SiteAddres"],
     description: f["UseDesc"]
   })
@@ -944,7 +943,7 @@ function batchSetFeatureStates({ //batching experiment
                     });
                 });
 
-                fetch('CMRPC_Parcels_LandUse_Residensity_Pared_251107.json') //batching experiment!
+                fetch('CMRPC_Parcels_LandUse_Density_251203.json') //batching experiment!
                     .then(response => response.json())
                     .then(data => {
                         batchSetFeatureStates({
@@ -1799,22 +1798,21 @@ map.addLayer({
                     "fill-color": [
                         "match",
                         ["feature-state", "useCode"],
-                        "R-SF-L", landUsePalette[0].color,
-                        "R-SF-S", landUsePalette[1].color,
-                        "R-L", landUsePalette[2].color,
-                        "R-M", landUsePalette[3].color,
-                        "R-H", landUsePalette[4].color,
-                        "R-0", landUsePalette[5].color,
-                        "MU-R", landUsePalette[6].color,
-                        "COMM", landUsePalette[7].color,
-                        "R-GR", landUsePalette[8].color,
-                        "GR", landUsePalette[9].color,
-                        "IND", landUsePalette[10].color,
-                        "IMP", landUsePalette[11].color,
-                        "DEV-R", landUsePalette[12].color,
-                        "UND", landUsePalette[13].color,
-                        "EXE", landUsePalette[14].color,
-                        "UNK", landUsePalette[15].color,
+                        "SFR", landUsePalette[0].color,
+                        "MR", landUsePalette[1].color,
+                        "MFR", landUsePalette[2].color,
+                        "GQ", landUsePalette[3].color,
+                        "MHR", landUsePalette[4].color,
+                        "MU-R", landUsePalette[5].color,
+                        "COMM", landUsePalette[6].color,
+                        "R-GR", landUsePalette[7].color,
+                        "GR", landUsePalette[8].color,
+                        "IND", landUsePalette[9].color,
+                        "IMP", landUsePalette[10].color,
+                        "DEV-R", landUsePalette[11].color,
+                        "UND", landUsePalette[12].color,
+                        "EXE", landUsePalette[13].color,
+                        "UNK", landUsePalette[14].color,
                         "#fff"
                     ],
                     "fill-outline-color": [
