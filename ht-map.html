@@ -829,7 +829,8 @@ function batchSetFeatureStates({ //batching experiment
 
         map.addSource("bus-stops", {
             type: "geojson",
-            data: 'https://raw.githubusercontent.com/CommunityScale/CMRPC/refs/heads/main/bus_stops.geojson' //replace with re-projected version??
+            data: 'bus_stops.geojson', //replace with re-projected version??
+            promoteId: 'fid'
         })
 
         map.addSource("train-stops", {
@@ -2256,8 +2257,15 @@ map.addLayer({
             type: "circle",
             source: "bus-stops",
             paint: {
-                "circle-color": "#ff0000", //change size based on zoom
-                'circle-radius': [
+                "circle-color": [
+                    'match',
+                    ['get', 'flag_likely'],
+                    'no',
+                    "#ff0000",
+                    'yes',
+                    "#ff9494",
+                  "#cccccc"], //match expression must have a default
+                'circle-radius': [ //change size based on zoom
                   'interpolate',
                   ['linear'],
                   ['zoom'],
@@ -2505,9 +2513,6 @@ const allFillLayers = [
     'parcels-density',
     'parcels-landuse',
     'buildable-land',
-    //'parcels-pctLV',
-    //'parcels-value',
-    //'parcels-ownership',
     'admin-layer',
     "bg-transport-diversity-layer",
     "bg-residensity-layer"
@@ -3103,12 +3108,10 @@ layerSelect.addEventListener('change', (e) => {
         'parcels-density',
         'parcels-landuse',
         'buildable-land',
-        //'parcels-pctLV',
-        //'parcels-value',
-        //'parcels-ownership',
         'admin-layer',
         "bg-transport-diversity-layer",
-        "bg-residensity-layer"
+        "bg-residensity-layer",
+        'bus-stops-layer'
 ];
            
     
@@ -3251,6 +3254,15 @@ layerSelect.addEventListener('change', (e) => {
                 html = `
                 <div class="popup-header">${attributes.NAME}</div>
                 <div class="popup-content">${attributes.rd_nonwhitePops != null ? `Displacement risk for nonwhite population: ${Math.round(attributes.rd_nonwhitePops*100)} out of 100, with 100 indicating highest risk.` : 'No score available.'}
+                </div>`;
+            break;
+            }
+
+            case "bus-stops-layer": {
+                const flag = attributes.flag_likely
+                const flagDisplay = flag === 'no' ? 'Fixed bus stop' : 'Flag bus stop';
+                html = `
+                <div class="popup-content">${flagDisplay}
                 </div>`;
             break;
             }
