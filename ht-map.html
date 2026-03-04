@@ -60,7 +60,7 @@
   }
 
   .mapboxgl-popup {
-      max-width: 150px;
+      max-width: 260px; /*try with wider max width per LLM's instructions, was 150px 2/3/2026 */
       font-family: 'Roboto', sans-serif;
       font-size: 0.875rem; /* Tailwind's text-sm */
     }
@@ -80,13 +80,33 @@
     }
   
   .popup-header {
-      font-weight: 600; /* font-semibold */
+      font-weight: 500; /* font-semibold */
       margin-bottom: 0.5rem;
+    }
+   
+  .popup-header.section {
+      font-size: 0.7rem;         /* smaller than pop-up header? */
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #6b7280;            /* text-gray-500 per tailwind css*/
+      margin-bottom: 0.25rem;
     }
   
   .popup-content p {
       margin: 0;
       line-height: 1.4;
+    }
+
+  .popup-group {
+        margin-bottom: 0.75rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 0.5px solid #e5e7eb;
+    }
+
+    .mapboxgl-popup-content > .popup-group:last-of-type {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
     }
 
   #layer-select {
@@ -190,6 +210,7 @@
     </svg>
   </button>
 
+  <!-- Hidden content -->
   <div id="overlay-content" class="hidden px-2 py-2 space-y-2 bg-white">
 
     <!-- Boundaries Section -->
@@ -202,324 +223,507 @@
           </div>
       <span class="leading-snug ms-2">CMRPC community boundaries</span>
     </label>
-    <div class="mt-2">
-      <div class="text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">
-        Subregions
-      </div>
-    </div>
+    <div class="accordion-section mt-2">
 
-    <div class="pl-3 border-l-2 border-gray-100 space-y-1">
-    <label class="flex items-start text-sm text-gray-700">
-        <div class="relative">
-            <input type="checkbox" class="sr-only overlay-toggle peer" value="subregion-central" />
-            <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
-            <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
-          </div>
-      <span class="leading-snug ms-2">Central subregion</span>
-    </label>
-    <label class="flex items-start text-sm text-gray-700">
-        <div class="relative">
-            <input type="checkbox" class="sr-only overlay-toggle peer" value="subregion-north" />
-            <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
-            <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
-          </div>
-        <span class="leading-snug ms-2">North subregion</span>
-    </label>
-    <label class="flex items-start text-sm text-gray-700">
-        <div class="relative">
-            <input type="checkbox" class="sr-only overlay-toggle peer" value="subregion-northeast" />
-            <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
-            <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
-          </div>
-        <span class="leading-snug ms-2">Northeast subregion</span>
-    </label>
-    <label class="flex items-start text-sm text-gray-700">
-        <div class="relative">
-            <input type="checkbox" class="sr-only overlay-toggle peer" value="subregion-west" />
-            <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
-            <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
-          </div>
-        <span class="leading-snug ms-2">West subregion</span>
-    </label>
-    <label class="flex items-start text-sm text-gray-700">
-        <div class="relative">
-            <input type="checkbox" class="sr-only overlay-toggle peer" value="subregion-southwest" />
-            <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
-            <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
-          </div>
-        <span class="leading-snug ms-2">Southwest subregion</span>
-    </label>
-    <label class="flex items-start text-sm text-gray-700">
-        <div class="relative">
-            <input type="checkbox" class="sr-only overlay-toggle peer" value="subregion-southeast" />
-            <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
-            <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
-          </div>
-        <span class="leading-snug ms-2">Southeast subregion</span>
-    </label>
-    </div>
+        <button type="button"
+                class="accordion-toggle w-full flex items-center justify-between
+                       text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">
+          <span>Subregions</span>
+          <svg class="accordion-icon w-3 h-3 transition-transform"
+               xmlns="http://www.w3.org/2000/svg"
+               fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+      
+        <div class="accordion-content hidden pl-3 border-l-2 border-gray-100 space-y-1">
+                <label class="flex items-start text-sm text-gray-700">
+                    <div class="relative">
+                        <input type="checkbox" class="sr-only overlay-toggle peer" value="subregion-central" />
+                        <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
+                        <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
+                      </div>
+                  <span class="leading-snug ms-2">Central subregion</span>
+                </label>
+                <label class="flex items-start text-sm text-gray-700">
+                    <div class="relative">
+                        <input type="checkbox" class="sr-only overlay-toggle peer" value="subregion-north" />
+                        <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
+                        <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
+                      </div>
+                    <span class="leading-snug ms-2">North subregion</span>
+                </label>
+                <label class="flex items-start text-sm text-gray-700">
+                    <div class="relative">
+                        <input type="checkbox" class="sr-only overlay-toggle peer" value="subregion-northeast" />
+                        <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
+                        <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
+                      </div>
+                    <span class="leading-snug ms-2">Northeast subregion</span>
+                </label>
+                <label class="flex items-start text-sm text-gray-700">
+                    <div class="relative">
+                        <input type="checkbox" class="sr-only overlay-toggle peer" value="subregion-west" />
+                        <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
+                        <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
+                      </div>
+                    <span class="leading-snug ms-2">West subregion</span>
+                </label>
+                <label class="flex items-start text-sm text-gray-700">
+                    <div class="relative">
+                        <input type="checkbox" class="sr-only overlay-toggle peer" value="subregion-southwest" />
+                        <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
+                        <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
+                      </div>
+                    <span class="leading-snug ms-2">Southwest subregion</span>
+                </label>
+                <label class="flex items-start text-sm text-gray-700">
+                    <div class="relative">
+                        <input type="checkbox" class="sr-only overlay-toggle peer" value="subregion-southeast" />
+                        <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
+                        <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
+                      </div>
+                    <span class="leading-snug ms-2">Southeast subregion</span>
+                </label>
+                </div>
+      
+      </div>
   
 
     <!-- Transportation Section -->
     <div class="text-xs font-semibold text-gray-600 uppercase tracking-wide mt-3 mb-1">Transportation</div>
-    <label class="flex items-start text-sm text-gray-700">
-        <div class="relative">
-            <input type="checkbox" class="sr-only overlay-toggle peer" value="bus-stops-layer" />
-            <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
-            <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
-          </div>
-        <span class="leading-snug ms-2">Bus stops</span>
-    </label>
-    <label class="flex items-start text-sm text-gray-700">
-      <div class="relative">
-          <input type="checkbox" class="sr-only overlay-toggle peer" value="wrta-fixed-layer" />
-          <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
-          <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
-        </div>
-      <span class="leading-snug ms-2">WRTA fixed transit lines</span>
-    </label>
-    <label class="flex items-start text-sm text-gray-700">
-      <div class="relative">
-          <input type="checkbox" class="sr-only overlay-toggle peer" value="train-stops-layer" />
-          <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
-          <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
-        </div>
-      <span class="leading-snug ms-2">Rail stops</span>
-    </label>
-    <label class="flex items-start text-sm text-gray-700">
-      <div class="relative">
-          <input type="checkbox" class="sr-only overlay-toggle peer" value="via-stops-layer" />
-          <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
-          <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
-        </div>
-      <span class="leading-snug ms-2">Via microtransit stops</span>
-    </label>
-    <label class="flex items-start text-sm text-gray-700">
-      <div class="relative">
-          <input type="checkbox" class="sr-only overlay-toggle peer" value="via-service-area-layer" />
-          <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
-          <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
-        </div>
-      <span class="leading-snug ms-2">Via microtransit service areas</span>
-      <button class="ml-1 text-gray-500 hover:text-gray-700 info-btn" style="font-size: 10px;"
-              data-info="Via, an WRTA microtransit partnership, operates its rideshare service in the highlighted areas. Via operates between 7am-7pm."> ⓘ
-      </button>
-    </label>
-    <label class="flex items-start text-sm text-gray-700">
-      <div class="relative">
-          <input type="checkbox" class="sr-only overlay-toggle peer" value="bike-trails-layer" />
-          <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
-          <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
-        </div>
-      <span class="leading-snug ms-2">Bike or shared use paths</span>
-      <button class="ml-1 text-gray-500 hover:text-gray-700 info-btn" style="font-size: 10px;"
-              data-info="Path access may increase quality of life and offer an alternative to other modes of transportation. Bike and shared use path usage is, however, primarily recreational."> ⓘ
-      </button>
-    </label>
-    <label class="flex items-start text-sm text-gray-700">
-      <div class="relative">
-          <input type="checkbox" class="sr-only overlay-toggle peer" value="fair-ped-layer" />
-          <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
-          <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
-        </div>
-      <span class="leading-snug ms-2">Pedestrian quality: fair</span>
-      <button class="ml-1 text-gray-500 hover:text-gray-700 info-btn" style="font-size: 10px;"
-              data-info="Pedestrian access and infrastructure in the highlighted area is considered fair relative to the CMRPC region."> ⓘ
-      </button>
-    </label>
-    <label class="flex items-start text-sm text-gray-700">
-      <div class="relative">
-          <input type="checkbox" class="sr-only overlay-toggle peer" value="good-ped-layer" />
-          <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
-          <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
-        </div>
-      <span class="leading-snug ms-2">Pedestrian quality: good</span>
-      <button class="ml-1 text-gray-500 hover:text-gray-700 info-btn" style="font-size: 10px;"
-              data-info="Pedestrian access and infrastructure in the highlighted area is considered good relative to the CMRPC region."> ⓘ
-      </button>
-    </label>
-    <label class="flex items-start text-sm text-gray-700">
-      <div class="relative">
-          <input type="checkbox" class="sr-only overlay-toggle peer" value="fair-transit-layer" />
-          <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
-          <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
-        </div>
-      <span class="leading-snug ms-2">Local transit access: fair</span>
-      <button class="ml-1 text-gray-500 hover:text-gray-700 info-btn" style="font-size: 10px;"
-              data-info="Transportation access in the highlighted area is considered fair relative to the CMRPC region."> ⓘ
-      </button>
-    </label>
-    <label class="flex items-start text-sm text-gray-700">
-      <div class="relative">
-          <input type="checkbox" class="sr-only overlay-toggle peer" value="good-transit-layer" />
-          <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
-          <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
-        </div>
-      <span class="leading-snug ms-2">Local transit access: good</span>
-      <button class="ml-1 text-gray-500 hover:text-gray-700 info-btn" style="font-size: 10px;"
-              data-info="Transportation access in the highlighted area is considered good relative to the CMRPC region."> ⓘ
-      </button>
-    </label>
-    <label class="flex items-start text-sm text-gray-700">
-      <div class="relative">
-          <input type="checkbox" class="sr-only overlay-toggle peer" value="transit-diversity-layer" />
-          <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
-          <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
-        </div>
-      <span class="leading-snug ms-2">Transportation diversity</span>
-      <button class="ml-1 text-gray-500 hover:text-gray-700 info-btn" style="font-size: 10px;"
-              data-info="Areas with stronger transportation diversity, shown here, are areas where some everyday trips don't require a car and can be completed on foot, on a bike, or by using transit."> ⓘ
-      </button>
-    </label>
+
+    <div class="accordion-section mt-2">
+
+        <button type="button"
+                class="accordion-toggle w-full flex items-center justify-between
+                       text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">
+          <span>Transit services</span>
+          <svg class="accordion-icon w-3 h-3 transition-transform"
+               xmlns="http://www.w3.org/2000/svg"
+               fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+      
+        <div class="accordion-content hidden pl-3 border-l-2 border-gray-100 space-y-1">
+            <label class="flex items-start text-sm text-gray-700">
+                <div class="relative">
+                    <input type="checkbox" class="sr-only overlay-toggle peer" value="bus-stops-layer" />
+                    <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
+                    <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
+                  </div>
+                <span class="leading-snug ms-2">Bus stops</span>
+            </label>
+            <label class="flex items-start text-sm text-gray-700">
+              <div class="relative">
+                  <input type="checkbox" class="sr-only overlay-toggle peer" value="wrta-fixed-layer" />
+                  <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
+                  <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
+                </div>
+              <span class="leading-snug ms-2">WRTA fixed transit lines</span>
+            </label>
+            <label class="flex items-start text-sm text-gray-700">
+              <div class="relative">
+                  <input type="checkbox" class="sr-only overlay-toggle peer" value="train-stops-layer" />
+                  <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
+                  <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
+                </div>
+              <span class="leading-snug ms-2">Rail stops</span>
+            </label>
+            <label class="flex items-start text-sm text-gray-700">
+              <div class="relative">
+                  <input type="checkbox" class="sr-only overlay-toggle peer" value="via-stops-layer" />
+                  <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
+                  <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
+                </div>
+              <span class="leading-snug ms-2">Via microtransit stops</span>
+            </label>
+            <label class="flex items-start text-sm text-gray-700">
+              <div class="relative">
+                  <input type="checkbox" class="sr-only overlay-toggle peer" value="via-service-area-layer" />
+                  <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
+                  <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
+                </div>
+              <span class="leading-snug ms-2">Via microtransit service areas</span>
+              <button class="ml-1 text-gray-500 hover:text-gray-700 info-btn" style="font-size: 10px;"
+                      data-info="Via, an WRTA microtransit partnership, operates its rideshare service in the highlighted areas. Via operates between 7am-7pm."> ⓘ
+              </button>
+            </label>
+            <label class="flex items-start text-sm text-gray-700">
+              <div class="relative">
+                  <input type="checkbox" class="sr-only overlay-toggle peer" value="bike-trails-layer" />
+                  <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
+                  <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
+                </div>
+              <span class="leading-snug ms-2">Bike or shared use paths</span>
+              <button class="ml-1 text-gray-500 hover:text-gray-700 info-btn" style="font-size: 10px;"
+                      data-info="Path access may increase quality of life and offer an alternative to other modes of transportation. Bike and shared use path usage is, however, primarily recreational."> ⓘ
+              </button>
+            </label>
+            </div>
+      </div>
+
+      <div class="accordion-section mt-2">
+
+        <button type="button"
+                class="accordion-toggle w-full flex items-center justify-between
+                       text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">
+          <span>Mobility mode quality</span>
+          <svg class="accordion-icon w-3 h-3 transition-transform"
+               xmlns="http://www.w3.org/2000/svg"
+               fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+      
+        <div class="accordion-content hidden pl-3 border-l-2 border-gray-100 space-y-1">
+            <label class="flex items-start text-sm text-gray-700">
+                <div class="relative">
+                    <input type="checkbox" class="sr-only overlay-toggle peer" value="fair-ped-layer" />
+                    <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
+                    <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
+                  </div>
+                <span class="leading-snug ms-2">Pedestrian quality: fair</span>
+                <button class="ml-1 text-gray-500 hover:text-gray-700 info-btn" style="font-size: 10px;"
+                        data-info="Pedestrian access and infrastructure in the highlighted area is considered fair relative to the CMRPC region."> ⓘ
+                </button>
+              </label>
+              <label class="flex items-start text-sm text-gray-700">
+                <div class="relative">
+                    <input type="checkbox" class="sr-only overlay-toggle peer" value="good-ped-layer" />
+                    <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
+                    <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
+                  </div>
+                <span class="leading-snug ms-2">Pedestrian quality: good</span>
+                <button class="ml-1 text-gray-500 hover:text-gray-700 info-btn" style="font-size: 10px;"
+                        data-info="Pedestrian access and infrastructure in the highlighted area is considered good relative to the CMRPC region."> ⓘ
+                </button>
+              </label>
+              <label class="flex items-start text-sm text-gray-700">
+                <div class="relative">
+                    <input type="checkbox" class="sr-only overlay-toggle peer" value="fair-transit-layer" />
+                    <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
+                    <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
+                  </div>
+                <span class="leading-snug ms-2">Local transit access: fair</span>
+                <button class="ml-1 text-gray-500 hover:text-gray-700 info-btn" style="font-size: 10px;"
+                        data-info="Transportation access in the highlighted area is considered fair relative to the CMRPC region."> ⓘ
+                </button>
+              </label>
+              <label class="flex items-start text-sm text-gray-700">
+                <div class="relative">
+                    <input type="checkbox" class="sr-only overlay-toggle peer" value="good-transit-layer" />
+                    <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
+                    <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
+                  </div>
+                <span class="leading-snug ms-2">Local transit access: good</span>
+                <button class="ml-1 text-gray-500 hover:text-gray-700 info-btn" style="font-size: 10px;"
+                        data-info="Transportation access in the highlighted area is considered good relative to the CMRPC region."> ⓘ
+                </button>
+              </label>
+              <label class="flex items-start text-sm text-gray-700">
+                <div class="relative">
+                    <input type="checkbox" class="sr-only overlay-toggle peer" value="transit-diversity-layer" />
+                    <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
+                    <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
+                  </div>
+                <span class="leading-snug ms-2">Transportation diversity</span>
+                <button class="ml-1 text-gray-500 hover:text-gray-700 info-btn" style="font-size: 10px;"
+                        data-info="Areas with stronger transportation diversity, shown here, are areas where some everyday trips don't require a car and can be completed on foot, on a bike, or by using transit."> ⓘ
+                </button>
+              </label>
+            </div>
+      </div>
 
     <!-- Zoning Section -->
     <div class="text-xs font-semibold text-gray-600 uppercase tracking-wide mt-3 mb-1">Zoning</div>
-    <label class="flex items-start text-sm text-gray-700">
-      <div class="relative">
-          <input type="checkbox" class="sr-only overlay-toggle peer" value="mf-byright-layer" />
-          <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
-          <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
+
+
+<div class="accordion-section mt-2">
+
+        <button type="button"
+                class="accordion-toggle w-full flex items-center justify-between
+                       text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">
+          <span>Multifamily allowed</span>
+          <svg class="accordion-icon w-3 h-3 transition-transform"
+               xmlns="http://www.w3.org/2000/svg"
+               fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+
+    <div class="accordion-content hidden pl-3 border-l-2 border-gray-100 space-y-1">
+        <label class="flex items-start text-sm text-gray-700">
+            <div class="relative">
+                <input type="checkbox" class="sr-only overlay-toggle peer" value="mf-byright-layer" />
+                <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
+                <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
+              </div>
+            <span class="leading-snug ms-2">Multifamily allowed by-right</span>
+            <button class="ml-1 text-gray-500 hover:text-gray-700 info-btn" style="font-size: 10px;"
+                    data-info="Multifamily housing, if pursued in the highlighted area, is permitted by-right under the respective municipality's zoning."> ⓘ
+            </button>
+          </label>
+          <label class="flex items-start text-sm text-gray-700">
+            <div class="relative">
+                <input type="checkbox" class="sr-only overlay-toggle peer" value="mf-specialpermit-layer" />
+                <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
+                <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
+              </div>
+            <span class="leading-snug ms-2">Multifamily allowed by special permit/review</span>
+            <button class="ml-1 text-gray-500 hover:text-gray-700 info-btn" style="font-size: 10px;"
+                    data-info="Multifamily housing, if pursued in the highlighted area, requires special permitting and/or review under the respective municipality's zoning."> ⓘ
+            </button>
+          </label>
         </div>
-      <span class="leading-snug ms-2">Multifamily allowed by-right</span>
-      <button class="ml-1 text-gray-500 hover:text-gray-700 info-btn" style="font-size: 10px;"
-              data-info="Multifamily housing, if pursued in the highlighted area, is permitted by-right under the respective municipality's zoning."> ⓘ
-      </button>
-    </label>
+  </div>
+    
+    
+
+  <div class="accordion-section mt-2">
+
+    <button type="button"
+            class="accordion-toggle w-full flex items-center justify-between
+                   text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">
+      <span>Zoned capacity</span>
+      <svg class="accordion-icon w-3 h-3 transition-transform"
+           xmlns="http://www.w3.org/2000/svg"
+           fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M19 9l-7 7-7-7" />
+      </svg>
+    </button>
+
+<div class="accordion-content hidden pl-3 border-l-2 border-gray-100 space-y-1">
     <label class="flex items-start text-sm text-gray-700">
-      <div class="relative">
-          <input type="checkbox" class="sr-only overlay-toggle peer" value="mf-specialpermit-layer" />
-          <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
-          <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
-        </div>
-      <span class="leading-snug ms-2">Multifamily allowed by special permit/review</span>
-      <button class="ml-1 text-gray-500 hover:text-gray-700 info-btn" style="font-size: 10px;"
-              data-info="Multifamily housing, if pursued in the highlighted area, requires special permitting and/or review under the respective municipality's zoning."> ⓘ
-      </button>
-    </label>
-    <label class="flex items-start text-sm text-gray-700">
-      <div class="relative">
-          <input type="checkbox" class="sr-only overlay-toggle peer" value="exceeds-capacity-layer" />
-          <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
-          <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
-        </div>
-      <span class="leading-snug ms-2">Exceeds zoned density</span>
-      <button class="ml-1 text-gray-500 hover:text-gray-700 info-btn" style="font-size: 10px;"
-              data-info="This area does not allow multi-family development. Current development patterns, however, exceed a three unit/acre density. It may be worth up-zoning this area should relatively dense development trends continue."> ⓘ
-      </button>
-    </label>
-    <label class="flex items-start text-sm text-gray-700">
-      <div class="relative">
-          <input type="checkbox" class="sr-only overlay-toggle peer" value="excess-capacity-layer" />
-          <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
-          <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
-        </div>
-      <span class="leading-snug ms-2">Excess capacity by zoning</span>
-      <button class="ml-1 text-gray-500 hover:text-gray-700 info-btn" style="font-size: 10px;"
-              data-info="This area either allows multi-family development by-right or by special permit/special review. Current development does not exceed three units per acre. There may be excess capacity for additional units should there be interest in further development or redevelopment."> ⓘ
-      </button>
-    </label> <!--new section start here -- Suitability?? unless we add a separate UI for this part of the tool-->
+        <div class="relative">
+            <input type="checkbox" class="sr-only overlay-toggle peer" value="exceeds-capacity-layer" />
+            <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
+            <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
+          </div>
+        <span class="leading-snug ms-2">Exceeds zoned density</span>
+        <button class="ml-1 text-gray-500 hover:text-gray-700 info-btn" style="font-size: 10px;"
+                data-info="This area does not allow multi-family development. Current development patterns, however, exceed a three unit/acre density. It may be worth up-zoning this area should relatively dense development trends continue."> ⓘ
+        </button>
+      </label>
+      <label class="flex items-start text-sm text-gray-700">
+        <div class="relative">
+            <input type="checkbox" class="sr-only overlay-toggle peer" value="excess-capacity-layer" />
+            <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
+            <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
+          </div>
+        <span class="leading-snug ms-2">Excess capacity by zoning</span>
+        <button class="ml-1 text-gray-500 hover:text-gray-700 info-btn" style="font-size: 10px;"
+                data-info="This area either allows multi-family development by-right or by special permit/special review. Current development does not exceed three units per acre. There may be excess capacity for additional units should there be interest in further development or redevelopment."> ⓘ
+        </button>
+      </label> 
+    </div>
+</div>
+    
+
+<!--new section start here -- Suitability?? unless we add a separate UI for this part of the tool-->
     <div class="text-xs font-semibold text-gray-600 uppercase tracking-wide mt-3 mb-1">Suitability</div>
-    <div class="mt-2">
-      <div class="text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">
-        Inputs
-      </div>
-    </div>
 
-    <div class="pl-3 border-l-2 border-gray-200 space-y-1">
-      <!--layrs here!! Housing readiness + buildable screen(s)??-->
-      </div>
-      <div class="mt-2">
-        <div class="text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">
-          Opportunity Sites
-        </div>
-      </div>
+    <div class="accordion-section mt-2">
 
-      <div class="pl-3 border-l-2 border-gray-100 space-y-1">
-    <label class="flex items-start text-sm text-gray-700">
-      <div class="relative">
-          <input type="checkbox" class="sr-only overlay-toggle peer" value="assessor-vacancy-layer" />
-          <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
-          <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
-        </div>
-      <span class="leading-snug ms-2">Vacant parcels</span>
-      <button class="ml-1 text-gray-500 hover:text-gray-700 info-btn" style="font-size: 10px;"
-              data-info="How we defined vacant for this layer, etc, etc."> ⓘ
-      </button>
-    </label>
-    <label class="flex items-start text-sm text-gray-700">
-      <div class="relative">
-          <input type="checkbox" class="sr-only overlay-toggle peer" value="soft-site-layer" />
-          <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
-          <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
-        </div>
-      <span class="leading-snug ms-2">Soft sites</span>
-      <button class="ml-1 text-gray-500 hover:text-gray-700 info-btn" style="font-size: 10px;"
-              data-info="How we defined soft sites for this layer, etc, etc."> ⓘ
-      </button>
-    </label>
-    <label class="flex items-start text-sm text-gray-700">
-      <div class="relative">
-          <input type="checkbox" class="sr-only overlay-toggle peer" value="hex-highest-prem" />
-          <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
-          <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
-        </div>
-      <span class="leading-snug ms-2">Highest premium for land due to location</span>
-      <button class="ml-1 text-gray-500 hover:text-gray-700 info-btn" style="font-size: 10px;"
-              data-info="How we defined soft sites for this layer, etc, etc."> ⓘ
-      </button>
-    </label>
-    <label class="flex items-start text-sm text-gray-700">
-      <div class="relative">
-          <input type="checkbox" class="sr-only overlay-toggle peer" value="hex-high-prem" />
-          <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
-          <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
-        </div>
-      <span class="leading-snug ms-2">Somewhat high premium for land due to location</span>
-      <button class="ml-1 text-gray-500 hover:text-gray-700 info-btn" style="font-size: 10px;"
-              data-info="How we defined soft sites for this layer, etc, etc."> ⓘ
-      </button>
-    </label>
-    <label class="flex items-start text-sm text-gray-700">
-      <div class="relative">
-          <input type="checkbox" class="sr-only overlay-toggle peer" value="hex-mid-prem"/>
-          <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
-          <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
-        </div>
-      <span class="leading-snug ms-2">No land discount or premium due to location</span>
-      <button class="ml-1 text-gray-500 hover:text-gray-700 info-btn" style="font-size: 10px;"
-              data-info="How we defined soft sites for this layer, etc, etc."> ⓘ
-      </button>
-    </label>
-    <label class="flex items-start text-sm text-gray-700">
-      <div class="relative">
-          <input type="checkbox" class="sr-only overlay-toggle peer" value="hex-low-prem"/>
-          <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
-          <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
-        </div>
-      <span class="leading-snug ms-2">Somewhat high discount for land due to location</span>
-      <button class="ml-1 text-gray-500 hover:text-gray-700 info-btn" style="font-size: 10px;"
-              data-info="How we defined soft sites for this layer, etc, etc."> ⓘ
-      </button>
-    </label>
-    <label class="flex items-start text-sm text-gray-700">
-      <div class="relative">
-          <input type="checkbox" class="sr-only overlay-toggle peer" value="hex-lowest-prem"/>
-          <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
-          <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
-        </div>
-      <span class="leading-snug ms-2">Highest discount for land due to location</span>
-      <button class="ml-1 text-gray-500 hover:text-gray-700 info-btn" style="font-size: 10px;"
-              data-info="How we defined soft sites for this layer, etc, etc."> ⓘ
-      </button>
-    </label>
-    </div>
-    <div class="mt-2">
-      <div class="text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">
-        Policy Considerations
+        <button type="button"
+                class="accordion-toggle w-full flex items-center justify-between
+                       text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">
+          <span>Opportunity sites</span>
+          <svg class="accordion-icon w-3 h-3 transition-transform"
+               xmlns="http://www.w3.org/2000/svg"
+               fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+      
+        <div class="accordion-content hidden pl-3 border-l-2 border-gray-100 space-y-1">
+                <label class="flex items-start text-sm text-gray-700">
+                  <div class="relative">
+                      <input type="checkbox" class="sr-only overlay-toggle peer" value="assessor-vacancy-layer" />
+                      <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
+                      <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
+                    </div>
+                  <span class="leading-snug ms-2">Vacant parcels</span>
+                  <button class="ml-1 text-gray-500 hover:text-gray-700 info-btn" style="font-size: 10px;"
+                          data-info="How we defined vacant for this layer, etc, etc."> ⓘ
+                  </button>
+                </label>
+                <label class="flex items-start text-sm text-gray-700">
+                  <div class="relative">
+                      <input type="checkbox" class="sr-only overlay-toggle peer" value="soft-site-layer" />
+                      <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
+                      <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
+                    </div>
+                  <span class="leading-snug ms-2">Soft sites</span>
+                  <button class="ml-1 text-gray-500 hover:text-gray-700 info-btn" style="font-size: 10px;"
+                          data-info="How we defined soft sites for this layer, etc, etc."> ⓘ
+                  </button>
+                </label>
+                <label class="flex items-start text-sm text-gray-700">
+                  <div class="relative">
+                      <input type="checkbox" class="sr-only overlay-toggle peer" value="hex-highest-prem" />
+                      <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
+                      <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
+                    </div>
+                  <span class="leading-snug ms-2">Highest premium for land due to location</span>
+                  <button class="ml-1 text-gray-500 hover:text-gray-700 info-btn" style="font-size: 10px;"
+                          data-info="How we defined soft sites for this layer, etc, etc."> ⓘ
+                  </button>
+                </label>
+                <label class="flex items-start text-sm text-gray-700">
+                  <div class="relative">
+                      <input type="checkbox" class="sr-only overlay-toggle peer" value="hex-some-prem" />
+                      <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
+                      <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
+                    </div>
+                  <span class="leading-snug ms-2">Somewhat high premium for land due to location</span>
+                  <button class="ml-1 text-gray-500 hover:text-gray-700 info-btn" style="font-size: 10px;"
+                          data-info="How we defined soft sites for this layer, etc, etc."> ⓘ
+                  </button>
+                </label>
+                <label class="flex items-start text-sm text-gray-700">
+                  <div class="relative">
+                      <input type="checkbox" class="sr-only overlay-toggle peer" value="hex-no-prem"/>
+                      <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
+                      <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
+                    </div>
+                  <span class="leading-snug ms-2">No land discount or premium due to location</span>
+                  <button class="ml-1 text-gray-500 hover:text-gray-700 info-btn" style="font-size: 10px;"
+                          data-info="How we defined soft sites for this layer, etc, etc."> ⓘ
+                  </button>
+                </label>
+                <label class="flex items-start text-sm text-gray-700">
+                  <div class="relative">
+                      <input type="checkbox" class="sr-only overlay-toggle peer" value="hex-some-disc"/>
+                      <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
+                      <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
+                    </div>
+                  <span class="leading-snug ms-2">Somewhat high discount for land due to location</span>
+                  <button class="ml-1 text-gray-500 hover:text-gray-700 info-btn" style="font-size: 10px;"
+                          data-info="How we defined soft sites for this layer, etc, etc."> ⓘ
+                  </button>
+                </label>
+                <label class="flex items-start text-sm text-gray-700">
+                  <div class="relative">
+                      <input type="checkbox" class="sr-only overlay-toggle peer" value="hex-highest-disc"/>
+                      <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
+                      <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
+                    </div>
+                  <span class="leading-snug ms-2">Highest discount for land due to location</span>
+                  <button class="ml-1 text-gray-500 hover:text-gray-700 info-btn" style="font-size: 10px;"
+                          data-info="How we defined soft sites for this layer, etc, etc."> ⓘ
+                  </button>
+                </label>
+                </div>
+    
+      
       </div>
-    </div>
+    
 
-    <div class="pl-3 border-l-2 border-gray-100 space-y-1">
+
+    <div class="accordion-section mt-2">
+
+        <button
+          type="button"
+          class="accordion-toggle w-full flex items-center justify-between
+                 text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">
+          <span>Policy Considerations</span>
+          <svg class="accordion-icon w-3 h-3 transition-transform"
+               xmlns="http://www.w3.org/2000/svg"
+               fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+      
+        <div class="accordion-content hidden pl-3 border-l-2 border-gray-100 space-y-1">
+                <label class="flex items-start text-sm text-gray-700">
+                  <div class="relative"> 
+                      <input type="checkbox" class="sr-only overlay-toggle peer" value="tracts-strongmkt-overlay" />
+                      <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
+                      <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
+                    </div>
+                  <span class="leading-snug ms-2">Strong market areas</span>
+                  <button class="ml-1 text-gray-500 hover:text-gray-700 info-btn" style="font-size: 10px;"
+                          data-info="Language about development policies, etc, that encourage a strong market and the future development of multifamily housing"> ⓘ
+                  </button>
+                </label>
+                <label class="flex items-start text-sm text-gray-700">
+                  <div class="relative"> 
+                      <input type="checkbox" class="sr-only overlay-toggle peer" value="tracts-midmkt-overlay" />
+                      <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
+                      <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
+                    </div>
+                  <span class="leading-snug ms-2">Mid market areas</span>
+                  <button class="ml-1 text-gray-500 hover:text-gray-700 info-btn" style="font-size: 10px;"
+                          data-info="Medium market strategies, light methods, etc"> ⓘ
+                  </button>
+                </label>
+                <label class="flex items-start text-sm text-gray-700">
+                  <div class="relative"> 
+                      <input type="checkbox" class="sr-only overlay-toggle peer" value="tracts-weakmkt-overlay" />
+                      <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
+                      <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
+                    </div>
+                  <span class="leading-snug ms-2">Weak market areas</span>
+                  <button class="ml-1 text-gray-500 hover:text-gray-700 info-btn" style="font-size: 10px;"
+                          data-info="Language about nuturing policies, etc, and light methods"> ⓘ
+                  </button>
+                </label>
+                <label class="flex items-start text-sm text-gray-700">
+                  <div class="relative"> <!--dummy layer replace!!-->
+                      <input type="checkbox" class="sr-only overlay-toggle peer" value="gen-rd-layer" />
+                      <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
+                      <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
+                    </div>
+                  <span class="leading-snug ms-2">General displacement risk</span>
+                  <button class="ml-1 text-gray-500 hover:text-gray-700 info-btn" style="font-size: 10px;"
+                          data-info="How we developed priority areas, etc."> ⓘ
+                  </button>
+                </label>
+                <div class="mt-2">
+                  <div class="text-[9px] font-semibold text-gray-500 uppercase tracking-wide mb-1">
+                    Demographics of interest
+                  </div>
+                </div>
+          
+                <div class="pl-3 border-l-2 border-gray-100 space-y-1">
+                <label class="flex items-start text-sm text-gray-700">
+                  <div class="relative"> 
+                      <input type="checkbox" class="sr-only overlay-toggle peer" value="nonwhite-layer" />
+                      <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
+                      <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
+                    </div>
+                  <span class="leading-snug ms-2"> Non-white households</span>
+                  <button class="ml-1 text-gray-500 hover:text-gray-700 info-btn" style="font-size: 10px;"
+                          data-info="Why this demographic matters in context of displacement - marginalization and historically capital disenfranchisement"> ⓘ
+                  </button>
+                </label>
+                <label class="flex items-start text-sm text-gray-700">
+                  <div class="relative"> 
+                      <input type="checkbox" class="sr-only overlay-toggle peer" value="seniors-layer" />
+                      <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
+                      <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
+                    </div>
+                  <span class="leading-snug ms-2">Senior households</span>
+                  <button class="ml-1 text-gray-500 hover:text-gray-700 info-btn" style="font-size: 10px;"
+                          data-info="Why this demographic matters in context of displacement - fixed incomes and market shock, downsizing interest, age, etc"> ⓘ
+                  </button>
+                </label>
+              </div>
+        </div>
+      
+      </div>
+      
+
+   <!-- <div class="pl-3 border-l-2 border-gray-100 space-y-1">
       <label class="flex items-start text-sm text-gray-700">
         <div class="relative"> 
             <input type="checkbox" class="sr-only overlay-toggle peer" value="tracts-strongmkt-overlay" />
@@ -554,7 +758,7 @@
         </button>
       </label>
       <label class="flex items-start text-sm text-gray-700">
-        <div class="relative"> <!--dummy layer replace!!-->
+        <div class="relative"> 
             <input type="checkbox" class="sr-only overlay-toggle peer" value="gen-rd-layer" />
             <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
             <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
@@ -594,59 +798,72 @@
         </button>
       </label>
       </div>
-    </div>
-    <!--<div class="mt-2">
-      <div class="text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">
-        Potential Density
-      </div>
-    </div>
+    </div>--> 
+    <div class="accordion-section mt-2">
 
-    <div class="pl-3 border-l-2 border-gray-100 space-y-1">
-    <label class="flex items-start text-sm text-gray-700">
-      <div class="relative">
-          <input type="checkbox" class="sr-only overlay-toggle peer" value="suit-a"/>
-          <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
-          <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
-        </div>
-      <span class="leading-snug ms-2">Suitability: high</span>
-      <button class="ml-1 text-gray-500 hover:text-gray-700 info-btn" style="font-size: 10px;"
-              data-info="How we defined housing readiness for this layer, etc, etc."> ⓘ
-      </button>
-    </label>
-    <label class="flex items-start text-sm text-gray-700">
-      <div class="relative">
-          <input type="checkbox" class="sr-only overlay-toggle peer" value="suit-b" />
-          <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
-          <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
-        </div>
-      <span class="leading-snug ms-2">Suitability: somewhat high</span>
-      <button class="ml-1 text-gray-500 hover:text-gray-700 info-btn" style="font-size: 10px;"
-              data-info="Same language as above."> ⓘ
-      </button>
-    </label>
-    <label class="flex items-start text-sm text-gray-700">
-      <div class="relative">
-          <input type="checkbox" class="sr-only overlay-toggle peer" value="suit-c" />
-          <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
-          <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
-        </div>
-      <span class="leading-snug ms-2">Suitability: somewhat limited</span>
-      <button class="ml-1 text-gray-500 hover:text-gray-700 info-btn" style="font-size: 10px;"
-              data-info="Same language as above."> ⓘ
-      </button>
-    </label>
-    <label class="flex items-start text-sm text-gray-700">
-      <div class="relative">
-          <input type="checkbox" class="sr-only overlay-toggle peer" value="suit-d" />
-          <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
-          <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
-        </div>
-      <span class="leading-snug ms-2">Suitability: limited</span>
-      <button class="ml-1 text-gray-500 hover:text-gray-700 info-btn" style="font-size: 10px;"
-              data-info="Same language as above."> ⓘ
-      </button>
-    </label>
-    </div>-->
+        <button type="button"
+                class="accordion-toggle w-full flex items-center justify-between
+                       text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">
+          <span>Potential density</span>
+          <svg class="accordion-icon w-3 h-3 transition-transform"
+               xmlns="http://www.w3.org/2000/svg"
+               fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+      
+        <div class="accordion-content hidden pl-3 border-l-2 border-gray-100 space-y-1">
+                <label class="flex items-start text-sm text-gray-700">
+                  <div class="relative">
+                      <input type="checkbox" class="sr-only overlay-toggle peer" value="suit-a"/>
+                      <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
+                      <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
+                    </div>
+                  <span class="leading-snug ms-2">Suitability: high</span>
+                  <button class="ml-1 text-gray-500 hover:text-gray-700 info-btn" style="font-size: 10px;"
+                          data-info="How we defined housing readiness for this layer, etc, etc."> ⓘ
+                  </button>
+                </label>
+                <label class="flex items-start text-sm text-gray-700">
+                  <div class="relative">
+                      <input type="checkbox" class="sr-only overlay-toggle peer" value="suit-b" />
+                      <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
+                      <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
+                    </div>
+                  <span class="leading-snug ms-2">Suitability: somewhat high</span>
+                  <button class="ml-1 text-gray-500 hover:text-gray-700 info-btn" style="font-size: 10px;"
+                          data-info="Same language as above."> ⓘ
+                  </button>
+                </label>
+                <label class="flex items-start text-sm text-gray-700">
+                  <div class="relative">
+                      <input type="checkbox" class="sr-only overlay-toggle peer" value="suit-c" />
+                      <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
+                      <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
+                    </div>
+                  <span class="leading-snug ms-2">Suitability: somewhat limited</span>
+                  <button class="ml-1 text-gray-500 hover:text-gray-700 info-btn" style="font-size: 10px;"
+                          data-info="Same language as above."> ⓘ
+                  </button>
+                </label>
+                <label class="flex items-start text-sm text-gray-700">
+                  <div class="relative">
+                      <input type="checkbox" class="sr-only overlay-toggle peer" value="suit-d" />
+                      <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
+                      <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
+                    </div>
+                  <span class="leading-snug ms-2">Suitability: limited</span>
+                  <button class="ml-1 text-gray-500 hover:text-gray-700 info-btn" style="font-size: 10px;"
+                          data-info="Same language as above."> ⓘ
+                  </button>
+                </label>
+                </div>
+
+      
+      </div>
+      
+
       <!--new section end here-->
   </label>
 
@@ -691,7 +908,7 @@
     <div>
         <label class="block mb-1 font-medium">Basemap style</label>
         <div id="basemap-style-thumbnails" class="flex gap-2">
-            <button data-style="communityscale/cmgicidwh007k01qdauae93b0" class="px-3 py-1 bg-black text-white text-xs rounded hover:bg-gray-800">
+            <button data-style="communityscale/cmgicidwh007k01qdauae93b0" class="px-3 py-1 bg-black text-white text-xs mb-2 rounded hover:bg-gray-800">
                 Gray
               </button>
               <!--
@@ -810,12 +1027,9 @@
         'zip-chZHVI',
         'parcels-landuse',
         'buildable-land',
-        //'parcels-pctLV',
-        //'parcels-value',
         'parcels-density',
         "bg-transport-diversity-layer",
         "bg-residensity-layer"
-        //'admin-layer' //not sure if admin layer should be included here
     ];
 
     const overlayLayers = [ // all overlay layers need to be listed here
@@ -842,17 +1056,14 @@
         "wrta-fixed-layer",
         "bike-trails-layer",
         "assessor-vacancy-layer",
-        "tracts-rd-gen-layer",
-        "tracts-seniors-layer",
-        "tracts-nonwhite-layer",
         "tracts-strongmkt-overlay",
         "tracts-midmkt-overlay",
         "tracts-weakmkt-overlay",
         "hex-highest-prem",
-        "hex-high-prem",
-        "hex-mid-prem",
-        "hex-low-prem",
-        "hex-lowest-prem",
+        "hex-some-prem",
+        "hex-no-prem",
+        "hex-some-disc",
+        "hex-highest-disc",
         "soft-site-layer",
         "seniors-layer",
         "nonwhite-layer",
@@ -971,7 +1182,8 @@ function batchSetFeatureStates({ //batching experiment
     density: Number(f["DUA"]),
     useCode: f["use_2"],
     SiteAddress: f["SiteAddres"],
-    description: f["UseDesc"]
+    description: f["UseDesc"],
+    suitclass1: f["suitclass1"]
   })
 }) {
   let i = 0;
@@ -1079,6 +1291,12 @@ function batchSetFeatureStates({ //batching experiment
             data: 'https://raw.githubusercontent.com/CommunityScale/CMRPC/refs/heads/main/communityboundaries.geojson'
         })
 
+        map.addSource("suitability-classes", {
+            type: "geojson",
+            data: "suitability_clip_dissolve_260129.geojson",
+            promoteId: "suitclass1"
+        })
+
         map.addSource("subregions", {
             type: "geojson",
             data: 'CMRPC_Subregions_251120.geojson',
@@ -1149,8 +1367,8 @@ function batchSetFeatureStates({ //batching experiment
 
         map.addSource("assessor-vacancy", {
             type: "geojson",
-            data: "cmrpc_vacantresparcels_260108.geojson", //replace with an updated version that includes vacant commercial properties 
-            promoteId: "MAP_PAR_ID"
+            data: "cmrpc_assessor_vacany_260226.geojson", //replace with an updated version that includes vacant commercial properties 
+            promoteId: "LOC_ID"
         })
 
         map.addSource("tracts-demo-suitability", {
@@ -1166,8 +1384,8 @@ function batchSetFeatureStates({ //batching experiment
 
         map.addSource("hexes-location-premiums", {
             type: "geojson",
-            data: "CMRPC_Hexes_PremiumDiscount_260128_v2.geojson",
-            promoteId: "fid"
+            data: "hex_home_index.geojson",
+            promoteId: "hex_id"
         })
 
         map.addSource("excess-capacity", {
@@ -1225,7 +1443,7 @@ function batchSetFeatureStates({ //batching experiment
                     });
                 });
 
-                fetch('CMRPC_Parcels_LandUse_Density_251203.json') //batching experiment!
+                fetch('CMRPC_Parcels_Suitability_LandUse_DUA_260302.json') //batching experiment!
                     .then(response => response.json())
                     .then(data => {
                         batchSetFeatureStates({
@@ -1544,84 +1762,6 @@ const interpolateLayers = [
             useFeatureState: false,
             useQuintiles: true
         },
-        // {
-        //     id: "parcels-pctLV",
-        //     property: "pctLandVal",
-        //     data_source: "parcels",
-        //     source_url: "https://raw.githubusercontent.com/CommunityScale/JohnsonCounty/main/uninc_parcels_jcia.geojson",
-        //     colors: landValuePalette,
-        //     defaultViz: "none",
-        //     useFeatureState: true
-        // },
-        // {
-        //     id: "parcels-value",
-        //     property: "acreVal",
-        //     data_source: "parcels",
-        //     source_url: "https://raw.githubusercontent.com/CommunityScale/JohnsonCounty/main/uninc_parcels_jcia.geojson",
-        //     colors: parcelValuePalette,
-        //     defaultViz: "none",
-        //     useFeatureState: true
-        // },
-        // {
-        //     id: "parcels-density",
-        //     property: "DUA", //LIPA
-        //     data_source: "parcels",
-        //     source_url: "https://raw.githubusercontent.com/CommunityScale/JohnsonCounty/main/uninc_parcels_jcia.geojson",
-        //     colors: parcelValuePalette,
-        //     defaultViz: "none",
-        //     useFeatureState: true
-        // },
-        // {
-        //     id: 'zip-currentZHVI', //to use again when data source is json/geojson!!
-        //     property: 'zhvi25',
-        //     data_source: 'zips',
-        //     'source-layer': 'massachusetts_zips-4e09nn',
-        //     source_url: "replace",
-        //     colors: pricePalette,
-        //     defaultViz: "none",
-        //     useFeatureState: false 
-        // },
-        // {
-        //     id: 'zip-chZHVI',
-        //     property: 'chZhvi',
-        //     data_source: 'zips',
-        //     'source-layer': 'massachusetts_zips-4e09nn',
-        //     source_url: "replace",
-        //     colors: chPricePalette,
-        //     defaultViz: "none",
-        //     useFeatureState: false 
-        // },
-        // {
-        //     id: 'ctysds-pctHH',
-        //     property: 'pctChangeHH',
-        //     data_source: "ctysds",
-        //     'source-layer': 'massachusetts_ctysds-3vobtg',
-        //     source_url: "replace",
-        //     colors: hhChangePalette,
-        //     defaultViz: "none",
-        //     useFeatureState: false 
-        // },
-        // {   
-        //     id: "tracts-rdAge",
-        //     property: "rd_seniors",
-        //     data_source: "tracts",
-        //     "source-layer": "tracts", //not sure if needed
-        //     source_url: "https://raw.githubusercontent.com/emtzot/mapSources/main/CMRPC_RiskDisplacement_2023_ACS5Yr_Tract_250702.json",
-        //     colors: riskDisplacementPalette, 
-        //     defaultViz: "none",
-        //     useFeatureState: true
-        // },
-        // {   
-        //     id: "tracts-rdRace",
-        //     property: "rd_nonWhitePops",
-        //     data_source: "tracts",
-        //     "source-layer": "tracts", //not sure if needed
-        //     source_url: "https://raw.githubusercontent.com/emtzot/mapSources/main/CMRPC_RiskDisplacement_2023_ACS5Yr_Tract_250702.json",
-        //     colors: riskDisplacementPalette,  
-        //     defaultViz: "none",
-        //     useFeatureState: true
-        // }
-
             
     ]
 
@@ -2159,44 +2299,6 @@ map.addLayer({
             },
             labelLayerId)
 
-
-    // map.addLayer({ 
-    //         id: "parcels-pctLV",  
-    //         type: "fill",
-    //         source: "parcels",
-    //              'source-layer': 'parcels',
-    //         paint: {
-    //             "fill-color": [
-    //                 "case", ["==", ["get", "pctLandVal"], null], communityScaleGray,
-    //                 ["interpolate", 
-    //                 ["linear"],
-    //                 ["get", "pctLandVal"],
-    //                 0.03,
-    //                 landValuePalette[4], 
-    //                 0.15,
-    //                 landValuePalette[3],
-    //                 0.35,
-    //                 landValuePalette[2],
-    //                 0.65,
-    //                 landValuePalette[1],
-    //                 0.90,
-    //                 landValuePalette[0]]],
-    //             "fill-outline-color": "#545453",
-    //             "fill-opacity": [
-    //                 "case", ["==", ["get", "pctLandVal"], null], 0.3,
-    //                 ["case",
-    //                 ["boolean", ["feature-state", "hover"], false],
-    //                 0.95,
-    //                 0.66
-    //         ]]
-    //          },
-    //          layout: {
-    //             visibility: "none"
-    //          }
-    //     },
-    //     labelLayerId
-    // )
-
     // Transit diversity fill layer (polygon fill)
     map.addLayer({
             id: 'transit-diversity-layer',
@@ -2252,9 +2354,9 @@ map.addLayer({
           }}, 
         labelLayerId
   )
-
-  //displacement risk overlays
-  map.addLayer({
+  
+    //displacement base layers 
+    map.addLayer({
             id: "gen-rd-layer",
             type: "fill",
             source: "tracts-demo-suitability",
@@ -2335,23 +2437,9 @@ map.addLayer({
     labelLayerId
   )
   
-  map.addLayer({
-            id: 'mf-byright-layer',
-            type: 'fill',
-            source: 'mf-byright',
-            paint: {
-              'fill-color': '#028b57', //mbta green lol
-              'fill-opacity': 0.6
-            },
-          layout: {
-            visibility: 'none'
-          }},
-        labelLayerId
-  )
 
-
-  //suitability layers 
-  map.addLayer({
+    //suitability overlays here!!
+    map.addLayer({
             id: "tracts-strongmkt-overlay",
             type: "fill",
             source: "tracts-demo-suitability",
@@ -2406,15 +2494,20 @@ map.addLayer({
   map.addLayer({
             id: "suit-a",
             type: "fill",
-            source: "suitability-classes",
+            source: "parcels",
+                'source-layer': 'CMRPC_Parcels_Cleaned_NoData_251008',
             paint: {
-              "fill-color": "#fde725", 
-              "fill-opacity": 0.5
+                "fill-color": [
+                    "match",
+                    ["feature-state", "suitclass1"],  
+                    "A1", "#fde725",
+                    "transparent"   
+                    ],
+                "fill-opacity": 0.5,
             },
             layout: {
               visibility: "none"
-            },
-            filter: ["==", ["get", "suitclass1"], "A1"]
+            }
     },
   labelLayerId
   )
@@ -2422,23 +2515,25 @@ map.addLayer({
   map.addLayer({
             id: "suit-b",
             type: "fill",
-            source: "suitability-classes",
+            source: "parcels",
+                'source-layer': 'CMRPC_Parcels_Cleaned_NoData_251008',
             paint: {
-              "fill-color": "#3cbb75", 
-              "fill-opacity": 0.5
+                "fill-color": [
+                    "match",
+                    ["feature-state", "suitclass1"],  
+                    "B1", "#3cbb75",
+                    "B2", "#3cbb75",
+                    "B3", "#3cbb75",
+                    "B4", "#3cbb75",
+                    "B5", "#3cbb75",
+                    "B6", "#3cbb75",
+                    "transparent"  
+                    ], 
+                "fill-opacity": 0.5
             },
             layout: {
               visibility: "none"
-            },
-            filter: [
-              "any",
-              ["==", ["get", "suitclass1"], "B1"],
-              ["==", ["get", "suitclass1"], "B2"],
-              ["==", ["get", "suitclass1"], "B3"],
-              ["==", ["get", "suitclass1"], "B4"],
-              ["==", ["get", "suitclass1"], "B5"],
-              ["==", ["get", "suitclass1"], "B6"]
-            ]
+            }
     },
   labelLayerId
   )
@@ -2446,19 +2541,21 @@ map.addLayer({
   map.addLayer({
             id: "suit-c",
             type: "fill",
-            source: "suitability-classes",
+            source: "parcels",
+                'source-layer': 'CMRPC_Parcels_Cleaned_NoData_251008',
             paint: {
-              "fill-color": "#2d708e", 
-              "fill-opacity": 0.5
+                "fill-color": [
+                    "match",
+                    ["feature-state", "suitclass1"], 
+                    "C1", "#2d708e",
+                    "C2", "#2d708e",
+                    "transparent"   
+                    ], 
+                "fill-opacity": 0.5
             },
             layout: {
               visibility: "none"
-            },
-            filter: [
-              "any",
-              ["==", ["get", "suitclass1"], "C1"],
-              ["==", ["get", "suitclass1"], "C2"]
-            ]
+            }
     },
   labelLayerId
   )
@@ -2466,16 +2563,20 @@ map.addLayer({
   map.addLayer({
             id: "suit-d",
             type: "fill",
-            source: "suitability-classes",
+            source: "parcels",
+                'source-layer': 'CMRPC_Parcels_Cleaned_NoData_251008',
             paint: {
-              "fill-color": "#481567", //light yellow 2 from google
-              "fill-outline-color": "#4d9eab", //change color
+              "fill-color": [
+                    "match",
+                    ["feature-state", "suitclass1"],  
+                    "D1", "#9e0142",
+                    "transparent"   
+                    ],
               "fill-opacity": 0.5
             },
             layout: {
               visibility: "none"
-            },
-            filter: ["==", ["get", "suitclass1"], "D1"]
+            }
     },
   labelLayerId
   )
@@ -2492,13 +2593,17 @@ map.addLayer({
             layout: {
               visibility: "none"
             },
-            filter: ["==", ["get", "class"], "A"]
+            filter: [
+                "all",
+                ["!=", ["get", "home_idx"], null],
+                [">=", ["get", "home_idx"], 1.25]
+            ]         
     },
   labelLayerId
   )
 
   map.addLayer({
-            id: "hex-high-prem",
+            id: "hex-some-prem",
             type: "fill",
             source: "hexes-location-premiums",
             paint: {
@@ -2509,13 +2614,18 @@ map.addLayer({
             layout: {
               visibility: "none"
             },
-            filter: ["==", ["get", "class"], "B"]
+            filter: [
+                "all",
+                ["!=", ["get", "home_idx"], null],
+                [">=", ["get", "home_idx"], 1.05],
+                ["<", ["get", "home_idx"], 1.25]
+            ]
     },
   labelLayerId
   )
 
   map.addLayer({
-            id: "hex-mid-prem",
+            id: "hex-no-prem",
             type: "fill",
             source: "hexes-location-premiums",
             paint: {
@@ -2526,13 +2636,18 @@ map.addLayer({
             layout: {
               visibility: "none"
             },
-            filter: ["==", ["get", "class"], "C"]
+            filter: [
+                "all",
+                ["!=", ["get", "home_idx"], null],
+                [">=", ["get", "home_idx"], 0.95],
+                ["<", ["get", "home_idx"], 1.05]
+            ]
     },
   labelLayerId
   )
 
   map.addLayer({
-            id: "hex-low-prem",
+            id: "hex-some-disc",
             type: "fill",
             source: "hexes-location-premiums",
             paint: {
@@ -2543,13 +2658,18 @@ map.addLayer({
             layout: {
               visibility: "none"
             },
-            filter: ["==", ["get", "class"], "D"]
+            filter: [
+                "all",
+                ["!=", ["get", "home_idx"], null],
+                [">=", ["get", "home_idx"], 0.75],
+                ["<", ["get", "home_idx"], .95]
+            ]
     },
   labelLayerId
   )
 
   map.addLayer({
-            id: "hex-lowest-prem",
+            id: "hex-highest-disc",
             type: "fill",
             source: "hexes-location-premiums",
             paint: {
@@ -2560,9 +2680,27 @@ map.addLayer({
             layout: {
               visibility: "none"
             },
-            filter: ["==", ["get", "class"], "F"]
+            filter: [
+                "all",
+                ["!=", ["get", "home_idx"], null],
+                ["<=", ["get", "home_idx"], 0.75]
+            ]
     },
   labelLayerId
+  )
+
+  map.addLayer({
+            id: 'mf-byright-layer',
+            type: 'fill',
+            source: 'mf-byright',
+            paint: {
+              'fill-color': '#028b57', //mbta green lol
+              'fill-opacity': 0.6
+            },
+          layout: {
+            visibility: 'none'
+          }},
+        labelLayerId
   )
 
   map.addLayer({
@@ -2724,7 +2862,8 @@ map.addLayer({
             labelLayerId
         )
   
-        map.addLayer({
+
+  map.addLayer({
             id: "soft-site-layer",
             type: "fill",
             source: "soft-sites",
@@ -2756,6 +2895,10 @@ map.addLayer({
     labelLayerId
   )
 
+
+
+
+  //do not insert more overlays below this line!! These are important boundaries that must be rendering on top of data overlays/other layers
     map.addLayer({
             id: "town-layer",
             type: "line",
@@ -3600,36 +3743,6 @@ layerSelect.addEventListener('change', (e) => {
     });
 
 
-    // document.getElementById("opacity").addEventListener("input", function (e) {
-    //     const newOpacity = parseFloat(e.target.value);
-    //     const props = {
-    //         //"parcels-landuse": "PropClass", //make sure property names exist...
-    //         //"parcels-pctLV": "pctLandVal",
-    //         //"parcels-value": "acreVal",
-    //         //"parcels-density": "DUA",
-    //         'tracts-medIncome': "medIncome",
-    //         'tracts-pctCostBurdenedRenters': 'pctrent30_23',
-    //         'tracts-pctCostBurdenedOwners': 'pctowned30_23',
-    //         'tracts-rdAge': 'rd-propName',
-    //         'tracts-rdRace': 'rd_nonWhitePops',
-    //         'ctysds-pctHH': 'pctChangeHH',
-    //         'zip-currentZHVI': 'zhvi25',
-    //         'zip-chZHVI': 'chZhvi',
-    //         'admin-layer': 'GEOID'
-    //     };
-
-    //     dataLayers.forEach(layerId => {
-    //         const prop = props[layerId];
-    //         if (map.getLayer(layerId)) {
-    //             map.setPaintProperty(
-    //                 layerId,
-    //                 "fill-opacity",
-    //                 getOpacityExp(prop, newOpacity)
-    //             );
-    //         }
-    //     });
-    // });
-
     function updateLayerOpacity() {
         const currentOpacity = parseFloat(document.getElementById("opacity").value);
         const props = {
@@ -3721,7 +3834,37 @@ layerSelect.addEventListener('change', (e) => {
         'admin-layer',
         "bg-transport-diversity-layer",
         "bg-residensity-layer",
-        'bus-stops-layer'
+        "towns-layer",
+        "transit-diversity-layer",
+        "fair-transit-layer",
+        "fair-ped-layer",
+        "good-transit-layer",
+        "good-ped-layer",
+        "mf-byright-layer",
+        "mf-specialpermit-layer",
+        "excess-capacity-layer",
+        "exceeds-capacity-layer",
+        "via-service-area-layer",
+        "via-stops-layer",
+        "wrta-fixed-layer",
+        "bike-trails-layer",
+        "assessor-vacancy-layer",
+        "tracts-strongmkt-overlay",
+        "tracts-midmkt-overlay",
+        "tracts-weakmkt-overlay",
+        "hex-highest-prem",
+        "hex-some-prem",
+        "hex-no-prem",
+        "hex-some-disc",
+        "hex-highest-disc",
+        "soft-site-layer",
+        "seniors-layer",
+        "nonwhite-layer",
+        "gen-rd-layer",
+        "suit-a",
+        "suit-b",
+        "suit-d",
+        "suit-c"
 ];
            
     
@@ -3737,28 +3880,48 @@ layerSelect.addEventListener('change', (e) => {
             layers: visiblePopupLayers
             });
 
+            // Deduplicate only within suitability layers
+            const seenSuitability = new Set();
+
+            const dedupedFeatures = features.filter(f => {
+                if (f.layer.id.startsWith("suit-")) {
+                    if (seenSuitability.has(f.id)) return false;
+                    seenSuitability.add(f.id);
+                }
+                return true; 
+            });
+
             console.log("Visible & valid layers:", visiblePopupLayers); //debugging, remove
             console.log("Features at click:", features); //debugging, remove
 
+
         if (!features.length) return;
 
-        const selectedGeo = features[0]; // grabs top feature
-        const geoId = selectedGeo.layer.id;
-        const featureState = map.getFeatureState({ //static props with dynamic features or something like that 
-            source: selectedGeo.source, 
-            sourceLayer: selectedGeo.sourceLayer,
-            id: selectedGeo.id
-        });
-        const attributes = {
-            ...selectedGeo.properties,
-            ...featureState
-        };
-        let html = '';  
-        // Use click location for popup
+        let popupSections = [];
         const coords = e.lngLat;
 
-        const name = attributes.SiteAddress; //for parcels/reused naming where it would be chaotic to reuse same lines in multiple blocks; use lines like these to deal with names of non-census geos that require some special formatting 
-        const parcelDisplayName = (name === null || name === undefined || name.trim() === "") ? `Address unavailable` : `${name}`; //set blank strings to same value as null/undefined!!
+        dedupedFeatures.forEach(selectedGeo => {
+
+            const geoId = selectedGeo.layer.id;
+
+            const featureState = map.getFeatureState({
+                source: selectedGeo.source,
+                sourceLayer: selectedGeo.sourceLayer,
+                id: selectedGeo.id
+            });
+
+            const attributes = {
+                ...selectedGeo.properties,
+                ...featureState
+            };
+
+            let html = '';  // holds one section (for each loops thru)
+
+            const name = attributes.SiteAddress;
+            const parcelDisplayName =
+                (name === null || name === undefined || name.trim() === "")
+                ? `Address unavailable`
+                : `${name}`;
 
         switch (geoId) {
             case "tracts-medIncome": {
@@ -3829,6 +3992,35 @@ layerSelect.addEventListener('change', (e) => {
                 html = `
                 <div class="popup-header">Block Group ${attributes.GEO_ID_clean}</div>
                 <div class="popup-content">${avg_transport_cost != null ? `Average monthly transportation costs across household type: $${Math.round(avg_transport_cost).toLocaleString()}` : 'No available data.'}
+                </div>`;
+            break;
+            }
+
+            
+            case "suit-a":
+            case "suit-b":
+            case "suit-c":
+            case "suit-d": {
+                const suitability = attributes.suitclass1;
+                const suitabilityStatement = {
+                    'A1' : `This parcel is in an lively area with adequate infrastructure to support density. If developing for greater density, this parcel would be a good candidate for the highest density residential typology possible.`,
+                    'B1' : `This parcel has ready access to public sewer and is located in a transportation or marginally transportation diverse area. There is some activity. This parcel would be a good candidate for fairly dense missing middle housing, such as row houses or a quadplex.`,
+                    'B2' : `This parcel has ready access to public sewer and is located in a transportation or marginally transportation deiverse area. It is not located in a high activity area. This parcel would be a good candidate for fairly dense missing middle housing, such as ownership-oriented row hours or a quadplex.`,
+                    'B3' : `This parcel has no existing access to sewer but is located in a transportation or marginally transportation diverse area. Activity around this parcel is limited. If developing for greater density, this parcel would be a good candidate for up to a duplex. Further development potential may be unlocked should infrastructure be added or if the parcel is greater than an acre.`,
+                    'B4' : `This parcel has no existing access to sewer but is located in a transportation or marginally transportation diverse area. It is located in a high activity area. If developing for greater density, this parcel would be a good candidate for up to a duplex. Further development potential may be unlocked should infrastructure be added or if the parcel is greater than an acre.`,
+                    'B5' : `This parcel has ready access to public sewer but is located in an area of no transportation diversity. It is located in an area of high activty. If developing for greater density, this parcel would be a good candidate for fairly dense missing middle types oriented toward ownership, such as anything up to a town house.`,
+                    'B6' : `This parcel has neither sewer access nor any type of transportation diversity. It is, however, located in a high activity area. If developing for greater density, this parcel would be a good candidate for up to a duplex, though improvements in infrastruture could unlock greater development potential. `,
+                    'C1' : `This parcel has ready access to public sewer. It is not located in a transportation or marginally transportation diverse area, and there is litte activity around. If developing for greater density, this parcel could support up to a triplex or a small row of town homes.`,
+                    'C2' : `This parcel has neither sewer access nor any type of transportation diversity. It is located in a somewhat limited activty area. If developing for higher density, this parcel could support up to a duplex.`,
+                    'D1' : `This parcel has no sewer access, no transportation diversity, and no activity center. If developing for higher density, this parcel could support up to a duplex.`
+                };
+
+                const displaySuitability = suitabilityStatement[suitability]|| `Not available.`;
+
+                html = `
+                <div class="popup-header">${parcelDisplayName}</div>
+                <div class="popup-content">
+                    Suitability class: ${suitability || "N/a"} <p>${displaySuitability}
                 </div>`;
             break;
             }
@@ -3907,27 +4099,6 @@ layerSelect.addEventListener('change', (e) => {
             break;
             }
 
-            // case "parcels-pctLV": {
-            //     const pctLandValue = attributes.pctLandVal;
-            //     html = `
-            //     <div class="popup-header">${parcelDisplayName}</div>
-            //     <div class="popup-content">${pctLandValue != null ? `Land value accounts for ${Math.round(pctLandValue * 1000) / 10}% of Parcel #${selectedGeo.properties.PPN}'s total assessed value.` : 'No available data.'}
-            //     </div>`;
-            // break;
-            // }
-
-            // case "parcels-value": {
-            //     const normVal = attributes.acreVal != null ? Math.round(attributes.acreVal) : null;
-            //     const av = attributes.TotalValue;
-            //     const displayVal = normVal === null || normVal === undefined ? 'No available data.' : `Assessed value per acre: $${normVal.toLocaleString('en-US')}.`;
-            //     const displayAV = av === null || av === undefined ? `No available data.` : `Total assessed value: $${av.toLocaleString('en-US')}.`;
-            //     html = `
-            //     <div class="popup-header">${parcelDisplayName}</div>
-            //     <div class="popup-content">${displayVal}<br>${displayAV}
-            //     </div>`;
-            // break;
-            // }
-
             case "parcels-landuse": {
                 const propClassVal = attributes.useCode;
                 const propClassMatch = landUsePalette.find(entry => entry.key === propClassVal);
@@ -3988,11 +4159,155 @@ layerSelect.addEventListener('change', (e) => {
             break;
             }
 
-            case "bg-residensity-layer": { //add density pop-up!!
-                const density = Math.round(attributes.avgDUA * 10) /10;;
+            case "bg-residensity-layer": { 
+                const density = Math.round(attributes.avgDUA * 10) /10;
                 html = `
                 <div class="popup-header">Block Group ${attributes.GEOID}</div>
                 <div class="popup-content">Average residential density across this block group is ${density} per acre.
+                </div>`;
+            break;
+            }
+
+            case "fair-ped-layer" : { //fair ped
+                html = `
+                <div class="popup-content">Pedestrian infrastructure quality rating: fair.
+                </div>`;
+            break;
+            }
+
+            case "transit-diversity-layer" : { //transit diversity overlay
+                html = `
+                <div class="popup-content">This area has sufficient transit infrastructure to support a car-lite lifestyle.
+                </div>`;
+            break;
+            }
+
+            case "good-ped-layer" : { //good ped
+                html = `
+                <div class="popup-content">Pedestrian infrastructure quality rating: good.
+                </div>`;
+            break;
+            }
+
+            case "fair-transit-layer" : { //fair transit
+                html = `
+                <div class="popup-content">Transit infrastructure and service quality rating: fair.
+                </div>`;
+            break;
+            }
+
+            case "good-transit-layer" : { //good transit
+                html = `
+                <div class="popup-content">Transit infrastructure and service quality rating: good.
+                </div>`;
+            break;
+            }
+
+            case "mf-byright-layer" : { //mf byright, needs special conditions (available on next export, use a smaller text)
+                html = `
+                <div class="popup-content">Mulifamily development is allowed by-right in this area. 
+                </div>`;
+            break;
+            }
+
+            case "mf-specialpermit-layer" : { //mf special permit, , needs special conditions (available on next export, use a smaller text)
+                html = `
+                <div class="popup-content">Multifamily development is allowed via special permit in this area. Please see the municipality's zoning regulations for additional information.
+                </div>`;
+            break;
+            }
+
+            case "exceeds-capacity-layer" : { //exceeds capacity layer
+                html = `
+                <div class="popup-content">Present development exceeds the zoned capacity for this area.
+                </div>`;
+            break;
+            }
+
+            case "excess-capacity-layer" : { //excess capacity layer
+                html = `
+                <div class="popup-content">Present development leaves an excess of zoned development capacity in this area.
+                </div>`;
+            break;
+            }
+
+            case "via-service-area-layer" : { //via
+                html = `
+                <div class="popup-content">This area is currently served by Via, a ride hailing service partnered with local entities to increase mobility and decrease household dependence on car ownership.
+                </div>`;
+            break;
+            }
+
+            case "assessor-vacancy-layer" : { //update layer and make sure it pulls a parcel ID or parcel address
+                html = `
+                <div class="popup-header">Parcel ${attributes.LOC_ID}</div>
+                <div class="popup-content">This parcel is identified as vacant per the Massachusetts Assessor's Database.
+                </div>`;
+            break;
+            }
+
+            case "soft-site-layer" : { //correct this with a better blurb + parcel specific??
+                html = `
+                <div class="popup-content">This parcel is identified as a 'soft site' - land acquisition cost for this site may be lower than another developed parcel.
+                </div>`;
+            break;
+            }
+
+            case "tracts-strongmkt-overlay" : { //strong market - update text
+                html = `
+                <div class="popup-header">${attributes.NAME}</div>
+                <div class="popup-content">This tract was identified as a strong market area by the market value analysis. Policy recommendations to encourage development include upzoning....(link)
+                </div>`;
+            break;
+            }
+
+            case "tracts-midmkt-overlay" : { //mid market - update text
+                html = `
+                <div class="popup-header">${attributes.NAME}</div>
+                <div class="popup-content">This tract was identified as a middle market area by the market value analysis. Development may need some support. Policy recommendations to support development include public-private partnerships....(link)
+                </div>`;
+            break;
+            }
+
+            case "tracts-weakmkt-overlay" : { //weak market - update text
+                html = `
+                <div class="popup-header">${attributes.NAME}</div>
+                <div class="popup-content">This tract was identified as a weak market area by the market value analysis. Weak market areas may be historically disinvested in. Development here may bear additional risks to both developers and current residents. Policy recommendations to support thoughtful development and neighborhood sustainability include...(link)
+                </div>`;
+            break;
+            }
+
+            case "hex-highest-prem" : { //premiums (high) update
+                html = `
+                <div class="popup-content">Across all unit types, land here bears the highest premiums due to location.
+                </div>`;
+            break;
+            }
+
+            case "hex-some-prem" : { //premiums (somewhat high) update
+                html = `
+                <div class="popup-content">Across all unit types, land here bears some premium due to location.
+                </div>`;
+            break;
+            }
+
+            case "hex-no-prem" : { //premium (no premium/discount) update
+                html = `
+                <div class="popup-content">Across all unit types, land here bears neither a discount nor premium due to location.
+                </div>`;
+            break;
+            }
+
+            case "hex-some-disc" : { //discount (somewhat low) update
+                html = `
+                <div class="popup-content">Across all unit types, land here bears some discount due to location.
+                </div>`;
+            break;
+            }
+
+            case "hex-highest-disc" : { //discount (low) update
+                html = `
+                <div class="popup-content">Across all unit types, land here bears the highest discounts due to location.
                 </div>`;
             break;
             }
@@ -4012,10 +4327,23 @@ layerSelect.addEventListener('change', (e) => {
             default:
             html = `<div class="popup-content">No popup available.</div>`;
         }
-        new mapboxgl.Popup({ closeButton: true })
-            .setLngLat(coords)
-            .setHTML(html)
-            .addTo(map);
+        if (html) {
+        popupSections.push(`
+            <div class="popup-group">
+                ${html}
+            </div>
+        `);
+    }
+
+    }); // end forEach
+
+
+    if (!popupSections.length) return;
+
+    new mapboxgl.Popup({ closeButton: true })
+        .setLngLat(coords)
+        .setHTML(popupSections.join(''))
+        .addTo(map);
     });
 
 document.querySelectorAll('#basemap-style-thumbnails button').forEach(button => {
@@ -4566,6 +4894,36 @@ document.getElementById('layer-select').addEventListener('change', () => {
     descriptionEl.innerHTML = description;
   }
 });
+
+//javascript elements/code for accordion feature 
+document.addEventListener('click', function (e) {
+
+const toggle = e.target.closest('.accordion-toggle');
+if (!toggle) return;
+
+const section = toggle.closest('.accordion-section');
+const content = section.querySelector('.accordion-content');
+const icon = toggle.querySelector('.accordion-icon');
+
+const isOpen = !content.classList.contains('hidden');
+
+// Close ALL sections first
+document.querySelectorAll('.accordion-content').forEach(el => {
+  el.classList.add('hidden');
+});
+
+document.querySelectorAll('.accordion-icon').forEach(el => {
+  el.classList.remove('rotate-180');
+});
+
+// If it wasn't already open, open it
+if (!isOpen) {
+  content.classList.remove('hidden');
+  icon.classList.add('rotate-180');
+}
+
+});
+
 
 
 const overlayToggle = document.getElementById('overlay-toggle');
