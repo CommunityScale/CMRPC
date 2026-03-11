@@ -721,84 +721,7 @@
         </div>
       
       </div>
-      
 
-   <!-- <div class="pl-3 border-l-2 border-gray-100 space-y-1">
-      <label class="flex items-start text-sm text-gray-700">
-        <div class="relative"> 
-            <input type="checkbox" class="sr-only overlay-toggle peer" value="tracts-strongmkt-overlay" />
-            <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
-            <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
-          </div>
-        <span class="leading-snug ms-2">Strong market areas</span>
-        <button class="ml-1 text-gray-500 hover:text-gray-700 info-btn" style="font-size: 10px;"
-                data-info="Language about development policies, etc, that encourage a strong market and the future development of multifamily housing"> ⓘ
-        </button>
-      </label>
-      <label class="flex items-start text-sm text-gray-700">
-        <div class="relative"> 
-            <input type="checkbox" class="sr-only overlay-toggle peer" value="tracts-midmkt-overlay" />
-            <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
-            <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
-          </div>
-        <span class="leading-snug ms-2">Mid market areas</span>
-        <button class="ml-1 text-gray-500 hover:text-gray-700 info-btn" style="font-size: 10px;"
-                data-info="Medium market strategies, light methods, etc"> ⓘ
-        </button>
-      </label>
-      <label class="flex items-start text-sm text-gray-700">
-        <div class="relative"> 
-            <input type="checkbox" class="sr-only overlay-toggle peer" value="tracts-weakmkt-overlay" />
-            <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
-            <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
-          </div>
-        <span class="leading-snug ms-2">Weak market areas</span>
-        <button class="ml-1 text-gray-500 hover:text-gray-700 info-btn" style="font-size: 10px;"
-                data-info="Language about nuturing policies, etc, and light methods"> ⓘ
-        </button>
-      </label>
-      <label class="flex items-start text-sm text-gray-700">
-        <div class="relative"> 
-            <input type="checkbox" class="sr-only overlay-toggle peer" value="gen-rd-layer" />
-            <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
-            <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
-          </div>
-        <span class="leading-snug ms-2">General displacement risk</span>
-        <button class="ml-1 text-gray-500 hover:text-gray-700 info-btn" style="font-size: 10px;"
-                data-info="How we developed priority areas, etc."> ⓘ
-        </button>
-      </label>
-      <div class="mt-2">
-        <div class="text-[9px] font-semibold text-gray-500 uppercase tracking-wide mb-1">
-          Demographics of interest
-        </div>
-      </div>
-
-      <div class="pl-3 border-l-2 border-gray-100 space-y-1">
-      <label class="flex items-start text-sm text-gray-700">
-        <div class="relative"> 
-            <input type="checkbox" class="sr-only overlay-toggle peer" value="nonwhite-layer" />
-            <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
-            <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
-          </div>
-        <span class="leading-snug ms-2"> Non-white households</span>
-        <button class="ml-1 text-gray-500 hover:text-gray-700 info-btn" style="font-size: 10px;"
-                data-info="Why this demographic matters in context of displacement - marginalization and historically capital disenfranchisement"> ⓘ
-        </button>
-      </label>
-      <label class="flex items-start text-sm text-gray-700">
-        <div class="relative"> 
-            <input type="checkbox" class="sr-only overlay-toggle peer" value="seniors-layer" />
-            <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
-            <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
-          </div>
-        <span class="leading-snug ms-2">Senior households</span>
-        <button class="ml-1 text-gray-500 hover:text-gray-700 info-btn" style="font-size: 10px;"
-                data-info="Why this demographic matters in context of displacement - fixed incomes and market shock, downsizing interest, age, etc"> ⓘ
-        </button>
-      </label>
-      </div>
-    </div>--> 
     <div class="accordion-section mt-2">
 
         <button type="button"
@@ -1172,12 +1095,27 @@
 //   //best way to match palettes to their respective layers ?? particularly for categorical layers
 };
 
-function batchSetFeatureStates({ //batching experiment
+//data cache
+const dataCache = {};
+
+async function fetchJSON(key, url) {
+  if (dataCache[key]) {
+    console.log(`Using cached data for: ${key}`);
+    return dataCache[key];
+  }
+  console.log(`Fetching: ${url}`);
+  const res = await fetch(url);
+  const data = await res.json();
+  dataCache[key] = data;
+  return data;
+}
+
+//batch feature setting
+function batchSetFeatureStates({
   data,
   source,
   sourceLayer,
-  batchSize = 1000,
-  delay = 50,
+  batchSize = 5000, // increased from 1000 — rAF handles pacing, not a fixed timer
   propertyParser = (f) => ({
     density: Number(f["DUA"]),
     useCode: f["use_2"],
@@ -1187,28 +1125,30 @@ function batchSetFeatureStates({ //batching experiment
   })
 }) {
   let i = 0;
+  const total = data.length;
 
   function processNextBatch() {
-    const batch = data.slice(i, i + batchSize);
-    batch.forEach(f => {
+    const end = Math.min(i + batchSize, total);
+
+    for (; i < end; i++) {
+      const f = data[i];
       const id = f.LOC_ID?.toString();
-      if (!id || !f["DUA"]) return; // Skip invalid or missing data
+      if (!id) continue;
 
       map.setFeatureState(
         { source, sourceLayer, id },
         propertyParser(f)
       );
-    });
+    }
 
-    i += batchSize;
-    if (i < data.length) {
-      setTimeout(processNextBatch, delay); // Yield to keep UI responsive
+    if (i < total) {
+      requestAnimationFrame(processNextBatch); // yields to browser between batches
     } else {
-      console.log(`✅ Finished setting feature state for ${data.length} features.`);
+      console.log(`✅ Feature state applied for ${total} features`);
     }
   }
 
-  processNextBatch();
+  requestAnimationFrame(processNextBatch); // kick off first batch on next frame
 }
 
 
@@ -1420,104 +1360,71 @@ function batchSetFeatureStates({ //batching experiment
             promoteId: 'GEOID'
         })
 
-        // Load median income data without filtering
-        fetch('https://raw.githubusercontent.com/emtzot/mapSources/main/mass_basicHNA_2023acs_250620.json')
-                .then(response => response.json())
-                .then(data => {
-                    data.forEach(f => {
-                        const id = f.GEOID.toString();
-                        map.setFeatureState(
-                            {
-                            source: 'tracts',
-                            sourceLayer: 'tracts',
-                            id: id
-                            },
-                            {
-                            medIncome: f["medIncome"]
-                            }
-                        );
-                    });
-                });
+        // Json fethces
+        fetchJSON('medIncome', 'https://raw.githubusercontent.com/emtzot/mapSources/main/mass_basicHNA_2023acs_250620.json')
+        .then(data => {
+            data.forEach(f => {
+            map.setFeatureState(
+                { source: 'tracts', sourceLayer: 'tracts', id: f.GEOID.toString() },
+                { medIncome: f["medIncome"] }
+            );
+            });
+        });
 
-                fetch('CMRPC_Parcels_Suitability_LandUse_DUA_260302.json') //batching experiment!
-                    .then(response => response.json())
-                    .then(data => {
-                        batchSetFeatureStates({
-                        data,
-                        source: 'parcels',
-                        sourceLayer: 'CMRPC_Parcels_Cleaned_NoData_251008',
-                        batchSize: 1000,     // adjustable
-                        delay: 50,           // ms delay between batches
-                        });
-                    })
-                    .catch(err => console.error("Failed to load parcel density data:", err));
+        // Parcel suitability/land use/density
+        fetchJSON('parcels', 'CMRPC_Parcels_Suitability_LandUse_DUA_260302.json')
+        .then(data => {
+            batchSetFeatureStates({
+            data,
+            source: 'parcels',
+            sourceLayer: 'CMRPC_Parcels_Cleaned_NoData_251008',
+            });
+        })
+        .catch(err => console.error("Failed to load parcel data:", err));
 
+        // Displacement risk (two-step fetch — keep sequential, just cache both)
+        fetchJSON('ctfilter', 'https://raw.githubusercontent.com/CommunityScale/CMRPC/refs/heads/main/CTfilter2.geojson')
+        .then(filterData => {
+            const validTractsRD = new Set();
+            const features = filterData.features || filterData;
+            features.forEach(f => {
+            const geoid = f.properties?.GEOID || f.GEOID;
+            if (geoid) validTractsRD.add(geoid.toString());
+            });
 
-                // Load CTfilter2 to get valid tract GEOIDs for filtering displacement risk data
-                let validTractsRD = new Set();
-                fetch('https://raw.githubusercontent.com/CommunityScale/CMRPC/refs/heads/main/CTfilter2.geojson')
-                .then(response => response.json())
-                .then(filterData => {
-                    console.log('CTfilter2 loaded for displacement risk filtering');
-                    // Build set of valid tract GEOIDs from CTfilter2
-                    const features = filterData.features || filterData;
-                    features.forEach(f => {
-                        const geoid = f.properties?.GEOID || f.GEOID;
-                        if (geoid) {
-                            validTractsRD.add(geoid.toString());
-                        }
-                    });
+            return fetchJSON('rdTracts', 'https://raw.githubusercontent.com/CommunityScale/CMRPC/refs/heads/main/rd_tracts_250731.json')
+            .then(data => ({ data, validTractsRD }));
+        })
+        .then(({ data, validTractsRD }) => {
+            let matched = 0;
+            data.forEach(f => {
+            const id = f.GEOID.toString();
+            if (validTractsRD.has(id)) {
+                matched++;
+                map.setFeatureState(
+                { source: 'tracts', sourceLayer: 'tracts', id },
+                { rd_seniors: Number(f["rd_seniors"]), rd_nonwhitePops: Number(f["rd_nonWhitePops"]) }
+                );
+            }
+            });
+            console.log(`Displacement risk loaded for ${matched} tracts`);
+        })
+        .catch(err => console.error('Error loading displacement risk:', err));
 
-                    console.log('Valid tracts for displacement risk:', validTractsRD.size);
-
-                    // Now load displacement risk data and filter to valid tracts only
-                    return fetch('https://raw.githubusercontent.com/CommunityScale/CMRPC/refs/heads/main/rd_tracts_250731.json');
-                })
-                .then(response => response.json())
-                .then(data => {
-                    let matchedRD = 0;
-                    data.forEach(f => {
-                        const id = f.GEOID.toString(); // Ensure id is a string to match with geometry's geoid
-
-                        // Only set feature state for valid tracts from CTfilter2
-                        if (validTractsRD.has(id)) {
-                            matchedRD++;
-                            map.setFeatureState(
-                                {
-                                source: 'tracts',
-                                sourceLayer: 'tracts',
-                                id: id
-                                },
-                                {
-                                rd_seniors: Number(f["rd_seniors"]),
-                                rd_nonwhitePops: Number(f["rd_nonWhitePops"])
-                                }
-                            );
-                        }
-                    });
-                    console.log('Displacement risk data loaded for', matchedRD, 'tracts from CTfilter2');
-                })
-                .catch(err => console.error('Error loading displacement risk data:', err));
-
-                fetch('https://raw.githubusercontent.com/CommunityScale/CMRPC/adc9df09b39883512a5175738efe5ace91ad2917/CMRPC_Tracts_MVA_CostBurden_250828.json') 
-                .then(response => response.json())
-                .then(data => {
-                    data.forEach(f => {
-                    const id = f.geoid.toString(); // Ensure id is a string to match with geometry's geoid 
-                    map.setFeatureState(
-                        {
-                        source: 'tracts',
-                        sourceLayer: 'tracts',
-                        id: id
-                        },
-                        {
-                        pctowned30_23: Number(f["pctowned30_23"]),
-                        pctrent30_23: Number(f["pctrent30_23"]),
-                        mva: (f["class"])
-                        }
-                    )
-                    });
-                });
+        // Cost burden / MVA
+        fetchJSON('tractsMVA', 'https://raw.githubusercontent.com/CommunityScale/CMRPC/adc9df09b39883512a5175738efe5ace91ad2917/CMRPC_Tracts_MVA_CostBurden_250828.json')
+        .then(data => {
+            data.forEach(f => {
+            map.setFeatureState(
+                { source: 'tracts', sourceLayer: 'tracts', id: f.geoid.toString() },
+                {
+                pctowned30_23: Number(f["pctowned30_23"]),
+                pctrent30_23: Number(f["pctrent30_23"]),
+                mva: f["class"]
+                }
+            );
+            });
+        });
 
     }
 
