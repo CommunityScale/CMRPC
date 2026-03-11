@@ -4701,6 +4701,12 @@ document.getElementById('clear-map').addEventListener('click', () => {
   if (typeof popup !== 'undefined') {
     popup.remove();
   }
+
+  //re-add town layer
+  if (map.getLayer('town-layer')) {
+  map.setLayoutProperty('town-layer', 'visibility', 'visible');
+    }
+    document.querySelector('.overlay-toggle[value="town-layer"]').checked = true;
 });
 
 
