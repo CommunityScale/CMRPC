@@ -1338,14 +1338,10 @@ function batchSetFeatureStates({ //batching experiment
             promoteId: 'fid'
         })
 
-        map.addSource("mf-byright", {
+        map.addSource("mf-zoning", {
             type: 'geojson',
-            data: 'https://raw.githubusercontent.com/CommunityScale/CMRPC/refs/heads/main/CMRPC_MFByRight_251009.geojson'
-        })
-
-        map.addSource("mf-specialpermit", {
-            type: 'geojson',
-            data: 'https://raw.githubusercontent.com/CommunityScale/CMRPC/refs/heads/main/CMRPC_MFBySpecialPermit_SpecialReview_251009.geojson'
+            data: 'CMRPC_zoning_mfpossible_wmc_260311.geojson', 
+            promoteId: 'fid'
         })
 
         map.addSource("bg-costs", {
@@ -2704,28 +2700,37 @@ map.addLayer({
   map.addLayer({
             id: 'mf-byright-layer',
             type: 'fill',
-            source: 'mf-byright',
+            source: 'mf-zoning',
             paint: {
               'fill-color': '#028b57', //mbta green lol
               'fill-opacity': 0.6
             },
           layout: {
             visibility: 'none'
-          }},
+          },
+          filter: [
+                "any",
+                ["==", ["get", "highdense"], 'Y'],
+                ["==", ["get", "highdense"], 'Y-SR']
+            ]},
         labelLayerId
   )
 
   map.addLayer({
             id: 'mf-specialpermit-layer',
             type: 'fill',
-            source: 'mf-specialpermit',
+            source: 'mf-zoning',
             paint: {
               'fill-color': '#9e1583', //mbta purple lol
               'fill-opacity': 0.6
             },
           layout: {
             visibility: 'none'
-          }},
+          },
+          filter: [
+                "all",
+                ["==", ["get", "highdense"], 'M']
+            ]},
         labelLayerId
   )
 
@@ -4216,15 +4221,19 @@ layerSelect.addEventListener('change', (e) => {
             }
 
             case "mf-byright-layer" : { //mf byright, needs special conditions (available on next export, use a smaller text)
+                const constraint = attributes.constraint 
                 html = `
-                <div class="popup-content">Mulifamily development is allowed by-right in this area. 
+                <div class="popup-content">Mulifamily development is allowed by-right in this area. Development may require site plan review. <p>
+                    <strong>Additional restrictions:</strong> ${constraint != null ? `${constraint}` : 'Not available.'}
                 </div>`;
             break;
             }
 
             case "mf-specialpermit-layer" : { //mf special permit, , needs special conditions (available on next export, use a smaller text)
+                const constraint = attributes.constraint 
                 html = `
-                <div class="popup-content">Multifamily development is allowed via special permit in this area. Please see the municipality's zoning regulations for additional information.
+                <div class="popup-content">Multifamily development is allowed via special permit in this area. Please see the municipality's zoning regulations for additional information. <p>
+                    <strong>Additional restrictions:</strong> ${constraint != null ? `${constraint}` : 'Not available.'}
                 </div>`;
             break;
             }
