@@ -64,7 +64,7 @@
   }
 
   .mapboxgl-popup {
-      max-width: 260px; /*try with wider max width per LLM's instructions, was 150px 2/3/2026 */
+      max-width: 280px; /*try with wider max width per LLM's instructions, was 150px 2/3/2026 */
       font-family: 'Roboto', sans-serif;
       font-size: 0.875rem; /* Tailwind's text-sm */
     }
@@ -75,6 +75,8 @@
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
       padding: 1rem;
       color: #1f2937; /* text-gray-800 */
+      max-height: 250px;       
+      overflow-y: auto;         
     }
   
   .mapboxgl-popup-close-button {
