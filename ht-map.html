@@ -137,7 +137,7 @@
     <!-- Layer toggle - add all layers that will be in the dropdown menu  -->
     <div class="mb-4">
       <select id="layer-select" class="w-full border border-gray-300 rounded px-2 py-1">
-        <option value="" disabled selected>Select layer</option>
+        <option value="" selected>Select layer</option>
 
         <optgroup label="Housing and People">
           <option value="ctysds-pctHH">Recent growth (change in households, 2015-2023)</option>
@@ -221,7 +221,7 @@
 
     <!-- Boundaries Section -->
     <div class="text-xs font-semibold text-gray-600 uppercase tracking-wide mt-2 mb-1">Boundaries</div>
-    <label class="flex items-start text-sm text-gray-700"> <!--for single line overlay labels, please use this label class. Preserves spacing and is slightly different than multi-line labels-->
+    <label class="flex items-start text-xs text-gray-700"> <!--for single line overlay labels, please use this label class. Preserves spacing and is slightly different than multi-line labels-->
         <div class="relative">
             <input type="checkbox" class="sr-only overlay-toggle peer" value="town-layer" checked/>
             <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
@@ -233,7 +233,7 @@
 
         <button type="button"
                 class="accordion-toggle w-full flex items-center justify-between
-                       text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">
+                       text-[11px] font-semibold text-gray-500 tracking-wide mb-1">
           <span>Subregions</span>
           <svg class="accordion-icon w-3 h-3 transition-transform"
                xmlns="http://www.w3.org/2000/svg"
@@ -244,7 +244,7 @@
         </button>
       
         <div class="accordion-content hidden pl-3 border-l-2 border-gray-100 space-y-1">
-                <label class="flex items-start text-sm text-gray-700">
+                <label class="flex items-start text-xs text-gray-700">
                     <div class="relative">
                         <input type="checkbox" class="sr-only overlay-toggle peer" value="subregion-central" />
                         <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
@@ -252,7 +252,7 @@
                       </div>
                   <span class="leading-snug ms-2">Central subregion</span>
                 </label>
-                <label class="flex items-start text-sm text-gray-700">
+                <label class="flex items-start text-xs text-gray-700">
                     <div class="relative">
                         <input type="checkbox" class="sr-only overlay-toggle peer" value="subregion-north" />
                         <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
@@ -260,7 +260,7 @@
                       </div>
                     <span class="leading-snug ms-2">North subregion</span>
                 </label>
-                <label class="flex items-start text-sm text-gray-700">
+                <label class="flex items-start text-xs text-gray-700">
                     <div class="relative">
                         <input type="checkbox" class="sr-only overlay-toggle peer" value="subregion-northeast" />
                         <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
@@ -268,7 +268,7 @@
                       </div>
                     <span class="leading-snug ms-2">Northeast subregion</span>
                 </label>
-                <label class="flex items-start text-sm text-gray-700">
+                <label class="flex items-start text-xs text-gray-700">
                     <div class="relative">
                         <input type="checkbox" class="sr-only overlay-toggle peer" value="subregion-west" />
                         <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
@@ -276,7 +276,7 @@
                       </div>
                     <span class="leading-snug ms-2">West subregion</span>
                 </label>
-                <label class="flex items-start text-sm text-gray-700">
+                <label class="flex items-start text-xs text-gray-700">
                     <div class="relative">
                         <input type="checkbox" class="sr-only overlay-toggle peer" value="subregion-southwest" />
                         <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
@@ -284,7 +284,7 @@
                       </div>
                     <span class="leading-snug ms-2">Southwest subregion</span>
                 </label>
-                <label class="flex items-start text-sm text-gray-700">
+                <label class="flex items-start text-xs text-gray-700">
                     <div class="relative">
                         <input type="checkbox" class="sr-only overlay-toggle peer" value="subregion-southeast" />
                         <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
@@ -304,8 +304,8 @@
 
         <button type="button"
                 class="accordion-toggle w-full flex items-center justify-between
-                       text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">
-          <span>Transit services</span>
+                       text-[11px] font-semibold text-gray-500 tracking-wide mb-1">
+          <span>Services</span>
           <svg class="accordion-icon w-3 h-3 transition-transform"
                xmlns="http://www.w3.org/2000/svg"
                fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -315,7 +315,7 @@
         </button>
       
         <div class="accordion-content hidden pl-3 border-l-2 border-gray-100 space-y-1">
-            <label class="flex items-start text-sm text-gray-700">
+            <label class="flex items-start text-xs text-gray-700">
                 <div class="relative">
                     <input type="checkbox" class="sr-only overlay-toggle peer" value="bus-stops-layer" />
                     <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
@@ -323,7 +323,7 @@
                   </div>
                 <span class="leading-snug ms-2">Bus stops</span>
             </label>
-            <label class="flex items-start text-sm text-gray-700">
+            <label class="flex items-start text-xs text-gray-700">
               <div class="relative">
                   <input type="checkbox" class="sr-only overlay-toggle peer" value="wrta-fixed-layer" />
                   <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
@@ -331,7 +331,7 @@
                 </div>
               <span class="leading-snug ms-2">WRTA fixed transit lines</span>
             </label>
-            <label class="flex items-start text-sm text-gray-700">
+            <label class="flex items-start text-xs text-gray-700">
               <div class="relative">
                   <input type="checkbox" class="sr-only overlay-toggle peer" value="train-stops-layer" />
                   <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
@@ -339,7 +339,7 @@
                 </div>
               <span class="leading-snug ms-2">Rail stops</span>
             </label>
-            <label class="flex items-start text-sm text-gray-700">
+            <label class="flex items-start text-xs text-gray-700">
               <div class="relative">
                   <input type="checkbox" class="sr-only overlay-toggle peer" value="via-stops-layer" />
                   <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
@@ -347,7 +347,7 @@
                 </div>
               <span class="leading-snug ms-2">Via microtransit stops</span>
             </label>
-            <label class="flex items-start text-sm text-gray-700">
+            <label class="flex items-start text-xs text-gray-700">
               <div class="relative">
                   <input type="checkbox" class="sr-only overlay-toggle peer" value="via-service-area-layer" />
                   <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
@@ -358,7 +358,7 @@
                       data-info="Via, an WRTA microtransit partnership, operates its rideshare service in the highlighted areas. Via operates between 7am-7pm."> ⓘ
               </button>
             </label>
-            <label class="flex items-start text-sm text-gray-700">
+            <label class="flex items-start text-xs text-gray-700">
               <div class="relative">
                   <input type="checkbox" class="sr-only overlay-toggle peer" value="bike-trails-layer" />
                   <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
@@ -376,8 +376,8 @@
 
         <button type="button"
                 class="accordion-toggle w-full flex items-center justify-between
-                       text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">
-          <span>Mobility mode quality</span>
+                       text-[11px] font-semibold text-gray-500 tracking-wide mb-1">
+          <span>Mode quality</span>
           <svg class="accordion-icon w-3 h-3 transition-transform"
                xmlns="http://www.w3.org/2000/svg"
                fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -387,7 +387,7 @@
         </button>
       
         <div class="accordion-content hidden pl-3 border-l-2 border-gray-100 space-y-1">
-            <label class="flex items-start text-sm text-gray-700">
+            <label class="flex items-start text-xs text-gray-700">
                 <div class="relative">
                     <input type="checkbox" class="sr-only overlay-toggle peer" value="fair-ped-layer" />
                     <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
@@ -398,7 +398,7 @@
                         data-info="Pedestrian access and infrastructure in the highlighted area is considered fair relative to the CMRPC region."> ⓘ
                 </button>
               </label>
-              <label class="flex items-start text-sm text-gray-700">
+              <label class="flex items-start text-xs text-gray-700">
                 <div class="relative">
                     <input type="checkbox" class="sr-only overlay-toggle peer" value="good-ped-layer" />
                     <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
@@ -409,7 +409,7 @@
                         data-info="Pedestrian access and infrastructure in the highlighted area is considered good relative to the CMRPC region."> ⓘ
                 </button>
               </label>
-              <label class="flex items-start text-sm text-gray-700">
+              <label class="flex items-start text-xs text-gray-700">
                 <div class="relative">
                     <input type="checkbox" class="sr-only overlay-toggle peer" value="fair-transit-layer" />
                     <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
@@ -420,7 +420,7 @@
                         data-info="Transportation access in the highlighted area is considered fair relative to the CMRPC region."> ⓘ
                 </button>
               </label>
-              <label class="flex items-start text-sm text-gray-700">
+              <label class="flex items-start text-xs text-gray-700">
                 <div class="relative">
                     <input type="checkbox" class="sr-only overlay-toggle peer" value="good-transit-layer" />
                     <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
@@ -431,7 +431,7 @@
                         data-info="Transportation access in the highlighted area is considered good relative to the CMRPC region."> ⓘ
                 </button>
               </label>
-              <label class="flex items-start text-sm text-gray-700">
+              <label class="flex items-start text-xs text-gray-700">
                 <div class="relative">
                     <input type="checkbox" class="sr-only overlay-toggle peer" value="transit-diversity-layer" />
                     <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
@@ -453,7 +453,7 @@
 
         <button type="button"
                 class="accordion-toggle w-full flex items-center justify-between
-                       text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">
+                       text-[11px] font-semibold text-gray-500 tracking-wide mb-1">
           <span>Multifamily allowed</span>
           <svg class="accordion-icon w-3 h-3 transition-transform"
                xmlns="http://www.w3.org/2000/svg"
@@ -464,7 +464,7 @@
         </button>
 
     <div class="accordion-content hidden pl-3 border-l-2 border-gray-100 space-y-1">
-        <label class="flex items-start text-sm text-gray-700">
+        <label class="flex items-start text-xs text-gray-700">
             <div class="relative">
                 <input type="checkbox" class="sr-only overlay-toggle peer" value="mf-byright-layer" />
                 <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
@@ -475,7 +475,7 @@
                     data-info="Multifamily housing, if pursued in the highlighted area, is permitted by-right under the respective municipality's zoning."> ⓘ
             </button>
           </label>
-          <label class="flex items-start text-sm text-gray-700">
+          <label class="flex items-start text-xs text-gray-700">
             <div class="relative">
                 <input type="checkbox" class="sr-only overlay-toggle peer" value="mf-specialpermit-layer" />
                 <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
@@ -495,7 +495,7 @@
 
     <button type="button"
             class="accordion-toggle w-full flex items-center justify-between
-                   text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">
+                   text-[11px] font-semibold text-gray-500 tracking-wide mb-1">
       <span>Zoned capacity</span>
       <svg class="accordion-icon w-3 h-3 transition-transform"
            xmlns="http://www.w3.org/2000/svg"
@@ -506,7 +506,7 @@
     </button>
 
 <div class="accordion-content hidden pl-3 border-l-2 border-gray-100 space-y-1">
-    <label class="flex items-start text-sm text-gray-700">
+    <label class="flex items-start text-xs text-gray-700">
         <div class="relative">
             <input type="checkbox" class="sr-only overlay-toggle peer" value="exceeds-capacity-layer" />
             <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
@@ -517,7 +517,7 @@
                 data-info="This area does not allow multi-family development. Current development patterns, however, exceed a three unit/acre density. It may be worth up-zoning this area should relatively dense development trends continue."> ⓘ
         </button>
       </label>
-      <label class="flex items-start text-sm text-gray-700">
+      <label class="flex items-start text-xs text-gray-700">
         <div class="relative">
             <input type="checkbox" class="sr-only overlay-toggle peer" value="excess-capacity-layer" />
             <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
@@ -539,7 +539,7 @@
 
         <button type="button"
                 class="accordion-toggle w-full flex items-center justify-between
-                       text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">
+                       text-[11px] font-semibold text-gray-500 tracking-wide mb-1">
           <span>Opportunity sites</span>
           <svg class="accordion-icon w-3 h-3 transition-transform"
                xmlns="http://www.w3.org/2000/svg"
@@ -550,7 +550,7 @@
         </button>
       
         <div class="accordion-content hidden pl-3 border-l-2 border-gray-100 space-y-1">
-                <label class="flex items-start text-sm text-gray-700">
+                <label class="flex items-start text-xs text-gray-700">
                   <div class="relative">
                       <input type="checkbox" class="sr-only overlay-toggle peer" value="assessor-vacancy-layer" />
                       <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
@@ -561,7 +561,7 @@
                           data-info="Vacancy was established via Massachusetts' assessor records. Vacant parcels here include parcels attributed to residential, commercial, and industrial land uses."> ⓘ
                   </button>
                 </label>
-                <label class="flex items-start text-sm text-gray-700">
+                <label class="flex items-start text-xs text-gray-700">
                   <div class="relative">
                       <input type="checkbox" class="sr-only overlay-toggle peer" value="soft-site-layer" />
                       <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
@@ -572,7 +572,7 @@
                           data-info="General text + methods link (?)."> ⓘ
                   </button>
                 </label>
-                <label class="flex items-start text-sm text-gray-700">
+                <label class="flex items-start text-xs text-gray-700">
                   <div class="relative">
                       <input type="checkbox" class="sr-only overlay-toggle peer" value="hex-highest-prem" />
                       <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
@@ -583,7 +583,7 @@
                           data-info="General text + methods link"> ⓘ
                   </button>
                 </label>
-                <label class="flex items-start text-sm text-gray-700">
+                <label class="flex items-start text-xs text-gray-700">
                   <div class="relative">
                       <input type="checkbox" class="sr-only overlay-toggle peer" value="hex-some-prem" />
                       <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
@@ -594,7 +594,7 @@
                           data-info="General text + methods link"> ⓘ
                   </button>
                 </label>
-                <label class="flex items-start text-sm text-gray-700">
+                <label class="flex items-start text-xs text-gray-700">
                   <div class="relative">
                       <input type="checkbox" class="sr-only overlay-toggle peer" value="hex-no-prem"/>
                       <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
@@ -605,7 +605,7 @@
                           data-info="General text + methods link"> ⓘ
                   </button>
                 </label>
-                <label class="flex items-start text-sm text-gray-700">
+                <label class="flex items-start text-xs text-gray-700">
                   <div class="relative">
                       <input type="checkbox" class="sr-only overlay-toggle peer" value="hex-some-disc"/>
                       <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
@@ -616,7 +616,7 @@
                           data-info="General text + methods link"> ⓘ
                   </button>
                 </label>
-                <label class="flex items-start text-sm text-gray-700">
+                <label class="flex items-start text-xs text-gray-700">
                   <div class="relative">
                       <input type="checkbox" class="sr-only overlay-toggle peer" value="hex-highest-disc"/>
                       <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
@@ -639,7 +639,7 @@
         <button
           type="button"
           class="accordion-toggle w-full flex items-center justify-between
-                 text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">
+                 text-[11px] font-semibold text-gray-500 tracking-wide mb-1">
           <span>Policy Considerations</span>
           <svg class="accordion-icon w-3 h-3 transition-transform"
                xmlns="http://www.w3.org/2000/svg"
@@ -650,7 +650,7 @@
         </button>
       
         <div class="accordion-content hidden pl-3 border-l-2 border-gray-100 space-y-1">
-                <label class="flex items-start text-sm text-gray-700">
+                <label class="flex items-start text-xs text-gray-700">
                   <div class="relative"> 
                       <input type="checkbox" class="sr-only overlay-toggle peer" value="tracts-strongmkt-overlay" />
                       <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
@@ -661,7 +661,7 @@
                           data-info="The strong market overlay draws on market value analysis and identifies tract-level areas that may be good candidates for ..... (link out to recommendations)"> ⓘ
                   </button>
                 </label>
-                <label class="flex items-start text-sm text-gray-700">
+                <label class="flex items-start text-xs text-gray-700">
                   <div class="relative"> 
                       <input type="checkbox" class="sr-only overlay-toggle peer" value="tracts-midmkt-overlay" />
                       <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
@@ -672,7 +672,7 @@
                           data-info="The medium market overlay draws on market value analysis and identifies tract-level areas that may be good candidates for ..... (link out to recommendations)"> ⓘ
                   </button>
                 </label>
-                <label class="flex items-start text-sm text-gray-700">
+                <label class="flex items-start text-xs text-gray-700">
                   <div class="relative"> 
                       <input type="checkbox" class="sr-only overlay-toggle peer" value="tracts-weakmkt-overlay" />
                       <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
@@ -683,7 +683,7 @@
                           data-info="The weak market overlay draws on market value analysis and identifies tract-level areas that may be good candidates for ..... (link out to recommendations)"> ⓘ
                   </button>
                 </label>
-                <label class="flex items-start text-sm text-gray-700">
+                <label class="flex items-start text-xs text-gray-700">
                   <div class="relative"> 
                       <input type="checkbox" class="sr-only overlay-toggle peer" value="gen-rd-layer" />
                       <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
@@ -695,13 +695,13 @@
                   </button>
                 </label>
                 <div class="mt-2">
-                  <div class="text-[9px] font-semibold text-gray-500 uppercase tracking-wide mb-1">
+                  <div class="text-[9px] font-semibold text-gray-500 tracking-wide mb-1">
                     Demographics of interest
                   </div>
                 </div>
           
                 <div class="pl-3 border-l-2 border-gray-100 space-y-1">
-                <label class="flex items-start text-sm text-gray-700">
+                <label class="flex items-start text-xs text-gray-700">
                   <div class="relative"> 
                       <input type="checkbox" class="sr-only overlay-toggle peer" value="nonwhite-layer" />
                       <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
@@ -712,7 +712,7 @@
                           data-info="This layer highlights areas where there are relative concentrations of non-white households. Overlaying this layer with the general displacement risk layer may provide insight into the housing vulnerability of non-white households across the CMRPC region."> ⓘ
                   </button>
                 </label>
-                <label class="flex items-start text-sm text-gray-700">
+                <label class="flex items-start text-xs text-gray-700">
                   <div class="relative"> 
                       <input type="checkbox" class="sr-only overlay-toggle peer" value="seniors-layer" />
                       <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
@@ -732,7 +732,7 @@
 
         <button type="button"
                 class="accordion-toggle w-full flex items-center justify-between
-                       text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-1">
+                       text-[11px] font-semibold text-gray-500 tracking-wide mb-1">
           <span>Potential density</span>
           <svg class="accordion-icon w-3 h-3 transition-transform"
                xmlns="http://www.w3.org/2000/svg"
@@ -743,7 +743,7 @@
         </button>
       
         <div class="accordion-content hidden pl-3 border-l-2 border-gray-100 space-y-1">
-                <label class="flex items-start text-sm text-gray-700">
+                <label class="flex items-start text-xs text-gray-700">
                   <div class="relative">
                       <input type="checkbox" class="sr-only overlay-toggle peer" value="suit-a"/>
                       <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
@@ -754,7 +754,7 @@
                           data-info="The suitability analysis is a ."> ⓘ
                   </button>
                 </label>
-                <label class="flex items-start text-sm text-gray-700">
+                <label class="flex items-start text-xs text-gray-700">
                   <div class="relative">
                       <input type="checkbox" class="sr-only overlay-toggle peer" value="suit-b" />
                       <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
@@ -765,7 +765,7 @@
                           data-info="Same language as above."> ⓘ
                   </button>
                 </label>
-                <label class="flex items-start text-sm text-gray-700">
+                <label class="flex items-start text-xs text-gray-700">
                   <div class="relative">
                       <input type="checkbox" class="sr-only overlay-toggle peer" value="suit-c" />
                       <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
@@ -776,7 +776,7 @@
                           data-info="Same language as above."> ⓘ
                   </button>
                 </label>
-                <label class="flex items-start text-sm text-gray-700">
+                <label class="flex items-start text-xs text-gray-700">
                   <div class="relative">
                       <input type="checkbox" class="sr-only overlay-toggle peer" value="suit-d" />
                       <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
@@ -3194,6 +3194,7 @@ const legendContent = document.getElementById('legend-content');
 let currentlySelectedDataLayer = null;
 
 const allFillLayers = [
+    '', //empty layer for select layer?
     'tracts-medIncome',
     'tracts-pctCostBurdenedRenters',
     'tracts-pctCostBurdenedOwners',
@@ -3608,10 +3609,31 @@ function renderLegend(layerId) {
 
 
 // Change legend on dropdown change/selection
+// Change legend on dropdown change/selection
 layerSelect.addEventListener('change', (e) => {
   const selected = e.target.value;
 
-  if (!selected) return;
+  // Handle clear selection
+  if (!selected) {
+    currentlySelectedDataLayer = null;
+
+    allFillLayers.forEach(id => {
+      if (map.getLayer(id)) map.setLayoutProperty(id, 'visibility', 'none');
+    });
+
+    if (map.getLayer('cmrpc-region-fill')) {
+      map.setLayoutProperty('cmrpc-region-fill', 'visibility', 'none');
+    }
+
+    document.getElementById('legend-title').innerHTML = '';
+    document.getElementById('legend-title').innerHTML = '';
+    const dataLayerContainer = document.getElementById('legend-data-layers');
+    if (dataLayerContainer) dataLayerContainer.innerHTML = '';
+    return;
+  }
+
+  // Restore layer-info button for normal layer selections
+  document.getElementById('layer-info').style.display = '';
 
   // Store the selected layer globally so we can restore it after basemap changes
   currentlySelectedDataLayer = selected;
@@ -3633,9 +3655,6 @@ layerSelect.addEventListener('change', (e) => {
   // Update legend title with selected layer name
   const selectedOption = e.target.options[e.target.selectedIndex];
   document.getElementById('legend-title').textContent = selectedOption.text;
-
-  // Don't reset dropdown - keep it showing the selected layer
-  // This ensures the selection persists when changing basemaps
 });
        
     function layerLegendVisibility() {
