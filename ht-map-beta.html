@@ -1387,7 +1387,7 @@ function batchSetFeatureStates({
         });
 
         // Parcel suitability/land use/density
-        fetchJSON('parcels', 'CMRPC_Parcels_Suitability_LandUse_DUA_260302.json')
+        fetchJSON('parcels', 'CMRPC_Parcels_Suitability_LandUse_DUA_TranspoDiv_260618.json')
         .then(data => {
             batchSetFeatureStates({
             data,
@@ -3968,25 +3968,113 @@ layerSelect.addEventListener('change', (e) => {
             case "suit-d": {
                 const suitability = attributes.suitclass1;
                 const suitabilityStatement = {
-                    'A1' : `This parcel is in an lively area with adequate infrastructure to support density. If developing for greater density, this parcel would be a good candidate for the highest density residential typology possible.`,
-                    'B1' : `This parcel has ready access to public sewer and is located in a transportation or marginally transportation diverse area. There is some activity. This parcel would be a good candidate for fairly dense missing middle housing, such as row houses or a quadplex.`,
-                    'B2' : `This parcel has ready access to public sewer and is located in a transportation or marginally transportation deiverse area. It is not located in a high activity area. This parcel would be a good candidate for fairly dense missing middle housing, such as ownership-oriented row hours or a quadplex.`,
-                    'B3' : `This parcel has no existing access to sewer but is located in a transportation or marginally transportation diverse area. Activity around this parcel is limited. If developing for greater density, this parcel would be a good candidate for up to a duplex. Further development potential may be unlocked should infrastructure be added or if the parcel is greater than an acre.`,
-                    'B4' : `This parcel has no existing access to sewer but is located in a transportation or marginally transportation diverse area. It is located in a high activity area. If developing for greater density, this parcel would be a good candidate for up to a duplex. Further development potential may be unlocked should infrastructure be added or if the parcel is greater than an acre.`,
-                    'B5' : `This parcel has ready access to public sewer but is located in an area of no transportation diversity. It is located in an area of high activty. If developing for greater density, this parcel would be a good candidate for fairly dense missing middle types oriented toward ownership, such as anything up to a town house.`,
-                    'B6' : `This parcel has neither sewer access nor any type of transportation diversity. It is, however, located in a high activity area. If developing for greater density, this parcel would be a good candidate for up to a duplex, though improvements in infrastruture could unlock greater development potential. `,
-                    'C1' : `This parcel has ready access to public sewer. It is not located in a transportation or marginally transportation diverse area, and there is litte activity around. If developing for greater density, this parcel could support up to a triplex or a small row of town homes.`,
-                    'C2' : `This parcel has neither sewer access nor any type of transportation diversity. It is located in a somewhat limited activty area. If developing for higher density, this parcel could support up to a duplex.`,
-                    'D1' : `This parcel has no sewer access, no transportation diversity, and no activity center. If developing for higher density, this parcel could support up to a duplex.`
-                };
+                    // 'A1' : `This parcel is in an lively area with adequate infrastructure to support density. If developing for greater density, this parcel would be a good candidate for the highest density residential typology possible.`,
+                    // 'B1' : `This parcel has ready access to public sewer and is located in a transportation or marginally transportation diverse area. There is some activity. This parcel would be a good candidate for fairly dense missing middle housing, such as row houses or a quadplex.`,
+                    // 'B2' : `This parcel has ready access to public sewer and is located in a transportation or marginally transportation deiverse area. It is not located in a high activity area. This parcel would be a good candidate for fairly dense missing middle housing, such as ownership-oriented row hours or a quadplex.`,
+                    // 'B3' : `This parcel has no existing access to sewer but is located in a transportation or marginally transportation diverse area. Activity around this parcel is limited. If developing for greater density, this parcel would be a good candidate for up to a duplex. Further development potential may be unlocked should infrastructure be added or if the parcel is greater than an acre.`,
+                    // 'B4' : `This parcel has no existing access to sewer but is located in a transportation or marginally transportation diverse area. It is located in a high activity area. If developing for greater density, this parcel would be a good candidate for up to a duplex. Further development potential may be unlocked should infrastructure be added or if the parcel is greater than an acre.`,
+                    // 'B5' : `This parcel has ready access to public sewer but is located in an area of no transportation diversity. It is located in an area of high activty. If developing for greater density, this parcel would be a good candidate for fairly dense missing middle types oriented toward ownership, such as anything up to a town house.`,
+                    // 'B6' : `This parcel has neither sewer access nor any type of transportation diversity. It is, however, located in a high activity area. If developing for greater density, this parcel would be a good candidate for up to a duplex, though improvements in infrastruture could unlock greater development potential. `,
+                    // 'C1' : `This parcel has ready access to public sewer. It is not located in a transportation or marginally transportation diverse area, and there is litte activity around. If developing for greater density, this parcel could support up to a triplex or a small row of town homes.`,
+                    // 'C2' : `This parcel has neither sewer access nor any type of transportation diversity. It is located in a somewhat limited activty area. If developing for higher density, this parcel could support up to a duplex.`,
+                    // 'D1' : `This parcel has no sewer access, no transportation diversity, and no activity center. If developing for higher density, this parcel could support up to a duplex.`
+    'A1': {
+        bullets: [
+            'Located in a lively, high-activity area',
+            'Adequate infrastructure to support density',
+            'Best candidate for the highest density residential typology possible'
+        ]
+    },
+    'B1': {
+        bullets: [
+            'Ready access to public sewer',
+            'Transportation or marginally transportation-diverse area with some activity',
+            'Good candidate for fairly dense missing middle housing (e.g. row houses or quadplex)'
+        ]
+    },
+    'B2': {
+        bullets: [
+            'Ready access to public sewer',
+            'Transportation-diverse area but not high activity',
+            'Good candidate for ownership-oriented row houses or a quadplex'
+        ]
+    },
+    'B3': {
+        bullets: [
+            'No existing sewer access; limited activity',
+            'Transportation or marginally transportation-diverse area',
+            'Candidate for up to a duplex — more potential with infrastructure or 1+ acre parcel'
+        ]
+    },
+    'B4': {
+        bullets: [
+            'No existing sewer access but high-activity area',
+            'Transportation or marginally transportation-diverse area',
+            'Candidate for up to a duplex — more potential with added infrastructure'
+        ]
+    },
+    'B5': {
+        bullets: [
+            'Ready access to public sewer; high-activity area',
+            'No transportation diversity',
+            'Good candidate for ownership-oriented missing middle up to a townhouse'
+        ]
+    },
+    'B6': {
+        bullets: [
+            'No sewer access or transportation diversity',
+            'High-activity area',
+            'Candidate for up to a duplex — infrastructure improvements could unlock more'
+        ]
+    },
+    'C1': {
+        bullets: [
+            'Ready access to public sewer',
+            'Not in a transportation-diverse or high-activity area',
+            'Could support up to a triplex or small row of townhomes'
+        ]
+    },
+    'C2': {
+        bullets: [
+            'No sewer access or transportation diversity',
+            'Somewhat limited activity area',
+            'Could support up to a duplex'
+        ]
+    },
+    'D1': {
+        bullets: [
+            'No sewer access, no transportation diversity, no activity center',
+            'Could support up to a duplex'
+        ]
+    }
+};
 
-                const displaySuitability = suitabilityStatement[suitability]|| `Not available.`;
+
+                const displaySuitability = suitabilityStatement[suitability];
+
+                let suitabilityHTML;
+                if (!displaySuitability) {
+                    suitabilityHTML = `<p>Not available.</p>`;
+                } else if (displaySuitability.bullets) {
+                  const items = displaySuitability.bullets
+                    .map(b => `<div>• ${b}</div>`)
+                    .join('');
+                  suitabilityHTML = `<div style="margin-top: 4px; line-height: 1.4;">${items}</div>`;
+                } else {
+                    suitabilityHTML = `<p>${displaySuitability}</p>`;
+                }
 
                 html = `
                 <div class="popup-header">${parcelDisplayName}</div>
                 <div class="popup-content">
-                    Suitability class: ${suitability || "N/a"} <p>${displaySuitability}
+                    Suitability class: ${suitability || "N/a"}
+                    ${suitabilityHTML}
                 </div>`;
+                // html = `
+                // <div class="popup-header">${parcelDisplayName}</div>
+                // <div class="popup-content">
+                //     Suitability class: ${suitability || "N/a"} <p>${displaySuitability}
+                // </div>`;
             break;
             }
 
