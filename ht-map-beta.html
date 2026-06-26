@@ -7,6 +7,9 @@
 <!-- Tailwind CSS -->
 <script src="https://cdn.tailwindcss.com"></script> <!--add packages instead of cdn/api to keep us nimble in case of cloudflare attack!!-->
 
+<!--Papa Parser for reading csv data-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+
 <!-- Mapbox GL JS -->
 <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
 <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet" />
@@ -150,13 +153,14 @@
           <option value="tracts-rdRace">Displacement risk of non-white populations</option>
           <option value="parcels-landuse">Land use (property class)</option>
           <option value="parcels-density">Actual residential density (units per acre)</option>
-          <option value="tracts-mva">Neighborhood conditions</option>
+          <!--<option value="tracts-mva">Neighborhood conditions</option>-->
         </optgroup>
 
         <optgroup label="Transportation">
 <<<<<<< HEAD
 =======
-       <option value="bg-transport-diversity-layer">Transportation diversity</option>
+       <option value="bg-transport-diversity-layer">Transportation diversity by block group</option>
+       <option value="parcel-transport-assess-layer">Transportation assessment by parcel</option>
 >>>>>>> e00fd6365de46ccc9d6454c9b35693d2be6484e0
         </optgroup>
 
@@ -173,7 +177,7 @@
         </optgroup>
 
         <optgroup label="Suitability Analysis">
-          <option value="buildable-land">Land without environmental constraints</option>
+         <!-- <option value="buildable-land">Land without environmental constraints</option>--> 
         </optgroup>
 
         <optgroup label="Other">
@@ -355,7 +359,7 @@
                 </div>
               <span class="leading-snug ms-2">Via microtransit service areas</span>
               <button class="ml-1 text-gray-500 hover:text-gray-700 info-btn" style="font-size: 10px;"
-                      data-info="Via, an WRTA microtransit partnership, operates its rideshare service in the highlighted areas. Via operates between 7am-7pm."> ⓘ
+                      data-info="Via, an WRTA microtransit partnership, operates its rideshare service in the highlighted areas. Via operates between 7am-7pm. The Via service area is subject to change as the program evolves."> ⓘ
               </button>
             </label>
             <label class="flex items-start text-xs text-gray-700">
@@ -840,14 +844,13 @@
             <button data-style="communityscale/cmgicidwh007k01qdauae93b0" class="px-3 py-1 bg-black text-white text-xs mb-2 rounded hover:bg-gray-800">
                 Gray
               </button>
-              <!--
-              <button data-style="communityscale/cmgidsjne002c01qne3nf930s" class="px-3 py-1 bg-black text-white text-xs rounded hover:bg-gray-800">
+              <button data-style="communityscale/cmgidsjne002c01qne3nf930s" class="px-3 py-1 bg-black text-white text-xs mb-2 rounded hover:bg-gray-800">
                 Satellite
               </button>
-              <button data-style="communityscale/cmgidu19b00n301sb0jcihsuk" class="px-3 py-1 bg-black text-white text-xs rounded hover:bg-gray-800">
+              <button data-style="communityscale/cmgidu19b00n301sb0jcihsuk" class="px-3 py-1 bg-black text-white text-xs mb-2 rounded hover:bg-gray-800">
                 Light Satellite
               </button>
-              -->
+             
       </div>
     </div>
     
@@ -964,10 +967,11 @@
         'zip-currentZHVI',
         'zip-chZHVI',
         'parcels-landuse',
-        'buildable-land',
+       // 'buildable-land',
         'parcels-density',
         "bg-transport-diversity-layer",
-        "bg-residensity-layer"
+        "bg-residensity-layer",
+        "parcel-transport-assess-layer"
     ];
 
     const overlayLayers = [ // all overlay layers need to be listed here
@@ -1086,8 +1090,7 @@
 
    const palettesByLayer = { //leave empty if not needed
             'parcels-landuse': landUsePalette,
-            'buildable-land': buildablePalette,
-//             'parcels-ownership': taxCreditPalette,
+           // 'buildable-land': buildablePalette,
        'tracts-rdAge': [
            { value: 0, color: '#edf8fb', label: 'Relatively low displacement risk' },
            { value: 0.23, color: '#b3cde3', label: 'Somewhat low' },
@@ -1136,7 +1139,12 @@ function batchSetFeatureStates({
     useCode: f["use_2"],
     SiteAddress: f["SiteAddres"],
     description: f["UseDesc"],
-    suitclass1: f["suitclass1"]
+    suitclass1: f["suitclass1"],
+    ped_assess: f["ped_assessment"], //commentary
+    transit_assess: f["transit_assessment"], //commentary 
+    div_assess: f["trans_diversity_assessment"], //categorical transport quality assessment to visualize on
+    marginality: f["trans_diverse_marginal"], //mariginality for tranportation diversity - potentially not needed? 
+    transport_quality: f["overall_transport_quality"] //commentary/needs 
   })
 }) {
   let i = 0;
@@ -1147,7 +1155,7 @@ function batchSetFeatureStates({
 
     for (; i < end; i++) {
       const f = data[i];
-      const id = f.LOC_ID?.toString();
+      const id = f.loc_id?.toString(); //was f.LOC_ID
       if (!id) continue;
 
       map.setFeatureState(
@@ -1159,7 +1167,7 @@ function batchSetFeatureStates({
     if (i < total) {
       requestAnimationFrame(processNextBatch); // yields to browser between batches
     } else {
-      console.log(`✅ Feature state applied for ${total} features`);
+      console.log(`Feature state applied for ${total} features`);
     }
   }
 
@@ -1210,238 +1218,320 @@ function batchSetFeatureStates({
         map.resize(); 
         }
 
-    function addSources () { 
+        function waitForIdle() {
+          return new Promise(resolve => {
+            map.once('idle', resolve);
+          });
+        }
+
+let parcelsCSVLoaded = false;
+let parcelsCSVData = null;
+
+function addSources() { 
+
+    if (!map.getSource("tracts")) {
         map.addSource("tracts", {    
             type: "vector",
-            url: 'mapbox://communityscale.tracts-2020', //update to stream json source + join!!
+            url: 'mapbox://communityscale.tracts-2020',
             promoteId: "GEOID"
-        })
+        });
+    }
 
+    if (!map.getSource("parcels")) {
         map.addSource("parcels", {    
             type: "vector",
-            url: 'mapbox://communityscale.csy6z5wg', //update to stream json source + join!!
+            url: 'mapbox://communityscale.csy6z5wg',
             promoteId: "LOC_ID"
-        })
-   
+        });
+    }
+
+    if (!map.getSource("bike-trails")) {
         map.addSource("bike-trails", {
             type: 'geojson',
-            data: 'CMRPC_BikeTrails_251125.geojson',
+            data: 'CMRPC_biketrails_260626.geojson',
             promoteId: 'OBJECTID'
-        })
+        });
+    }
 
+    if (!map.getSource("zips")) {
         map.addSource("zips", {
             type: 'vector',
             url: 'mapbox://emtzot01.963cu3b9',
             promoteId: 'ZCTA5'
-        })
-   
+        });
+    }
+
+    if (!map.getSource("towns")) {
         map.addSource("towns", {
             type: "vector",
             url: "mapbox://emtzot01.4s34saee",
             promoteId: "TOWN_ID"
-        })
+        });
+    }
 
+    if (!map.getSource("communityboundaries")) {
         map.addSource("communityboundaries", {
             type: "geojson",
             data: 'https://raw.githubusercontent.com/CommunityScale/CMRPC/refs/heads/main/communityboundaries.geojson'
-        })
+        });
+    }
 
+    if (!map.getSource("suitability-classes")) {
         map.addSource("suitability-classes", {
             type: "geojson",
             data: "suitability_clip_dissolve_260129.geojson",
             promoteId: "suitclass1"
-        })
+        });
+    }
 
+    if (!map.getSource("subregions")) {
         map.addSource("subregions", {
             type: "geojson",
             data: 'CMRPC_Subregions_251120.geojson',
             promoteId: "region"
-        })
+        });
+    }
 
+    if (!map.getSource("bus-stops")) {
         map.addSource("bus-stops", {
             type: "geojson",
-            data: 'bus_stops.geojson', //replace with re-projected version??
+            data: 'bus_stops.geojson',
             promoteId: 'fid'
-        })
+        });
+    }
 
+    if (!map.getSource("train-stops")) {
         map.addSource("train-stops", {
             type: "geojson",
             data: 'https://raw.githubusercontent.com/CommunityScale/CMRPC/refs/heads/main/CMRPC_RailStations_251017.geojson'
-        })
+        });
+    }
 
+    if (!map.getSource("transit-diversity")) {
         map.addSource("transit-diversity", {
             type: 'geojson',
             data: 'https://raw.githubusercontent.com/CommunityScale/CMRPC/refs/heads/main/parcels_transportation_diversity_marg_onlytrue_diss.geojson',
             promoteId: 'loc_id'
-        })
+        });
+    }
 
+    if (!map.getSource("ped-quality")) {
         map.addSource("ped-quality", {
             type: 'geojson',
             data: 'CMRPC_ped_quality_dissolved_select_qualities_251020.geojson',
             promoteId: 'loc_id'
-        })
+        });
+    }
 
+    if (!map.getSource("transit-quality-2")) {
         map.addSource("transit-quality-2", {
             type: 'geojson',
             data: 'CMRPC_transit_quality_dissolved_selected_qualities_251020.geojson',
             promoteId: 'loc_id'
-        })
+        });
+    }
 
+    if (!map.getSource("transit-quality")) {
         map.addSource("transit-quality", {
             type: 'geojson',
             data: 'https://raw.githubusercontent.com/CommunityScale/CMRPC/refs/heads/main/CMRPC_transit_quality_dissolved_selected_qualities_251020.geojson',
             promoteId: 'fid'
-        })
+        });
+    }
 
+    if (!map.getSource("mf-zoning")) {
         map.addSource("mf-zoning", {
             type: 'geojson',
             data: 'CMRPC_zoning_mfpossible_wmc_260311.geojson', 
             promoteId: 'fid'
-        })
+        });
+    }
 
+    if (!map.getSource("bg-costs")) {
         map.addSource("bg-costs", {
             type: "geojson",
             data: 'https://raw.githubusercontent.com/CommunityScale/CMRPC/refs/heads/main/CMRPC_bg_costs.geojson',
             promoteId: 'GEO_ID_clean'
-        })
+        });
+    }
 
+    if (!map.getSource("bg-transport-diversity")) {
         map.addSource("bg-transport-diversity", {
             type: 'geojson',
             data: 'https://raw.githubusercontent.com/CommunityScale/CMRPC/refs/heads/main/CMRPC_bg_transportation_diverse_marg.geojson',
             promoteId: 'geoid'
-        })
+        });
+    }
 
-        map.addSource("buildable", {
-            type: "geojson",
-            data: 'https://raw.githubusercontent.com/CommunityScale/CMRPC/refs/heads/main/buildable6.geojson'
-        })
-
+    if (!map.getSource("assessor-vacancy")) {
         map.addSource("assessor-vacancy", {
             type: "geojson",
-            data: "cmrpc_assessor_vacany_260226.geojson", //replace with an updated version that includes vacant commercial properties 
+            data: "cmrpc_assessor_vacany_260226.geojson",
             promoteId: "LOC_ID"
-        })
+        });
+    }
 
+    if (!map.getSource("tracts-demo-suitability")) {
         map.addSource("tracts-demo-suitability", {
             type: "geojson",
             data: "CMRPC_Tracts_SuitabilityOverlays_Displacement_Mkt_260128.geojson",
             promoteId: "GEOID"
-        })
+        });
+    }
 
+    if (!map.getSource("soft-sites")) {
         map.addSource("soft-sites", {
             type: "geojson",
             data: "softsitesdiss.geojson"
-        })
+        });
+    }
 
+    if (!map.getSource("hexes-location-premiums")) {
         map.addSource("hexes-location-premiums", {
             type: "geojson",
             data: "hex_home_index.geojson",
             promoteId: "hex_id"
-        })
+        });
+    }
 
+    if (!map.getSource("excess-capacity")) {
         map.addSource("excess-capacity", {
             type: "geojson",
             data: 'https://raw.githubusercontent.com/CommunityScale/CMRPC/refs/heads/main/CMRPC_DissolvedParcels_ExcessCapacity_251017.geojson'
-        })
+        });
+    }
 
+    if (!map.getSource("exceeds-capacity")) {
         map.addSource("exceeds-capacity", {
             type: "geojson",
             data: 'https://raw.githubusercontent.com/CommunityScale/CMRPC/refs/heads/main/CMRPC_DissolvedParcels_ExceedsCapacity_251017.geojson'
-        })
+        });
+    }
 
+    if (!map.getSource("via-service-area")) {
         map.addSource("via-service-area", {
             type: "geojson",
             data: "Via_Microtransit_Service_Areas_251030.geojson"
-        })
+        });
+    }
 
+    if (!map.getSource("bg-residensity")) {
         map.addSource("bg-residensity",{
             type: "geojson",
             data: "CMRPC_Bgs_ResidentialDensity_251106.geojson"
-        })
+        });
+    }
 
+    if (!map.getSource("via-stops")) {
         map.addSource("via-stops", {
             type: "geojson",
             data: "Via_Microtransit_Origin_Destination_Points_251030.geojson"
-        })
+        });
+    }
 
+    if (!map.getSource("wrta-fixed")) {
         map.addSource("wrta-fixed", {
             type: "geojson",
-            data: "Via_WRTA_Fixed_Routes_251030.geojson"
-        })
+            data: "CMRPC_fixedroutes_260625.geojson" //"Via_WRTA_Fixed_Routes_251030.geojson" replaced 6/26
+        });
+    }
 
+    if (!map.getSource("ctysds")) {
         map.addSource("ctysds", {
             type: "vector",
             url: "mapbox://emtzot01.7fsgy5ln",
             promoteId: 'GEOID'
-        })
+        });
+    }
+}
 
-        // Json fethces
-        fetchJSON('medIncome', 'https://raw.githubusercontent.com/emtzot/mapSources/main/mass_basicHNA_2023acs_250620.json')
-        .then(data => {
-            data.forEach(f => {
-            map.setFeatureState(
-                { source: 'tracts', sourceLayer: 'tracts', id: f.GEOID.toString() },
-                { medIncome: f["medIncome"] }
-            );
-            });
+function applyTractsFeatureState() {
+    fetchJSON('medIncome', 'https://raw.githubusercontent.com/emtzot/mapSources/main/mass_basicHNA_2023acs_250620.json')
+    .then(data => {
+        data.forEach(f => {
+        map.setFeatureState(
+            { source: 'tracts', sourceLayer: 'tracts', id: f.GEOID.toString() },
+            { medIncome: f["medIncome"] }
+        );
+        });
+    });
+
+    fetchJSON('ctfilter', 'https://raw.githubusercontent.com/CommunityScale/CMRPC/refs/heads/main/CTfilter2.geojson')
+    .then(filterData => {
+        const validTractsRD = new Set();
+        const features = filterData.features || filterData;
+        features.forEach(f => {
+        const geoid = f.properties?.GEOID || f.GEOID;
+        if (geoid) validTractsRD.add(geoid.toString());
         });
 
-        // Parcel suitability/land use/density
-        fetchJSON('parcels', 'CMRPC_Parcels_Suitability_LandUse_DUA_TranspoDiv_260618.json')
-        .then(data => {
-            batchSetFeatureStates({
-            data,
+        return fetchJSON('rdTracts', 'https://raw.githubusercontent.com/CommunityScale/CMRPC/refs/heads/main/rd_tracts_250731.json')
+        .then(data => ({ data, validTractsRD }));
+    })
+    .then(({ data, validTractsRD }) => {
+        let matched = 0;
+        data.forEach(f => {
+        const id = f.GEOID.toString();
+        if (validTractsRD.has(id)) {
+            matched++;
+            map.setFeatureState(
+            { source: 'tracts', sourceLayer: 'tracts', id },
+            { rd_seniors: Number(f["rd_seniors"]), rd_nonwhitePops: Number(f["rd_nonWhitePops"]) }
+            );
+        }
+        });
+        console.log(`Displacement risk loaded for ${matched} tracts`);
+    })
+    .catch(err => console.error('Error loading displacement risk:', err));
+
+    fetchJSON('tractsMVA', 'https://raw.githubusercontent.com/CommunityScale/CMRPC/adc9df09b39883512a5175738efe5ace91ad2917/CMRPC_Tracts_MVA_CostBurden_250828.json')
+    .then(data => {
+        data.forEach(f => {
+        map.setFeatureState(
+            { source: 'tracts', sourceLayer: 'tracts', id: f.geoid.toString() },
+            {
+            pctowned30_23: Number(f["pctowned30_23"]),
+            pctrent30_23: Number(f["pctrent30_23"]),
+            mva: f["class"]
+            }
+        );
+        });
+    });
+}
+
+function applyParcelsFeatureState() {
+    if (!parcelsCSVLoaded) {
+        console.log('About to parse CSV, Papa is:', typeof Papa);
+        Papa.parse('CMRPC_Parcels_Suitability_LandUse_DUA_TranspoDiv_260618_1.csv', {
+            download: true,
+            header: true,
+            skipEmptyLines: true,
+            complete: function(results) {
+                console.log('Parsed rows:', results.data.length);
+                console.log('Sample row:', results.data[0]);
+                parcelsCSVLoaded = true;
+                parcelsCSVData = results.data;
+                batchSetFeatureStates({
+                    data: parcelsCSVData,
+                    source: 'parcels',
+                    sourceLayer: 'CMRPC_Parcels_Cleaned_NoData_251008',
+                });
+            },
+            error: function(err) {
+                console.error("Failed to load parcel data:", err);
+            }
+        });
+    } else {
+        console.log('Reapplying cached parcels feature state to new source.');
+        batchSetFeatureStates({
+            data: parcelsCSVData,
             source: 'parcels',
             sourceLayer: 'CMRPC_Parcels_Cleaned_NoData_251008',
-            });
-        })
-        .catch(err => console.error("Failed to load parcel data:", err));
-
-        // Displacement risk (two-step fetch — keep sequential, just cache both)
-        fetchJSON('ctfilter', 'https://raw.githubusercontent.com/CommunityScale/CMRPC/refs/heads/main/CTfilter2.geojson')
-        .then(filterData => {
-            const validTractsRD = new Set();
-            const features = filterData.features || filterData;
-            features.forEach(f => {
-            const geoid = f.properties?.GEOID || f.GEOID;
-            if (geoid) validTractsRD.add(geoid.toString());
-            });
-
-            return fetchJSON('rdTracts', 'https://raw.githubusercontent.com/CommunityScale/CMRPC/refs/heads/main/rd_tracts_250731.json')
-            .then(data => ({ data, validTractsRD }));
-        })
-        .then(({ data, validTractsRD }) => {
-            let matched = 0;
-            data.forEach(f => {
-            const id = f.GEOID.toString();
-            if (validTractsRD.has(id)) {
-                matched++;
-                map.setFeatureState(
-                { source: 'tracts', sourceLayer: 'tracts', id },
-                { rd_seniors: Number(f["rd_seniors"]), rd_nonwhitePops: Number(f["rd_nonWhitePops"]) }
-                );
-            }
-            });
-            console.log(`Displacement risk loaded for ${matched} tracts`);
-        })
-        .catch(err => console.error('Error loading displacement risk:', err));
-
-        // Cost burden / MVA
-        fetchJSON('tractsMVA', 'https://raw.githubusercontent.com/CommunityScale/CMRPC/adc9df09b39883512a5175738efe5ace91ad2917/CMRPC_Tracts_MVA_CostBurden_250828.json')
-        .then(data => {
-            data.forEach(f => {
-            map.setFeatureState(
-                { source: 'tracts', sourceLayer: 'tracts', id: f.geoid.toString() },
-                {
-                pctowned30_23: Number(f["pctowned30_23"]),
-                pctrent30_23: Number(f["pctrent30_23"]),
-                mva: f["class"]
-                }
-            );
-            });
         });
-
     }
+}
+
+
 
 
 
@@ -1544,11 +1634,6 @@ async function computeQuintileBreaks(source, property) {
         (quantile(values, 0.6)), 
         (quantile(values, 0.8)), 
         (quantile(values, 1.0)) 
-      // Math.round(quantile(values, 0.2)), // / 10) * 10,
-      // Math.round(quantile(values, 0.4)), // / 10) * 10,
-      // Math.round(quantile(values, 0.6)), // / 10) * 10,
-      // Math.round(quantile(values, 0.8)), // / 10) * 10,
-      // Math.round(quantile(values, 1.0)) // / 10) * 10
     ];
   } catch (err) {
     console.error("Failed to compute quintile breaks:", err);
@@ -1683,9 +1768,16 @@ const interpolateLayers = [
             
     ]
 
+const breaksCache = {};
 
-    async function addInterpolatedLayers(opacity, visibleLayerId) {
+async function addInterpolatedLayers(opacity, visibleLayerId) {
   for (const { id, property, data_source, source_layer, source_url, colors, defaultViz, useFeatureState, useQuintiles, useCustomBreaks, customBreaks, useFilter, filterProperty } of interpolateLayers) {
+    
+    if (map.getLayer(id)) {
+      console.warn(`Layer ${id} already exists, skipping addLayer.`);
+      continue;
+    }
+
     console.log(`Processing layer: ${id}`);
 
     const expressionInput = useFeatureState
@@ -1694,10 +1786,8 @@ const interpolateLayers = [
 
     let fillColorExpression;
 
-    // Handle custom breaks
     if (useCustomBreaks && customBreaks) {
       const stops = [];
-      // For step: first color is default (< first break), then iterate through breaks
       for (let i = 0; i < customBreaks.length && i + 1 < colors.length; i++) {
         stops.push(customBreaks[i], colors[i + 1]);
       }
@@ -1708,15 +1798,25 @@ const interpolateLayers = [
         [
           "step",
           expressionInput,
-          colors[0],  // default color for values < first break
+          colors[0],
           ...stops
         ]
       ];
     } else {
-      // Use quintile breaks if specified, otherwise use default IQR-based breaks
-      const stats = useQuintiles
-        ? await computeQuintileBreaks(source_url, property)
-        : await computeStatsFromSource(source_url, property);
+      // Use cached breaks if we've already computed them once
+      let stats = breaksCache[id];
+
+      if (!stats) {
+        stats = useQuintiles
+          ? await computeQuintileBreaks(source_url, property)
+          : await computeStatsFromSource(source_url, property);
+
+        if (stats) {
+          breaksCache[id] = stats; // cache for future basemap switches
+        }
+      } else {
+        console.log(`Using cached breaks for: ${id}`);
+      }
 
       if (!stats) {
         console.warn(`Skipping ${id} – insufficient data.`);
@@ -1749,11 +1849,6 @@ const interpolateLayers = [
       continue;
     }
 
-    if (map.getLayer(id)) {
-      console.warn(`Layer ${id} already exists, skipping addLayer.`);
-      continue;
-    }
-
     const layerConfig = {
       id,
       type: "fill",
@@ -1769,25 +1864,26 @@ const interpolateLayers = [
           ["any",
             ["==", useFeatureState ? ["feature-state", property] : ["get", property], null],
             ["==", useFeatureState ? ["feature-state", property] : ["get", property], ""]
-          ], 0,  // fully transparent if null or empty string
-          opacity || 0.7  // default opacity
+          ], 0,
+          opacity || 0.7
         ]
       }
     };
 
-    // Only add source-layer if it exists (for vector tiles)
     if (source_layer) {
       layerConfig["source-layer"] = source_layer;
     }
 
-    // Add filter if specified
     if (useFilter && filterProperty) {
       layerConfig.filter = ["in", filterProperty, ...regionOfInterest];
     }
 
-    map.addLayer(layerConfig, labelLayerId);
-
-    console.log(`Layer ${id} added.`);
+    try {
+      map.addLayer(layerConfig, labelLayerId);
+      console.log(`Layer ${id} added.`);
+    } catch (err) {
+      console.error(`Failed to add layer ${id}:`, err);
+    }
   }
 }
 
@@ -1924,51 +2020,51 @@ map.addLayer({
         labelLayerId
     );
 
-  map.addLayer(
-    {
-    id: "tracts-mva",
-    type: "fill",
-    source: "tracts",
-    "source-layer": "tracts",
-    paint: {
-      "fill-color": [
-        "case",
-        ["==", ["feature-state", "mva"], null], "transparent",
-        [
-          "match",
-          ["feature-state", "mva"],
-          "HDCQ", "#7a9232",
-          "HDKU", "#becd5f",
-          "HDNI", "#f7fccf",
-          "OKCQ", "#2a6abc",
-          "OKKU", "#6ea6ea",
-          "OKNI", "#c3dcf5",
-          "DCQ", "#341188",
-          "DKU", "#815de1",
-          "DNI", "#c6b7f6",
-          "transparent"
-        ]
-      ],
-      "fill-outline-color": "white",
-      "fill-opacity": [
-        "case",
-        ["==", ["feature-state", "mva"], null], 0,
-        ["case",
-          ["boolean", ["feature-state", "hover"], false],
-          0.95,
-          0.6
-        ]
-      ]
-    },
-    layout: {
-      visibility: "none"
-    }
-  },
-  labelLayerId
-);
+//   map.addLayer(
+//     {
+//     id: "tracts-mva",
+//     type: "fill",
+//     source: "tracts",
+//     "source-layer": "tracts",
+//     paint: {
+//       "fill-color": [
+//         "case",
+//         ["==", ["feature-state", "mva"], null], "transparent",
+//         [
+//           "match",
+//           ["feature-state", "mva"],
+//           "HDCQ", "#7a9232",
+//           "HDKU", "#becd5f",
+//           "HDNI", "#f7fccf",
+//           "OKCQ", "#2a6abc",
+//           "OKKU", "#6ea6ea",
+//           "OKNI", "#c3dcf5",
+//           "DCQ", "#341188",
+//           "DKU", "#815de1",
+//           "DNI", "#c6b7f6",
+//           "transparent"
+//         ]
+//       ],
+//       "fill-outline-color": "white",
+//       "fill-opacity": [
+//         "case",
+//         ["==", ["feature-state", "mva"], null], 0,
+//         ["case",
+//           ["boolean", ["feature-state", "hover"], false],
+//           0.95,
+//           0.6
+//         ]
+//       ]
+//     },
+//     layout: {
+//       visibility: "none"
+//     }
+//   },
+//   labelLayerId
+// );
 
-const feats = map.queryRenderedFeatures({ layers: ["tracts-mva"] });
-console.log(feats[0]);
+// const feats = map.queryRenderedFeatures({ layers: ["tracts-mva"] });
+// console.log(feats[0]);
 
 
 
@@ -2129,6 +2225,38 @@ map.addLayer({
         labelLayerId
     )
 
+    map.addLayer({      
+            id: "parcel-transport-assess-layer",  
+            type: "fill",
+            source: "parcels",
+            'source-layer': 'CMRPC_Parcels_Cleaned_NoData_251008',
+            paint: {
+                "fill-color": [
+                        "match",
+                        ["feature-state", "div_assess"],
+                        "vehicle locked", medIncomePalette[0],
+                        "minimal", medIncomePalette[1],
+                        "marginal", medIncomePalette[3],
+                        "diverse", medIncomePalette[4],
+                        "#fff"
+                    ],
+                    "fill-outline-color": [
+                      "step",
+                      ["zoom"],
+                      "transparent",
+                      14,
+                      "white"],
+                    "fill-opacity":
+                      ["interpolate", 
+                      ["linear"], 
+                      ["zoom"], 6, 0, 8, 0.1, 10, 0.15, 11, 0.2, 12, 0.3, 12.5, 0.8]
+                  },
+                layout: {
+                    visibility: "none"
+                }
+            },
+            labelLayerId)
+
     map.addLayer({
                 id: "parcels-landuse", //update with parcel types!!
                 type: "fill",
@@ -2188,34 +2316,34 @@ map.addLayer({
             },
             labelLayerId)
 
-    map.addLayer({
-                id: "buildable-land",
-                type: "fill",
-                source: "buildable",
-                paint: {
-                    "fill-color": [
-                        "match",
-                        ["get", "clss"],
-                        "noSew Built noExempt", "#c7c7c7",
-                        "noSew noBuilt Exempt", "transparent",
-                        "noSew noBuilt noExempt", "#ec8f45",
-                        "Sew Built noExempt", "#c7c7c7",
-                        "Sew noBuilt Exempt", "transparent",
-                        "Sew unBuilt noExempt", "#3643b8",
-                        "transparent"
-                    ],
-                    "fill-opacity": [
-                        "case",
-                        ["in", ["get", "clss"], ["literal", ["noSew Built noExempt", "noSew noBuilt noExempt", "Sew Built noExempt", "Sew unBuilt noExempt"]]],
-                        1,
-                        0
-                    ]
-                },
-                layout: {
-                    visibility: "none"
-                }
-            },
-            labelLayerId)
+    // map.addLayer({
+    //             id: "buildable-land",
+    //             type: "fill",
+    //             source: "buildable",
+    //             paint: {
+    //                 "fill-color": [
+    //                     "match",
+    //                     ["get", "clss"],
+    //                     "noSew Built noExempt", "#c7c7c7",
+    //                     "noSew noBuilt Exempt", "transparent",
+    //                     "noSew noBuilt noExempt", "#ec8f45",
+    //                     "Sew Built noExempt", "#c7c7c7",
+    //                     "Sew noBuilt Exempt", "transparent",
+    //                     "Sew unBuilt noExempt", "#3643b8",
+    //                     "transparent"
+    //                 ],
+    //                 "fill-opacity": [
+    //                     "case",
+    //                     ["in", ["get", "clss"], ["literal", ["noSew Built noExempt", "noSew noBuilt noExempt", "Sew Built noExempt", "Sew unBuilt noExempt"]]],
+    //                     1,
+    //                     0
+    //                 ]
+    //             },
+    //             layout: {
+    //                 visibility: "none"
+    //             }
+    //         },
+    //         labelLayerId)
 
     // Transit diversity fill layer (polygon fill)
     map.addLayer({
@@ -2841,8 +2969,9 @@ map.addLayer({
     map.addLayer({
             id: "town-layer",
             type: "line",
-            source: "towns",
-            'source-layer': 'massachusetts_towns-a8k14v',
+            // source: "towns",
+            // 'source-layer': 
+            source:'communityboundaries',
             paint: {
                 "line-color": "black",
                 "line-width": 1.5
@@ -2850,7 +2979,7 @@ map.addLayer({
             layout: {
                 visibility: "visible"
                 },
-            filter: ["in", "TOWN",...regionOfInterest]},
+          },
             labelLayerId
         )
 
@@ -3079,38 +3208,46 @@ map.addLayer({
         })
 
 
-    // Create diagonal line pattern for buildable-land layer
-    const createDiagonalLinePattern = () => {
-      const size = 16; // Size of the pattern tile
-      const canvas = document.createElement('canvas');
-      canvas.width = size;
-      canvas.height = size;
-      const ctx = canvas.getContext('2d');
+    // // Create diagonal line pattern for buildable-land layer
+    // const createDiagonalLinePattern = () => {
+    //   const size = 16; // Size of the pattern tile
+    //   const canvas = document.createElement('canvas');
+    //   canvas.width = size;
+    //   canvas.height = size;
+    //   const ctx = canvas.getContext('2d');
 
-      // Clear canvas
-      ctx.clearRect(0, 0, size, size);
+    //   // Clear canvas
+    //   ctx.clearRect(0, 0, size, size);
 
-      // Draw diagonal lines at 45 degrees
-      ctx.strokeStyle = '#000000'; // Black lines
-      ctx.lineWidth = 1; // 1pt width
-      ctx.beginPath();
+    //   // Draw diagonal lines at 45 degrees
+    //   ctx.strokeStyle = '#000000'; // Black lines
+    //   ctx.lineWidth = 1; // 1pt width
+    //   ctx.beginPath();
 
-      // Draw multiple diagonal lines to fill the pattern
-      // We need to draw lines offset to create the pattern
-      for (let i = -size; i < size * 2; i += 6) { // spacing of 6 pixels (moderately close)
-        ctx.moveTo(i, 0);
-        ctx.lineTo(i + size, size);
-      }
+    //   // Draw multiple diagonal lines to fill the pattern
+    //   // We need to draw lines offset to create the pattern
+    //   for (let i = -size; i < size * 2; i += 6) { // spacing of 6 pixels (moderately close)
+    //     ctx.moveTo(i, 0);
+    //     ctx.lineTo(i + size, size);
+    //   }
 
-      ctx.stroke();
-      return canvas;
-    };
+    //   ctx.stroke();
+    //   return canvas;
+    // };
 
-    // Add the diagonal pattern to the map
-    const diagonalPattern = createDiagonalLinePattern();
-    map.addImage('diagonal-lines-black', diagonalPattern);
+    // // Add the diagonal pattern to the map
+    // const diagonalPattern = createDiagonalLinePattern();
+    // if (!map.hasImage('diagonal-lines-black')) {
+    //   map.addImage('diagonal-lines-black', diagonalPattern);
+    // };
+
+    // // Add the diagonal pattern to the map
+    // const diagonalPattern = createDiagonalLinePattern();
+    // map.addImage('diagonal-lines-black', diagonalPattern);
     };
     
+
+
 //dual layer logic!! 11/10 added + in testing 
 const dualLayerPairs = { //test!!
   'parcels-density': {
@@ -3136,12 +3273,15 @@ map.on('style.load', () => {
   }})  
 
 
-map.on('load', () => {
+  map.on('load', () => {
     addSources();
 
     map.once('idle', async () => {
+        applyTractsFeatureState();
+        applyParcelsFeatureState();
+
         const opacity = 0.66;
-        const visibleLayerId = null; // Don't show any layer by default - let user select from dropdown
+        const visibleLayerId = null;
 
         await addInterpolatedLayers(opacity, visibleLayerId); //add interpolated layers FIRST
 
@@ -3158,9 +3298,9 @@ map.on('load', () => {
           });
 
           // Show CMRPC region fill layer if buildable land is the initial layer
-          if (map.getLayer('cmrpc-region-fill')) {
-              map.setLayoutProperty('cmrpc-region-fill', 'visibility', initialLayer === 'buildable-land' ? 'visible' : 'none');
-          }
+          // if (map.getLayer('cmrpc-region-fill')) {
+          //     map.setLayoutProperty('cmrpc-region-fill', 'visibility', initialLayer === 'buildable-land' ? 'visible' : 'none');
+          // }
 
           renderLegendFromStops(initialLayer);
         } else {
@@ -3208,14 +3348,15 @@ const allFillLayers = [
     'tracts-rdRace',
     'ctysds-pctHH',
     'zip-currentZHVI',
-    'tracts-mva',
+   // 'tracts-mva',
     'zip-chZHVI',
     'parcels-density',
     'parcels-landuse',
-    'buildable-land',
+   // 'buildable-land',
     'admin-layer',
     "bg-transport-diversity-layer",
-    "bg-residensity-layer"
+    "bg-residensity-layer",
+    "parcel-transport-assess-layer"
 ];
 
 
@@ -3646,9 +3787,9 @@ layerSelect.addEventListener('change', (e) => {
   });
 
   // Show CMRPC region fill layer when buildable land is selected
-  if (map.getLayer('cmrpc-region-fill')) {
-    map.setLayoutProperty('cmrpc-region-fill', 'visibility', selected === 'buildable-land' ? 'visible' : 'none');
-  }
+  // if (map.getLayer('cmrpc-region-fill')) {
+  //   map.setLayoutProperty('cmrpc-region-fill', 'visibility', selected === 'buildable-land' ? 'visible' : 'none');
+  // }
 
   renderLegend(selected);
 
@@ -3726,7 +3867,7 @@ layerSelect.addEventListener('change', (e) => {
             'zip-currentZHVI': 'zhvi25',
             'zip-chZHVI': 'chZhvi',
             'admin-layer': 'GEOID',
-            'tracts-mva': 'mva'
+           // 'tracts-mva': 'mva'
         };
 
         dataLayers.forEach(layerId => {
@@ -3763,19 +3904,6 @@ layerSelect.addEventListener('change', (e) => {
         //"tracts-pctHH"
     ];
 
-    // const studyAreaFilter = ["==", ["get", "COUNTY"], countyFIPS]; //redefined/edit as needed
-
-    // document.getElementById("toggleCounty").addEventListener("change", (e) => {
-    //     showOnlyCounty = e.target.checked;
-    //     const filter = showOnlyCounty
-    //         ? studyAreaFilter
-    //         : null;
-
-    //     tractLayerIds.forEach(id => {
-    //         map.setFilter(id, filter);
-    //     });
-    // });
-
     map.on('click', (e) => { //pop-up logic!! just add additional layers to the array and case logic below to create new pop-up!!
         const popUpLayers = [
         'tracts-medIncome',
@@ -3791,13 +3919,14 @@ layerSelect.addEventListener('change', (e) => {
         'tracts-rdRace',
         'ctysds-pctHH',
         'zip-currentZHVI',
-        'tracts-mva',
+        //'tracts-mva',
         'zip-chZHVI',
         'parcels-density',
         'parcels-landuse',
-        'buildable-land',
+        //'buildable-land',
         'admin-layer',
         "bg-transport-diversity-layer",
+        "parcel-transport-assess-layer",
         "bg-residensity-layer",
         "towns-layer",
         "transit-diversity-layer",
@@ -3956,7 +4085,7 @@ layerSelect.addEventListener('change', (e) => {
                 const avg_transport_cost = attributes.monthly_t_costs_avg_hh;
                 html = `
                 <div class="popup-header">Block Group ${attributes.GEO_ID_clean}</div>
-                <div class="popup-content">${avg_transport_cost != null ? `Average monthly transportation costs across household type: $${Math.round(avg_transport_cost).toLocaleString()}` : 'No available data.'}
+                <div class="popup-content">${avg_transport_cost != null ? `Average monthly transportation costs, inclusive of all household types: $${Math.round(avg_transport_cost).toLocaleString()}` : 'No available data.'}
                 </div>`;
             break;
             }
@@ -3968,86 +4097,76 @@ layerSelect.addEventListener('change', (e) => {
             case "suit-d": {
                 const suitability = attributes.suitclass1;
                 const suitabilityStatement = {
-                    // 'A1' : `This parcel is in an lively area with adequate infrastructure to support density. If developing for greater density, this parcel would be a good candidate for the highest density residential typology possible.`,
-                    // 'B1' : `This parcel has ready access to public sewer and is located in a transportation or marginally transportation diverse area. There is some activity. This parcel would be a good candidate for fairly dense missing middle housing, such as row houses or a quadplex.`,
-                    // 'B2' : `This parcel has ready access to public sewer and is located in a transportation or marginally transportation deiverse area. It is not located in a high activity area. This parcel would be a good candidate for fairly dense missing middle housing, such as ownership-oriented row hours or a quadplex.`,
-                    // 'B3' : `This parcel has no existing access to sewer but is located in a transportation or marginally transportation diverse area. Activity around this parcel is limited. If developing for greater density, this parcel would be a good candidate for up to a duplex. Further development potential may be unlocked should infrastructure be added or if the parcel is greater than an acre.`,
-                    // 'B4' : `This parcel has no existing access to sewer but is located in a transportation or marginally transportation diverse area. It is located in a high activity area. If developing for greater density, this parcel would be a good candidate for up to a duplex. Further development potential may be unlocked should infrastructure be added or if the parcel is greater than an acre.`,
-                    // 'B5' : `This parcel has ready access to public sewer but is located in an area of no transportation diversity. It is located in an area of high activty. If developing for greater density, this parcel would be a good candidate for fairly dense missing middle types oriented toward ownership, such as anything up to a town house.`,
-                    // 'B6' : `This parcel has neither sewer access nor any type of transportation diversity. It is, however, located in a high activity area. If developing for greater density, this parcel would be a good candidate for up to a duplex, though improvements in infrastruture could unlock greater development potential. `,
-                    // 'C1' : `This parcel has ready access to public sewer. It is not located in a transportation or marginally transportation diverse area, and there is litte activity around. If developing for greater density, this parcel could support up to a triplex or a small row of town homes.`,
-                    // 'C2' : `This parcel has neither sewer access nor any type of transportation diversity. It is located in a somewhat limited activty area. If developing for higher density, this parcel could support up to a duplex.`,
-                    // 'D1' : `This parcel has no sewer access, no transportation diversity, and no activity center. If developing for higher density, this parcel could support up to a duplex.`
-    'A1': {
-        bullets: [
-            'Located in a lively, high-activity area',
-            'Adequate infrastructure to support density',
-            'Best candidate for the highest density residential typology possible'
-        ]
-    },
-    'B1': {
-        bullets: [
-            'Ready access to public sewer',
-            'Transportation or marginally transportation-diverse area with some activity',
-            'Good candidate for fairly dense missing middle housing (e.g. row houses or quadplex)'
-        ]
-    },
-    'B2': {
-        bullets: [
-            'Ready access to public sewer',
-            'Transportation-diverse area but not high activity',
-            'Good candidate for ownership-oriented row houses or a quadplex'
-        ]
-    },
-    'B3': {
-        bullets: [
-            'No existing sewer access; limited activity',
-            'Transportation or marginally transportation-diverse area',
-            'Candidate for up to a duplex — more potential with infrastructure or 1+ acre parcel'
-        ]
-    },
-    'B4': {
-        bullets: [
-            'No existing sewer access but high-activity area',
-            'Transportation or marginally transportation-diverse area',
-            'Candidate for up to a duplex — more potential with added infrastructure'
-        ]
-    },
-    'B5': {
-        bullets: [
-            'Ready access to public sewer; high-activity area',
-            'No transportation diversity',
-            'Good candidate for ownership-oriented missing middle up to a townhouse'
-        ]
-    },
-    'B6': {
-        bullets: [
-            'No sewer access or transportation diversity',
-            'High-activity area',
-            'Candidate for up to a duplex — infrastructure improvements could unlock more'
-        ]
-    },
-    'C1': {
-        bullets: [
-            'Ready access to public sewer',
-            'Not in a transportation-diverse or high-activity area',
-            'Could support up to a triplex or small row of townhomes'
-        ]
-    },
-    'C2': {
-        bullets: [
-            'No sewer access or transportation diversity',
-            'Somewhat limited activity area',
-            'Could support up to a duplex'
-        ]
-    },
-    'D1': {
-        bullets: [
-            'No sewer access, no transportation diversity, no activity center',
-            'Could support up to a duplex'
-        ]
-    }
-};
+                  'A1': {
+                      bullets: [
+                          'Located in a lively, high-activity area',
+                          'Adequate infrastructure to support density',
+                          'Best candidate for the highest density residential typology possible'
+                      ]
+                  },
+                  'B1': {
+                      bullets: [
+                          'Ready access to public sewer',
+                          'Transportation or marginally transportation-diverse area with some activity',
+                          'Good candidate for fairly dense missing middle housing (e.g. row houses or quadplex)'
+                      ]
+                  },
+                  'B2': {
+                      bullets: [
+                          'Ready access to public sewer',
+                          'Transportation-diverse area but not high activity',
+                          'Good candidate for ownership-oriented row houses or a quadplex'
+                      ]
+                  },
+                  'B3': {
+                      bullets: [
+                          'No existing sewer access; limited activity',
+                          'Transportation or marginally transportation-diverse area',
+                          'Candidate for up to a duplex — more potential with infrastructure or 1+ acre parcel'
+                      ]
+                  },
+                  'B4': {
+                      bullets: [
+                          'No existing sewer access but high-activity area',
+                          'Transportation or marginally transportation-diverse area',
+                          'Candidate for up to a duplex — more potential with added infrastructure'
+                      ]
+                  },
+                  'B5': {
+                      bullets: [
+                          'Ready access to public sewer; high-activity area',
+                          'No transportation diversity',
+                          'Good candidate for ownership-oriented missing middle up to a townhouse'
+                      ]
+                  },
+                  'B6': {
+                      bullets: [
+                          'No sewer access or transportation diversity',
+                          'High-activity area',
+                          'Candidate for up to a duplex — infrastructure improvements could unlock more'
+                      ]
+                  },
+                  'C1': {
+                      bullets: [
+                          'Ready access to public sewer',
+                          'Not in a transportation-diverse or high-activity area',
+                          'Could support up to a triplex or small row of townhomes'
+                      ]
+                  },
+                  'C2': {
+                      bullets: [
+                          'No sewer access or transportation diversity',
+                          'Somewhat limited activity area',
+                          'Could support up to a duplex'
+                      ]
+                  },
+                  'D1': {
+                      bullets: [
+                          'No sewer access, no transportation diversity, no activity center',
+                          'Could support up to a duplex'
+                      ]
+                  }
+              };
 
 
                 const displaySuitability = suitabilityStatement[suitability];
@@ -4070,11 +4189,6 @@ layerSelect.addEventListener('change', (e) => {
                     Suitability class: ${suitability || "N/a"}
                     ${suitabilityHTML}
                 </div>`;
-                // html = `
-                // <div class="popup-header">${parcelDisplayName}</div>
-                // <div class="popup-content">
-                //     Suitability class: ${suitability || "N/a"} <p>${displaySuitability}
-                // </div>`;
             break;
             }
 
@@ -4163,14 +4277,25 @@ layerSelect.addEventListener('change', (e) => {
             break;
             }
 
-            case "buildable-land": {
-                const buildClass = attributes.clss; 
-                const buildableClassMatch = buildablePalette.find(entry => entry.key === buildClass);
-                const displayBuildClass = buildableClassMatch ? buildableClassMatch.label : "Unavailable";
+            case "parcel-transport-assess-layer": {
+                const displayPedAssessment = attributes.ped_assess === null || attributes.ped_assess === undefined ? 'data unavailable' : `${attributes.ped_assess}`;
+                const displayTransitAssessment = attributes.transit_assess === null || attributes.transit_assess === undefined ? 'data unavailable' : `${attributes.transit_assess}`;
                 html = `
-                <div class="popup-header">${displayBuildClass}</div>`;
-            break;
+                <div class="popup-header">${parcelDisplayName}</div>
+                <div class="popup-content">Pedestrian infrastructure assessment: ${displayPedAssessment}. <br>
+                  Transit infrastructure assessment: ${displayTransitAssessment}.
+                </div>`;
+            break; 
             }
+
+            // case "buildable-land": {
+            //     const buildClass = attributes.clss; 
+            //     const buildableClassMatch = buildablePalette.find(entry => entry.key === buildClass);
+            //     const displayBuildClass = buildableClassMatch ? buildableClassMatch.label : "Unavailable";
+            //     html = `
+            //     <div class="popup-header">${displayBuildClass}</div>`;
+            // break;
+            // }
 
             case "parcels-density": {
                 const DUA = Math.round(attributes.density * 10) /10;
@@ -4181,36 +4306,27 @@ layerSelect.addEventListener('change', (e) => {
             break;
             }
 
-            // case "buildable-land": {
-            //     const build_class = attributes.density;
+            // case "tracts-mva": { 
+            //   const condition = attributes.mva;
+            //   const conditionText = {
+            //     'DCQ' : `${attributes.NAME} has been a competitve area and is changing quickly.`,
+            //     'DKU' : `${attributes.NAME} has been a competitive area and is keeping up.`,
+            //     'DNI' : `${attributes.NAME} has been a competitive area but has not improved over the past five years.`,
+            //     'OKCQ' : `${attributes.NAME} has been doing alright and is changing quickly.`,
+            //     'OKKU' : `${attributes.NAME} has been doing alright and is keeping up.`,
+            //     'OKNI' : `${attributes.NAME} has been doing alright but has not improved over the past five years.`,
+            //     'HDCQ' : `${attributes.NAME} is a historically disinvested area and is changing quickly`,
+            //     'HDKU' : `${attributes.NAME} is a historically disinvested area and is keeping up.`,
+            //     'HDNI' : `${attributes.NAME} is a historically disinvested area and has not improved over the past five years.`
+            // };
+
+            // const displayCondition = conditionText[condition]|| `No available data.`;
             //     html = `
-            //     <div class="popup-header">${parcelDisplayName}</div>
-            //     <div class="popup-content">${DUA != null ? `This parcel is built out at a residential density of ${DUA} units per acre.` : 'No available data.'}
+            //     <div class="popup-header">${attributes.NAME}</div>
+            //     <div class="popup-content">${displayCondition}
             //     </div>`;
             // break;
             // }
-
-            case "tracts-mva": { 
-              const condition = attributes.mva;
-              const conditionText = {
-                'DCQ' : `${attributes.NAME} has been a competitve area and is changing quickly.`,
-                'DKU' : `${attributes.NAME} has been a competitive area and is keeping up.`,
-                'DNI' : `${attributes.NAME} has been a competitive area but has not improved over the past five years.`,
-                'OKCQ' : `${attributes.NAME} has been doing alright and is changing quickly.`,
-                'OKKU' : `${attributes.NAME} has been doing alright and is keeping up.`,
-                'OKNI' : `${attributes.NAME} has been doing alright but has not improved over the past five years.`,
-                'HDCQ' : `${attributes.NAME} is a historically disinvested area and is changing quickly`,
-                'HDKU' : `${attributes.NAME} is a historically disinvested area and is keeping up.`,
-                'HDNI' : `${attributes.NAME} is a historically disinvested area and has not improved over the past five years.`
-            };
-
-            const displayCondition = conditionText[condition]|| `No available data.`;
-                html = `
-                <div class="popup-header">${attributes.NAME}</div>
-                <div class="popup-content">${displayCondition}
-                </div>`;
-            break;
-            }
 
             case "bg-residensity-layer": { 
                 const density = Math.round(attributes.avgDUA * 10) /10;
@@ -4290,7 +4406,7 @@ layerSelect.addEventListener('change', (e) => {
 
             case "via-service-area-layer" : { //via
                 html = `
-                <div class="popup-content">This area is currently served by Via, a ride hailing service partnered with local entities to increase mobility and decrease household dependence on car ownership.
+                <div class="popup-content">This area is currently served by Via, a ride hailing service partnered with local entities to increase mobility and decrease household dependence on car ownership. The Via service area is subject to change as the program evolves.
                 </div>`;
             break;
             }
@@ -4403,37 +4519,20 @@ layerSelect.addEventListener('change', (e) => {
         .addTo(map);
     });
 
-document.querySelectorAll('#basemap-style-thumbnails button').forEach(button => {
+    document.querySelectorAll('#basemap-style-thumbnails button').forEach(button => {
     button.addEventListener('click', () => {
-    console.log('===== BASEMAP BUTTON CLICKED =====');
     const style = button.getAttribute('data-style');
-    console.log('Style selected:', style);
 
-    // Don't capture visible data layers - we'll restore from dropdown value only
-    // This prevents the flash of wrong layers during basemap switching
-
-    // Capture visible overlays prior to switch
     const visibleOverlays = overlayLayers.filter(id => {
       const layer = map.getLayer(id);
       return layer && map.getLayoutProperty(id, 'visibility') === 'visible';
     });
-    console.log('Visible overlays captured:', visibleOverlays);
 
-    // Use the globally tracked selected layer (not dropdown value, since it resets)
     const selectedDropdownLayer = currentlySelectedDataLayer;
-    console.log('currentlySelectedDataLayer value:', currentlySelectedDataLayer);
-    console.log('selectedDropdownLayer value:', selectedDropdownLayer);
-    console.log('Captured selected layer before basemap switch:', selectedDropdownLayer);
 
-    // Switch basemap
-    console.log('About to switch basemap style...');
     map.setStyle(`mapbox://styles/${style}`);
-    console.log('Style set, waiting for idle event...');
 
-    // Wait for map to be idle after style change
-    map.once('idle', () => {
-      console.log('===== MAP IDLE AFTER STYLE CHANGE =====');
-      // Find the label layer ID FIRST before adding any layers
+    map.once('idle', async () => {
       const layers = map.getStyle().layers;
       labelLayerId = null;
       for (const layer of layers) {
@@ -4442,188 +4541,91 @@ document.querySelectorAll('#basemap-style-thumbnails button').forEach(button => 
           break;
         }
       }
-      console.log('Found labelLayerId for new basemap:', labelLayerId);
 
-      console.log('Calling addSources()...');
       addSources();
+
+      await waitForIdle(); // give Mapbox a cycle to register the new sources
+
+      applyTractsFeatureState();
+      applyParcelsFeatureState();
+
       const currentOpacity = parseFloat(document.getElementById("opacity").value);
-      console.log('Calling addInterpolatedLayers()...');
-      addInterpolatedLayers(currentOpacity);
-      console.log('Calling addAllOtherLayers()...');
-      addAllOtherLayers();
-      console.log('All layers added.');
 
-    // Use setTimeout instead of nested idle event since we're already idle
-    setTimeout(() => {
-      console.log('===== RUNNING RESTORATION AFTER LAYER ADD =====');
+      await addInterpolatedLayers(currentOpacity, null);
 
-    // Hide all data layers by default (don't restore them yet to avoid flashing)
-    allFillLayers.forEach(id => {
-      if (map.getLayer(id)) {
-        map.setLayoutProperty(id, 'visibility', 'none');
-      }
-    });
-
-    // Hide all overlay layers by default
-    overlayLayers.forEach(id => {
-      if (map.getLayer(id)) {
-        map.setLayoutProperty(id, 'visibility', 'none');
-      }
-    });
-
-    // Restore only the overlay layers (not data layers - they're handled separately below)
-    visibleOverlays.forEach(id => {
-      if (map.getLayer(id)) {
-        map.setLayoutProperty(id, 'visibility', 'visible');
-        // Also restore the outline layer for transit-diversity
-        if (id === 'transit-diversity-layer' && map.getLayer('transit-diversity-outline')) {
-          map.setLayoutProperty('transit-diversity-outline', 'visibility', 'visible');
-        }
-        // Also restore the outline layer for excess-capacity
-        if (id === 'excess-capacity-layer' && map.getLayer('excess-capacity-outline')) {
-          map.setLayoutProperty('excess-capacity-outline', 'visibility', 'visible');
-        }
-        // Also restore the outline layer for exceeds-capacity
-        if (id === 'exceeds-capacity-layer' && map.getLayer('exceeds-capacity-outline')) {
-          map.setLayoutProperty('exceeds-capacity-outline', 'visibility', 'visible');
-        }
-      }
-    });
-
-    // if (showOnlyCounty) { //this filter not needed!!
-    //   tractLayerIds.forEach(id => {
-    //     if (map.getLayer(id)) {
-    //       map.setFilter(id, studyAreaFilter);
-    //     }
-    //   });
-    // }
-
-    updateLayerOpacity();
-
-    // Restore the selected data layer from dropdown - do this FIRST (before overlays)
-    console.log('Attempting to restore layer:', selectedDropdownLayer);
-    console.log('Checks - not null?', selectedDropdownLayer ? 'YES' : 'NO');
-    console.log('Checks - not placeholder?', selectedDropdownLayer !== 'placeholder' ? 'YES' : 'NO');
-    console.log('Checks - not empty?', selectedDropdownLayer !== '' ? 'YES' : 'NO');
-
-    if (selectedDropdownLayer && selectedDropdownLayer !== 'placeholder' && selectedDropdownLayer !== '') {
-      console.log('✓ Layer value is valid, proceeding with restoration');
-
-      // Update the dropdown to maintain selection first
-      const dropdown = document.getElementById('layer-select');
-      if (dropdown) {
-        dropdown.value = selectedDropdownLayer;
-        console.log('Dropdown value set to:', dropdown.value);
-
-        // Update legend title
-        const selectedOption = dropdown.options[dropdown.selectedIndex];
-        if (selectedOption) {
-          document.getElementById('legend-title').textContent = selectedOption.text;
-        }
+      try {
+        addAllOtherLayers();
+      } catch (err) {
+        console.error('addAllOtherLayers failed:', err);
       }
 
-      // Don't hide all layers again - they're already hidden above
-      // Just show the selected layer
+      // ---- Restoration now runs only after layers are guaranteed to exist ----
 
-      renderLegendFromStops(selectedDropdownLayer);
+      allFillLayers.forEach(id => {
+        if (map.getLayer(id)) map.setLayoutProperty(id, 'visibility', 'none');
+      });
 
-      // Helper function to show and position a layer
-      const showAndPositionLayer = () => {
-        console.log('===== showAndPositionLayer CALLED =====');
-        console.log('Checking for layer:', selectedDropdownLayer);
-        const layerExists = map.getLayer(selectedDropdownLayer);
-        console.log('Layer exists?', layerExists ? 'YES' : 'NO');
-        if (layerExists) {
-          console.log('Layer object:', layerExists);
-        }
-        if (layerExists) {
-          map.setLayoutProperty(selectedDropdownLayer, 'visibility', 'visible');
-          console.log('Set visibility to visible for:', selectedDropdownLayer);
+      overlayLayers.forEach(id => {
+        if (map.getLayer(id)) map.setLayoutProperty(id, 'visibility', 'none');
+      });
 
-          // Handle CMRPC region fill layer for buildable land
-          if (selectedDropdownLayer === 'buildable-land' && map.getLayer('cmrpc-region-fill')) {
-            map.setLayoutProperty('cmrpc-region-fill', 'visibility', 'visible');
-            console.log('Showing cmrpc-region-fill for buildable-land');
-          } else if (map.getLayer('cmrpc-region-fill')) {
-            map.setLayoutProperty('cmrpc-region-fill', 'visibility', 'none');
-            console.log('Hiding cmrpc-region-fill');
+      visibleOverlays.forEach(id => {
+        if (map.getLayer(id)) {
+          map.setLayoutProperty(id, 'visibility', 'visible');
+          if (id === 'transit-diversity-layer' && map.getLayer('transit-diversity-outline')) {
+            map.setLayoutProperty('transit-diversity-outline', 'visibility', 'visible');
           }
-
-          // Move the selected layer above basemap but below labels
-          console.log('labelLayerId value:', labelLayerId);
-          if (labelLayerId) {
-            console.log('Moving layer', selectedDropdownLayer, 'before', labelLayerId);
-            try {
-              // First, position cmrpc-region-fill if buildable land is selected
-              if (selectedDropdownLayer === 'buildable-land' && map.getLayer('cmrpc-region-fill')) {
-                map.moveLayer('cmrpc-region-fill', labelLayerId);
-                console.log('✓ Region fill positioned below labels');
-              }
-
-              // Then position the selected layer above cmrpc-region-fill
-              map.moveLayer(selectedDropdownLayer, labelLayerId);
-              console.log('✓ Layer moved successfully');
-
-              // Verify the layer is still visible after moving
-              const visibility = map.getLayoutProperty(selectedDropdownLayer, 'visibility');
-              console.log('Visibility after move:', visibility);
-            } catch (error) {
-              console.error('ERROR moving layer:', error);
-            }
-          } else {
-            console.log('ERROR: labelLayerId not set, cannot move layer to correct z-position');
+          if (id === 'excess-capacity-layer' && map.getLayer('excess-capacity-outline')) {
+            map.setLayoutProperty('excess-capacity-outline', 'visibility', 'visible');
           }
-        }
-      };
-
-      // Use setTimeout to ensure sources are fully loaded before showing layer
-      // This is especially important for large files like buildable6.geojson (94MB)
-      // Using 2000ms to give enough time for large file to download
-      console.log('Setting timeout for layer restoration...');
-      setTimeout(() => {
-        console.log('===== TIMEOUT FIRED (after 2000ms) =====');
-        console.log('About to call showAndPositionLayer for:', selectedDropdownLayer);
-        showAndPositionLayer();
-      }, 2000);
-    }
-
-    // Move overlay layers to the top (just below labels) AFTER data layer restoration
-    // This ensures overlays are always above data layers
-    if (labelLayerId) {
-      console.log('Positioning overlay layers at top...');
-
-      // Move all overlay layers to top
-      overlayLayers.forEach(overlayId => {
-        if (map.getLayer(overlayId)) {
-          try {
-            map.moveLayer(overlayId, labelLayerId);
-            console.log('Moved overlay', overlayId, 'to top');
-          } catch (error) {
-            console.error('Error moving overlay', overlayId, ':', error);
+          if (id === 'exceeds-capacity-layer' && map.getLayer('exceeds-capacity-outline')) {
+            map.setLayoutProperty('exceeds-capacity-outline', 'visibility', 'visible');
           }
         }
       });
 
-      // Move town-layer (community boundaries) to very top (above all other overlays)
-      if (map.getLayer('town-layer')) {
-        map.moveLayer('town-layer', labelLayerId);
-        console.log('Moved town-layer to very top');
+      //updateLayerOpacity();
+
+      if (selectedDropdownLayer && selectedDropdownLayer !== 'placeholder' && selectedDropdownLayer !== '') {
+        const dropdown = document.getElementById('layer-select');
+        if (dropdown) {
+          dropdown.value = selectedDropdownLayer;
+          const selectedOption = dropdown.options[dropdown.selectedIndex];
+          if (selectedOption) {
+            document.getElementById('legend-title').textContent = selectedOption.text;
+          }
+        }
+
+        renderLegendFromStops(selectedDropdownLayer);
+
+        if (map.getLayer(selectedDropdownLayer)) {
+          map.setLayoutProperty(selectedDropdownLayer, 'visibility', 'visible');
+          if (labelLayerId) {
+            try {
+              map.moveLayer(selectedDropdownLayer, labelLayerId);
+            } catch (error) {
+              console.error('Error moving layer:', error);
+            }
+          }
+        } else {
+          console.warn('Selected layer not found after basemap switch:', selectedDropdownLayer);
+        }
       }
 
-      // Move transit-diversity layers to top (but below town boundaries)
-      if (map.getLayer('transit-diversity-layer')) {
-        map.moveLayer('transit-diversity-layer', labelLayerId);
-        console.log('Moved transit-diversity-layer to top');
+      if (labelLayerId) {
+        overlayLayers.forEach(overlayId => {
+          if (map.getLayer(overlayId)) {
+            try { map.moveLayer(overlayId, labelLayerId); } catch (e) {}
+          }
+        });
+        if (map.getLayer('town-layer')) map.moveLayer('town-layer', labelLayerId);
+        if (map.getLayer('transit-diversity-layer')) map.moveLayer('transit-diversity-layer', labelLayerId);
+        if (map.getLayer('transit-diversity-outline')) map.moveLayer('transit-diversity-outline', labelLayerId);
       }
-      if (map.getLayer('transit-diversity-outline')) {
-        map.moveLayer('transit-diversity-outline', labelLayerId);
-        console.log('Moved transit-diversity-outline to top');
-      }
-    }
-  });
-    }, 100); // Small delay to ensure layers are fully rendered
     });
 });
+});
+
 
 //BASEMAP SETTINGS TOGGLE
 function toggleBasemapSettings() {
@@ -4644,15 +4646,6 @@ function toggleBasemapSettings() {
         map.setPaintProperty(layerId, "fill-opacity", newOpacity);
         });
     });
-
-    // dropdown.addEventListener('change', function() { 
-    //     const selectedLayer = dropdown.value;
-    //     dataLayers.forEach(layerId => {
-    //         if (layerId !== selectedLayer && map.getLayer(layerId)) {
-    //         map.setLayoutProperty(layerId, 'visibility', 'none');
-    //     }
-    // });
-    // });
 
     dropdown.addEventListener('change', function() { 
   const selectedLayer = dropdown.value;
@@ -4856,22 +4849,14 @@ const layerDescriptions = { //edit as needed; some base text should be re-useabl
     <p><strong>Cost-burdened owners</strong>: % of homeowners, with and without mortgages, spending more than 30% of income on housing.</p><br>
     <p><em>Source(s):</em> Table B25140, 2023 ACS 5-year estimates; CommunityScale.</p>
   `,
-  // 'parcels-pctLV': `
-  //   <p><strong>Land value as a percent of total parcel value</strong>. Higher percentages may indicate urban blight, vacant land, or aging housing stock in urban areas. In rural contexts, higher values may simply indicate agricultural land use.</p><br>
-  //   <p><em>Source(s):</em> 2025 parcels, Massachusetts GIS assessor database; CommunityScale.</p>
-  // `,
   'parcels-landuse': `
     <p><strong>Land use classifications</strong> from local parcel data.</p><br>
     <p><em>Source(s):</em> 2025 parcels, Massachusetts GIS assessor database; CommunityScale.</p>
   `,
-  // 'parcels-value': `
-  //   <p><strong>Parcel value per acre</strong> normalizes parcel value over the acre and may provide insight into development value, potential tax revenue, and land prices.</p><br>
-  //   <p><em>Source(s):</em> 2025 parcels, Massachusetts GIS assessor database; CommunityScale.</p>
+  // 'tracts-mva': `
+  //   <p>This <strong>market value analysis</strong> measures both the relative change in and the current conditions of market value and desirability across CMRPC communities from 2020-2025. Working at the Census tract geography, the analysis assigns two composite scores to inform where each geography falls along a bivariate spectrum of investment and improvement.</p><br> 
+  //   <p><em>Source(s):</em> Tables B01001, B08303, B25004, B25016, B25074, B25095, 2020 & 2023 ACS 5-year estimates; Zillow ZHVI, March 2020 & March 2025; Realtor.com, 2020 & 2025; Mortgage actions, FFIEC, 2020 & 2024; TIGER/line road network shapefiles;  CommunityScale.</p>
   // `,
-  'tracts-mva': `
-    <p>This <strong>market value analysis</strong> measures both the relative change in and the current conditions of market value and desirability across CMRPC communities from 2020-2025. Working at the Census tract geography, the analysis assigns two composite scores to inform where each geography falls along a bivariate spectrum of investment and improvement.</p><br> 
-    <p><em>Source(s):</em> Tables B01001, B08303, B25004, B25016, B25074, B25095, 2020 & 2023 ACS 5-year estimates; Zillow ZHVI, March 2020 & March 2025; Realtor.com, 2020 & 2025; Mortgage actions, FFIEC, 2020 & 2024; TIGER/line road network shapefiles;  CommunityScale.</p>
-  `,
   'zip-currentZHVI': `
     <p>This layer examines <strong>current typical home price</strong> trends across Massachusetts by zipcode. Zipcodes may be missing values due to a lack of substantial sales and listing data in rural areas.</p><br>
     <p><em>Source(s):</em> Zillow Home Value Index (ZHVI), March 2025; CommunityScale.</p>
@@ -4885,11 +4870,11 @@ const layerDescriptions = { //edit as needed; some base text should be re-useabl
     <p><em>Source(s):</em> Table B11016, 2023 ACS 5-year estimates, 2015 ACS 5-year estimates; CommunityScale.</p>
   `,
   'bg-costs-ownership': `
-    <p><strong>Monthly ownership costs</strong> by Census block group, including mortgage payments, property taxes, insurance, and utilities for homeowners.</p><br>
+    <p><strong>Monthly ownership costs</strong> by Census block group, including mortgage payments, property taxes, insurance, and utilities for homeowners. This analysis uses block group by block group median costs.</p><br>
     <p><em>Source(s):</em> CMRPC housing and transportation cost analysis; CommunityScale.</p>
   `,
   'bg-costs-rental': `
-    <p><strong>Monthly rental costs</strong> by Census block group, including rent and utilities for renters.</p><br>
+    <p><strong>Monthly rental costs</strong> by Census block group, including rent and utilities for renters. This analysis uses block group by block group median costs.</p><br>
     <p><em>Source(s):</em> CMRPC housing and transportation cost analysis; CommunityScale.</p>
   `,
   'bg-costs-transport': `
@@ -4901,17 +4886,17 @@ const layerDescriptions = { //edit as needed; some base text should be re-useabl
     <p><em>Source(s):</em> CMRPC housing and transportation cost analysis; CommunityScale.</p>
   `,
   'bg-costs-HT': `
-    <p><strong>Combined housing and transportation costs</strong> per renting household, as reported at the block group geography across the CMRPC region.</p><br>
+    <p><strong>Combined housing and transportation costs</strong> per renting household, as reported at the block group geography across the CMRPC region. This analysis uses block group by block group median costs.</p><br>
     <p><em>Source(s):</em> CMRPC housing and transportation cost analysis; CommunityScale.</p>
   `,
   'bg-costs-HT-owner': `
-    <p><strong>Combined housing and transportation costs</strong> per homeowning household, as reported at the block group geography across the CMRPC region.</p><br>
+    <p><strong>Combined housing and transportation costs</strong> per homeowning household, as reported at the block group geography across the CMRPC region. This analysis uses block group by block group median costs.</p><br>
     <p><em>Source(s):</em> CMRPC housing and transportation cost analysis; CommunityScale.</p>
   `,
-  'buildable-land': `
-    <p><strong>A basic suitability analysis</strong> for development. This analysis considers unbuilt land where sewer/water access may be readily available as well as environmental constraints, including steep slopes, conservation areas, and wetlands.</p><br>
-    <p><em>Source(s):</em> CMRPC site suitability methods; MassGIS Protected and Recreational Open Space; MassGIS Areas of Critical Environmental Concern; MassDEP Estimated Sewer System Service Area Boundaries; CommunityScale.</p>
-  `,
+  // 'buildable-land': `
+  //   <p><strong>A basic suitability analysis</strong> for development. This analysis considers unbuilt land where sewer/water access may be readily available as well as environmental constraints, including steep slopes, conservation areas, and wetlands.</p><br>
+  //   <p><em>Source(s):</em> CMRPC site suitability methods; MassGIS Protected and Recreational Open Space; MassGIS Areas of Critical Environmental Concern; MassDEP Estimated Sewer System Service Area Boundaries; CommunityScale.</p>
+  // `,
   'admin-layer': `
     <p><strong>Census tracts of Massachusetts.</p><br>
     <p><em>Source(s):</em> US Census Bureau's TIGER/Line shapefile database</p>
@@ -4926,7 +4911,11 @@ const layerDescriptions = { //edit as needed; some base text should be re-useabl
   `,
   'bg-transport-diversity-layer': `
     <p>This layer examines <strong>transportation diversity</strong> at the block group. Marginal transporation diversity measures the percentage of parcels within each block group that are considered "transportation diverse."</p><br>
-    <p><em>Source(s):</em> CMRPC transportation quality analysis; CommunityScale.</p>
+    <p><em>Source(s):</em> CMRPC transportation quality analysis; Toole Design; CommunityScale.</p>
+  `,
+  'parcel-transport-assess-layer': `
+    <p>This layer analyzes <strong>transportation diversity</strong> parcel by parcel. Transportation diversity is categorized into four groups based upon pedestrian and transit quality assessments. Click a parcel to learn more about its categorization.</p><br>
+    <p><em>Source(s):</em> CMRPC transportation quality analysis; Toole Design; CommunityScale.</p>
   `,
   'parcels-density':`
     <p><strong>Units per acre</strong>. To explore parcel level data, please zoom to the neighborhood scale.</p><br>
