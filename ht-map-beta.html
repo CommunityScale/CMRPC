@@ -521,17 +521,6 @@
                 data-info="This area does not allow multi-family development. Current development patterns, however, exceed a three unit/acre density. It may be worth up-zoning this area should relatively dense development trends continue."> ⓘ
         </button>
       </label>
-      <label class="flex items-start text-xs text-gray-700">
-        <div class="relative">
-            <input type="checkbox" class="sr-only overlay-toggle peer" value="excess-capacity-layer" />
-            <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
-            <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
-          </div>
-        <span class="leading-snug ms-2">Excess capacity by zoning</span>
-        <button class="ml-1 text-gray-500 hover:text-gray-700 info-btn" style="font-size: 10px;"
-                data-info="This area either allows multi-family development by-right or by special permit/special review. Current development does not exceed three units per acre. There may be excess capacity for additional units should there be interest in further development or redevelopment."> ⓘ
-        </button>
-      </label> 
     </div>
 </div>
     
@@ -574,6 +563,17 @@
                   <span class="leading-snug ms-2">Soft sites</span>
                   <button class="ml-1 text-gray-500 hover:text-gray-700 info-btn" style="font-size: 10px;"
                           data-info="General text + methods link (?)."> ⓘ
+                  </button>
+                </label>
+                <label class="flex items-start text-xs text-gray-700">
+                  <div class="relative">
+                      <input type="checkbox" class="sr-only overlay-toggle peer" value="public-land-layer" />
+                      <div class="w-6 h-3.5 bg-gray-300 rounded-full peer-checked:bg-gray-600 transition-colors"></div>
+                      <div class="absolute top-[2px] left-[2px] w-2.5 h-2.5 bg-white border border-gray-400 rounded-full transition-transform peer-checked:translate-x-[10px]"></div>
+                    </div>
+                  <span class="leading-snug ms-2">Publicly held land</span>
+                  <button class="ml-1 text-gray-500 hover:text-gray-700 info-btn" style="font-size: 10px;"
+                          data-info="This parcel is held by a constituent town or the State of Massachusetts."> ⓘ
                   </button>
                 </label>
                 <label class="flex items-start text-xs text-gray-700">
@@ -991,13 +991,14 @@
         "subregion-southeast",
         "mf-byright-layer",
         "mf-specialpermit-layer",
-        "excess-capacity-layer",
+        //"excess-capacity-layer",
         "exceeds-capacity-layer",
         "via-service-area-layer",
         "via-stops-layer",
         "wrta-fixed-layer",
         "bike-trails-layer",
         "assessor-vacancy-layer",
+        'public-land-layer',
         "tracts-strongmkt-overlay",
         "tracts-midmkt-overlay",
         "tracts-weakmkt-overlay",
@@ -1371,6 +1372,14 @@ function addSources() {
         });
     }
 
+    if (!map.getSource("public-land")) {
+        map.addSource("public-land", {
+            type: "geojson",
+            data: "CMRPC_public_lands_260702.geojson",
+            promoteId: "LOC_ID"
+        });
+    }
+
     if (!map.getSource("tracts-demo-suitability")) {
         map.addSource("tracts-demo-suitability", {
             type: "geojson",
@@ -1394,17 +1403,17 @@ function addSources() {
         });
     }
 
-    if (!map.getSource("excess-capacity")) {
-        map.addSource("excess-capacity", {
-            type: "geojson",
-            data: 'https://raw.githubusercontent.com/CommunityScale/CMRPC/refs/heads/main/CMRPC_DissolvedParcels_ExcessCapacity_251017.geojson'
-        });
-    }
+    // if (!map.getSource("excess-capacity")) {
+    //     map.addSource("excess-capacity", {
+    //         type: "geojson",
+    //         data: 'https://raw.githubusercontent.com/CommunityScale/CMRPC/refs/heads/main/CMRPC_DissolvedParcels_ExcessCapacity_251017.geojson'
+    //     });
+    // }
 
     if (!map.getSource("exceeds-capacity")) {
         map.addSource("exceeds-capacity", {
             type: "geojson",
-            data: 'https://raw.githubusercontent.com/CommunityScale/CMRPC/refs/heads/main/CMRPC_DissolvedParcels_ExceedsCapacity_251017.geojson'
+            data: 'CMRPC_exceeds_zoned_density_260702.geojson'
         });
     }
 
@@ -2784,48 +2793,48 @@ map.addLayer({
         labelLayerId
   )
 
-  // Excess capacity fill layer (polygon fill)
-  map.addLayer({
-            id: 'excess-capacity-layer',
-            type: 'fill',
-            source: 'excess-capacity',
-            paint: {
-              'fill-color': '#ecd731', // yellow
-              'fill-opacity': [
-                'interpolate',
-                ['linear'],
-                ['zoom'],
-                0, 0.95,   // 95% opacity before zoom 15
-                15, 0.3    // 30% opacity at zoom 15 and beyond
-              ]
-            },
-          layout: {
-            visibility: 'none'
-          }},
-        labelLayerId
-  )
+  // // Excess capacity fill layer (polygon fill)
+  // map.addLayer({
+  //           id: 'excess-capacity-layer',
+  //           type: 'fill',
+  //           source: 'excess-capacity',
+  //           paint: {
+  //             'fill-color': '#ecd731', // yellow
+  //             'fill-opacity': [
+  //               'interpolate',
+  //               ['linear'],
+  //               ['zoom'],
+  //               0, 0.95,   // 95% opacity before zoom 15
+  //               15, 0.3    // 30% opacity at zoom 15 and beyond
+  //             ]
+  //           },
+  //         layout: {
+  //           visibility: 'none'
+  //         }},
+  //       labelLayerId
+  // )
 
-  // Excess capacity outline layer (appears at zoom 15+)
-  map.addLayer({
-            id: 'excess-capacity-outline',
-            type: 'line',
-            source: 'excess-capacity',
-            paint: {
-              'line-color': '#89aa42', // green
-              'line-width': 2.5,
-              'line-opacity': [
-                'interpolate',
-                ['linear'],
-                ['zoom'],
-                14, 0,      // invisible before zoom 15
-                15, 1       // fully visible at zoom 15+
-              ]
-            },
-          layout: {
-            visibility: 'none'
-          }},
-        labelLayerId
-  )
+  // // Excess capacity outline layer (appears at zoom 15+)
+  // map.addLayer({
+  //           id: 'excess-capacity-outline',
+  //           type: 'line',
+  //           source: 'excess-capacity',
+  //           paint: {
+  //             'line-color': '#89aa42', // green
+  //             'line-width': 2.5,
+  //             'line-opacity': [
+  //               'interpolate',
+  //               ['linear'],
+  //               ['zoom'],
+  //               14, 0,      // invisible before zoom 15
+  //               15, 1       // fully visible at zoom 15+
+  //             ]
+  //           },
+  //         layout: {
+  //           visibility: 'none'
+  //         }},
+  //       labelLayerId
+  // )
 
   // Exceeds capacity fill layer (polygon fill)
   map.addLayer({
@@ -2953,6 +2962,22 @@ map.addLayer({
             paint: {
               "fill-color": "#c2cfd1",
               "fill-outline-color": "#4d9eab",
+              "fill-opacity": 0.7
+            },
+            layout: {
+              visibility: "none"
+            }
+    },
+    labelLayerId
+  )
+
+  map.addLayer({
+            id: "public-land-layer",
+            type: "fill",
+            source: "public-land",
+            paint: {
+              "fill-color": "#4169e1",
+              "fill-outline-color": "#ffffff",
               "fill-opacity": 0.7
             },
             layout: {
